@@ -1,5 +1,10 @@
 <?php
 
+// Flag Vercel environment
+putenv('VERCEL=1');
+$_ENV['VERCEL'] = '1';
+$_SERVER['VERCEL'] = '1';
+
 // Prepare writable /tmp directories for Laravel serverless execution
 $storageDirs = [
     '/tmp/storage/app/public',
@@ -24,8 +29,15 @@ putenv('APP_ROUTES_CACHE=/tmp/bootstrap/cache/routes.php');
 putenv('APP_EVENTS_CACHE=/tmp/bootstrap/cache/events.php');
 
 // Create SQLite database in /tmp if DB_CONNECTION is sqlite
-$dbPath = getenv('DB_DATABASE') ?: '/tmp/database.sqlite';
-if (!file_exists($dbPath) && (getenv('DB_CONNECTION') === 'sqlite' || !getenv('DB_CONNECTION'))) {
+$dbPath = '/tmp/database.sqlite';
+putenv('DB_CONNECTION=sqlite');
+putenv("DB_DATABASE={$dbPath}");
+$_ENV['DB_CONNECTION'] = 'sqlite';
+$_ENV['DB_DATABASE'] = $dbPath;
+$_SERVER['DB_CONNECTION'] = 'sqlite';
+$_SERVER['DB_DATABASE'] = $dbPath;
+
+if (!file_exists($dbPath)) {
     $sourceDb = __DIR__ . '/../database/database.sqlite';
     if (file_exists($sourceDb)) {
         @copy($sourceDb, $dbPath);
@@ -34,5 +46,12 @@ if (!file_exists($dbPath) && (getenv('DB_CONNECTION') === 'sqlite' || !getenv('D
     }
 }
 
-// Forward Vercel request to Laravel index.php
-require __DIR__ . '/../public/index.php';
+// Forward Vercel request to Laravel index.php with error catching
+try {
+    require __DIR__ . '/../public/index.php';
+} catch (\Throwable $e) {
+    http_response_code(500);
+    echo "<h1>Server Error</h1>";
+    echo "<p><strong>Error:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+}
