@@ -83,13 +83,15 @@
                     <strong><span class="badge bg-warning text-dark"><i class="bi bi-clock-fill"></i> Pending</span></strong>
                 @elseif($order->status == 'processing')
                     <strong><span class="badge bg-primary"><i class="bi bi-arrow-repeat"></i> Diproses</span></strong>
-                @else
+                @elseif($order->status == 'completed')
                     <strong><span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Selesai</span></strong>
+                @elseif($order->status == 'cancelled')
+                    <strong><span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Dibatalkan</span></strong>
                 @endif
             </div>
         </div>
 
-        @if($order->payment_method == 'cash' && $order->payment_status == 'pending')
+        @if($order->payment_method == 'cash' && $order->payment_status == 'pending' && $order->status != 'cancelled')
             <div class="detail-action-strip">
                 <span>Konfirmasi pembayaran cash jika uang sudah diterima.</span>
                 <a href="{{ route('orders.paid', $order) }}" class="btn-detail-action primary">
@@ -130,21 +132,31 @@
             </table>
         </div>
 
-        <div class="detail-footer-actions">
+        <div class="detail-footer-actions" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
             @if($order->status == 'pending')
-                <a href="{{ route('orders.process', $order->id) }}" class="btn-detail-action warning">
-                    <i class="bi bi-fire"></i>
-                    Proses Pesanan
+                <a href="{{ route('orders.process', $order->id) }}" class="btn-detail-action primary">
+                    <i class="bi bi-play-fill me-1"></i> Proses Pesanan
+                </a>
+                <a href="{{ route('orders.cancel', $order->id) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                    <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
                 </a>
             @elseif($order->status == 'processing')
                 <a href="{{ route('orders.complete', $order->id) }}" class="btn-detail-action success">
-                    <i class="bi bi-check2-circle"></i>
-                    Selesaikan Pesanan
+                    <i class="bi bi-check2-circle me-1"></i> Pesanan Sampai / Selesai
                 </a>
-            @else
+                <a href="{{ route('orders.unprocess', $order->id) }}" class="btn-detail-action warning" style="background: #FFF7ED; color: #C2410C;" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i> Batal Proses
+                </a>
+                <a href="{{ route('orders.cancel', $order->id) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                    <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
+                </a>
+            @elseif($order->status == 'completed')
                 <button class="btn-detail-action disabled" disabled>
-                    <i class="bi bi-check-circle-fill"></i>
-                    Pesanan Selesai
+                    <i class="bi bi-check-circle-fill me-1"></i> Pesanan Selesai
+                </button>
+            @elseif($order->status == 'cancelled')
+                <button class="btn-detail-action disabled" style="background: #FFE4E6; color: #E11D48; border: 0;" disabled>
+                    <i class="bi bi-x-circle-fill me-1"></i> Pesanan Dibatalkan
                 </button>
             @endif
         </div>

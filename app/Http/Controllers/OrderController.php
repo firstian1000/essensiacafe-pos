@@ -45,42 +45,67 @@ class OrderController extends Controller
     }
 
     public function process(Order $order)
-{
-    $order->update([
-        'status' => 'processing'
-    ]);
+    {
+        $order->update([
+            'status' => 'processing'
+        ]);
 
-    return redirect()
-        ->route('orders.show', $order)
-        ->with('success', 'Pesanan sedang diproses.');
-}
+        return redirect()
+            ->back()
+            ->with('success', 'Pesanan #' . $order->invoice . ' sedang diproses dapur/bar.');
+    }
 
-public function complete(Order $order)
-{
-    $order->update([
-        'status' => 'completed'
-    ]);
+    public function unprocess(Order $order)
+    {
+        $order->update([
+            'status' => 'pending'
+        ]);
 
-    $this->checkAndResetTableStatus($order);
+        return redirect()
+            ->back()
+            ->with('success', 'Status pesanan #' . $order->invoice . ' dikembalikan ke Pending.');
+    }
 
-    return redirect()
-        ->route('orders.show', $order)
-        ->with('success', 'Pesanan selesai.');
-}
+    public function complete(Order $order)
+    {
+        $order->update([
+            'status' => 'completed'
+        ]);
 
-public function paid(Order $order)
-{
-    $order->update([
-        'payment_status' => 'paid',
-        'status'         => 'completed',
-    ]);
+        $this->checkAndResetTableStatus($order);
 
-    $this->checkAndResetTableStatus($order);
+        return redirect()
+            ->back()
+            ->with('success', 'Pesanan #' . $order->invoice . ' telah selesai dan diantar ke meja.');
+    }
 
-    return redirect()
-        ->route('payments.receipt', $order)
-        ->with('success', 'Pembayaran berhasil dikonfirmasi.');
-}
+    public function cancel(Order $order)
+    {
+        $order->update([
+            'status' => 'cancelled',
+            'payment_status' => $order->payment_status === 'paid' ? 'paid' : 'failed',
+        ]);
+
+        $this->checkAndResetTableStatus($order);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Pesanan #' . $order->invoice . ' berhasil dibatalkan.');
+    }
+
+    public function paid(Order $order)
+    {
+        $order->update([
+            'payment_status' => 'paid',
+            'status'         => $order->status === 'cancelled' ? 'cancelled' : 'completed',
+        ]);
+
+        $this->checkAndResetTableStatus($order);
+
+        return redirect()
+            ->route('payments.receipt', $order)
+            ->with('success', 'Pembayaran berhasil dikonfirmasi.');
+    }
 
 protected function checkAndResetTableStatus(Order $order)
 {

@@ -5,15 +5,23 @@
     $subtotal = $order->items->sum('subtotal');
     $methodLabel = $order->payment_method === 'cash' ? 'Cash' : 'QRIS (Midtrans)';
     $tableName = optional($order->table)->display_name ?? '-';
+    $isCancelled = $order->status === 'cancelled';
     $steps = [
         [1, 'Pesanan Diterima', $order->created_at->format('d M Y - H:i'), true],
-        [2, 'Sedang Diproses', 'Menunggu konfirmasi kitchen', in_array($order->status, ['processing', 'completed'])],
-        [3, 'Selesai', 'Terima kasih!', $order->status === 'completed'],
+        [2, 'Sedang Diproses', 'Dapur/bar sedang membuat pesanan', in_array($order->status, ['processing', 'completed'])],
+        [3, 'Pesanan Sampai / Selesai', 'Terima kasih, selamat menikmati!', $order->status === 'completed'],
     ];
 @endphp
 
 <section class="success-v2">
     <div class="success-v2-wrap">
+        @if($isCancelled)
+        <div class="success-v2-hero" style="background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%); border-color: #FECDD3;">
+            <div class="success-check" style="background: #E11D48; color: #fff;"><i class="bi bi-x-lg"></i></div>
+            <h1 style="color: #BE123C;">Pesanan Dibatalkan</h1>
+            <p style="color: #9F1239;">Mohon maaf, pesanan ini telah dibatalkan.<br>Silakan tanyakan kepada staf/kasir jika memerlukan bantuan.</p>
+        </div>
+        @else
         <div class="success-v2-hero">
             <div class="confetti-dot dot-a"></div>
             <div class="confetti-dot dot-b"></div>
@@ -22,6 +30,7 @@
             <h1>Pesanan Berhasil!</h1>
             <p>Terima kasih, pesanan Anda sudah kami terima.<br>Kami akan segera memprosesnya.</p>
         </div>
+        @endif
 
         <div class="success-summary-bar">
             <div class="summary-item">

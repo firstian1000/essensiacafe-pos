@@ -62,8 +62,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/orders/{order}/process', [OrderController::class, 'process'])
         ->name('orders.process');
 
+    Route::get('/orders/{order}/unprocess', [OrderController::class, 'unprocess'])
+        ->name('orders.unprocess');
+
     Route::get('/orders/{order}/complete', [OrderController::class, 'complete'])
         ->name('orders.complete');
+
+    Route::get('/orders/{order}/cancel', [OrderController::class, 'cancel'])
+        ->name('orders.cancel');
 
     Route::get('/orders/{order}/paid', [OrderController::class, 'paid'])
         ->name('orders.paid');
