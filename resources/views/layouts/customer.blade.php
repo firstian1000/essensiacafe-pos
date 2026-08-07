@@ -71,7 +71,7 @@
 
                 <i class="bi bi-grid-3x3"></i>
 
-                <span>{{ session('table_number') }}</span>
+                <span>Nomor Meja : {{ session('table_number') }}</span>
 
                 <i class="bi bi-chevron-down small"></i>
 

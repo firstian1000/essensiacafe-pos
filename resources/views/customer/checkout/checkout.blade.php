@@ -250,7 +250,7 @@
                     <div class="summary-table-info">
                         <i class="bi bi-grid-3x3 summary-table-icon"></i>
                         <div>
-                            <strong>{{ session('table_number') }}</strong>
+                            <strong>Nomor Meja : {{ session('table_number') }}</strong>
                             <p>Pesanan akan diantar ke meja ini.</p>
                         </div>
                     </div>
