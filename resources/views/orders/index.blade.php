@@ -96,10 +96,31 @@
                     @endif
                 </div>
                 <div class="time" data-label="Waktu">{{ $order->created_at->format('d M H:i') }}</div>
-                <div data-label="Aksi">
-                    <a href="{{ route('orders.show', $order) }}" class="btn-edit" style="background: #2563eb; color: white; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 10px;">
-                        <i class="bi bi-eye"></i>
-                    </a>
+                <div data-label="Aksi" class="action-buttons">
+                    @if($order->status == 'pending')
+                        <a href="{{ route('orders.process', $order) }}" class="btn-action-text btn-action-process" title="Proses Pesanan">
+                            <i class="bi bi-play-fill"></i> Proses
+                        </a>
+                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                            <i class="bi bi-eye-fill"></i> Detail
+                        </a>
+                    @elseif($order->status == 'processing')
+                        <a href="{{ route('orders.complete', $order) }}" class="btn-action-text btn-action-complete" title="Selesaikan Pesanan">
+                            <i class="bi bi-check-lg"></i> Selesai
+                        </a>
+                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                            <i class="bi bi-eye-fill"></i> Detail
+                        </a>
+                    @else
+                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                            <i class="bi bi-eye-fill"></i> Detail
+                        </a>
+                        @if($order->payment_status == 'pending')
+                        <a href="{{ route('orders.paid', $order) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Bayar" onclick="return confirm('Konfirmasi pembayaran lunas?')">
+                            <i class="bi bi-cash-coin"></i> Bayar
+                        </a>
+                        @endif
+                    @endif
                 </div>
             </div>
             @empty

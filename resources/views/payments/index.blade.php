@@ -201,17 +201,17 @@
                         <td class="time-cell">{{ $order->created_at->format('d M Y H:i') }}</td>
                         <td>
                             <div class="action-group">
-                                <a href="{{ route('payments.show', $order) }}" class="btn-action btn-view" title="Detail">
-                                    <i class="bi bi-eye-fill"></i>
+                                <a href="{{ route('payments.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Transaksi">
+                                    <i class="bi bi-eye-fill"></i> Detail
                                 </a>
                                 @if($order->payment_status == 'pending')
-                                <a href="{{ route('orders.paid', $order) }}" class="btn-action btn-confirm" title="Konfirmasi Lunas & Cetak Nota"
+                                <a href="{{ route('orders.paid', $order) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Lunas & Cetak Nota"
                                    onclick="return confirm('Konfirmasi pembayaran lunas untuk pesanan ini?')">
-                                    <i class="bi bi-check-lg"></i>
+                                    <i class="bi bi-check-circle-fill"></i> Lunasi
                                 </a>
                                 @elseif($order->payment_status == 'paid')
-                                <a href="{{ route('payments.receipt', $order) }}" class="btn-action btn-confirm" title="Cetak Nota" style="background:#E0F2FE!important; color:#0284C7!important;">
-                                    <i class="bi bi-printer-fill"></i>
+                                <a href="{{ route('payments.receipt', $order) }}" class="btn-action-text btn-action-print" title="Cetak Struk">
+                                    <i class="bi bi-printer-fill"></i> Struk
                                 </a>
                                 @endif
                             </div>
