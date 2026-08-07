@@ -9,6 +9,10 @@ class CartController extends Controller
 {
     public function add(Request $request)
     {
+        if (\App\Models\Setting::isOrderingClosed()) {
+            return back()->with('error', 'Pemesanan sudah ditutup untuk hari ini karena telah melewati batas jam operasional.');
+        }
+
         $menu = Menu::findOrFail($request->menu_id);
 
         $cart = session()->get('cart', []);

@@ -71,6 +71,14 @@
             </a>
         </li>
 
+        <li>
+            <a href="{{ route('settings.index') }}"
+               class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <i class="bi bi-gear-fill"></i>
+                <span>Pengaturan</span>
+            </a>
+        </li>
+
     </ul>
 
 

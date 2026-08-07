@@ -16,6 +16,7 @@ use App\Http\Controllers\MidtransController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\CashierController;
+use App\Http\Controllers\SettingController;
 
 Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->middleware('guest')->name('login');
 Route::post('/login', [AdminLoginController::class, 'login'])->middleware('guest');
@@ -75,6 +76,11 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/payments/{order}', [PaymentController::class, 'show'])
         ->name('payments.show');
+
+    Route::get('/settings', [SettingController::class, 'index'])
+        ->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'store'])
+        ->name('settings.store');
 });
 
 /*

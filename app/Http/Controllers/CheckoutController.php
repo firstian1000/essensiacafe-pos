@@ -15,6 +15,11 @@ class CheckoutController extends Controller
     {
         $cart = session()->get('cart', []);
 
+        if (\App\Models\Setting::isOrderingClosed()) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Pemesanan sudah ditutup untuk hari ini karena telah melewati batas jam operasional.');
+        }
+
         if (! session('table_id')) {
             return redirect()->route('cart.index')
                 ->with('error', 'Silakan scan QR meja terlebih dahulu.');
@@ -42,6 +47,11 @@ class CheckoutController extends Controller
         ]);
 
         $cart = session()->get('cart', []);
+
+        if (\App\Models\Setting::isOrderingClosed()) {
+            return redirect()->route('cart.index')
+                ->with('error', 'Pemesanan sudah ditutup untuk hari ini karena telah melewati batas jam operasional.');
+        }
 
         if (! session('table_id')) {
             return redirect()->route('cart.index')

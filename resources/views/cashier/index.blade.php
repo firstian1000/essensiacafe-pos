@@ -290,6 +290,27 @@ document.getElementById('cashierForm').addEventListener('submit', e => {
     if (cart.size === 0) {
         e.preventDefault();
         alert('Pilih minimal satu menu.');
+        return;
+    }
+
+    if (typeof cafeConfig !== 'undefined') {
+        const now = new Date();
+        const openParts = cafeConfig.openTime.split(':').map(Number);
+        const closeParts = cafeConfig.closeTime.split(':').map(Number);
+        
+        const openTime = new Date();
+        openTime.setHours(openParts[0], openParts[1], 0, 0);
+        
+        const closeTime = new Date();
+        closeTime.setHours(closeParts[0], closeParts[1], 0, 0);
+        
+        const orderLimitTime = new Date(closeTime.getTime() - (cafeConfig.orderLimitMinutes * 60 * 1000));
+
+        if (now < openTime || now >= orderLimitTime) {
+            e.preventDefault();
+            alert('Pemesanan sudah ditutup untuk hari ini karena telah melewati batas akhir pemesanan.');
+            return;
+        }
     }
 });
 

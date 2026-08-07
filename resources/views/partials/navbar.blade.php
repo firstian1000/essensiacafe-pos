@@ -14,6 +14,180 @@
 
     <div class="topbar-right">
 
+        <!-- Real-time Clock & Countdown Timer -->
+        @if(isset($cafeSettings))
+        <div class="d-flex align-items-center gap-3 me-3 text-dark px-3 py-1 bg-light rounded-pill border shadow-sm topbar-timer-container" style="font-size: 0.9rem; font-weight: 600; height: 38px;">
+            <div class="d-flex align-items-center gap-1 text-primary">
+                <i class="bi bi-clock-fill"></i>
+                <span id="topbar-realtime-clock">00:00:00</span>
+            </div>
+            <div class="vr bg-secondary" style="height: 15px; width: 1px; opacity: 0.3;"></div>
+            <div class="d-flex align-items-center gap-1 text-danger">
+                <i class="bi bi-hourglass-split"></i>
+                <span id="topbar-countdown-timer">Tutup: 00:00:00</span>
+            </div>
+        </div>
+
+        <!-- Modal Peringatan Operasional -->
+        <div class="modal fade" id="opAlertModal" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                    <div class="modal-header border-0 pb-0 justify-content-end" style="padding: 1rem 1rem 0 0;">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="border: none; background: none; font-size: 1.2rem;"></button>
+                    </div>
+                    <div class="modal-body text-center pt-0 px-4 pb-4">
+                        <div class="alert-icon-container mb-3 d-inline-flex align-items-center justify-content-center bg-light rounded-circle" style="width: 80px; height: 80px;">
+                            <i class="bi bi-bell-fill text-warning fs-1" id="opAlertIcon"></i>
+                        </div>
+                        <h4 class="fw-bold mb-2 text-dark" id="opAlertTitle">Pemberitahuan</h4>
+                        <p class="text-secondary mb-4" id="opAlertMessage">Pemberitahuan penting tentang operasional kafe.</p>
+                        <button type="button" class="btn btn-primary w-100 py-2 fw-bold" data-bs-dismiss="modal" style="border-radius: 12px; background: #2563EB; border: none;">Dimengerti</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const clockEl = document.getElementById('topbar-realtime-clock');
+            const timerEl = document.getElementById('topbar-countdown-timer');
+
+            if (!clockEl || !timerEl) return;
+
+            const cafeConfig = {
+                openTime: "{{ $cafeSettings['cafe_open_time'] ?? '08:00' }}",
+                closeTime: "{{ $cafeSettings['cafe_close_time'] ?? '22:00' }}",
+                shiftDurationHours: parseInt("{{ $cafeSettings['shift_duration_hours'] ?? '7' }}"),
+                beforeShiftNotifMinutes: parseInt("{{ $cafeSettings['before_shift_notif_minutes'] ?? '15' }}"),
+                beforeCloseNotifMinutes: parseInt("{{ $cafeSettings['before_close_notif_minutes'] ?? '15' }}"),
+                orderLimitMinutes: parseInt("{{ $cafeSettings['order_limit_minutes'] ?? '10' }}")
+            };
+
+            function playNotifSound() {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15);
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.30);
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.5);
+                } catch (e) {
+                    console.log("Audio context sound blocked or unsupported");
+                }
+            }
+
+            function showOpAlert(title, message, isDanger = false) {
+                const modalEl = document.getElementById('opAlertModal');
+                if (!modalEl) return;
+
+                document.getElementById('opAlertTitle').innerText = title;
+                document.getElementById('opAlertMessage').innerText = message;
+                
+                const iconEl = document.getElementById('opAlertIcon');
+                if (isDanger) {
+                    iconEl.className = 'bi bi-exclamation-triangle-fill text-danger fs-1';
+                } else {
+                    iconEl.className = 'bi bi-bell-fill text-warning fs-1';
+                }
+
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+                playNotifSound();
+            }
+
+            function parseTimeToday(timeStr) {
+                const parts = timeStr.split(':').map(Number);
+                const d = new Date();
+                d.setHours(parts[0], parts[1], 0, 0);
+                return d;
+            }
+
+            function updateTimers() {
+                const now = new Date();
+                
+                // Clock update
+                const timeString = now.toTimeString().split(' ')[0];
+                clockEl.innerText = timeString;
+
+                const openTime = parseTimeToday(cafeConfig.openTime);
+                const closeTime = parseTimeToday(cafeConfig.closeTime);
+                
+                const shiftChangeTime = new Date(openTime.getTime() + (cafeConfig.shiftDurationHours * 60 * 60 * 1000));
+                
+                const shiftWarningTime = new Date(shiftChangeTime.getTime() - (cafeConfig.beforeShiftNotifMinutes * 60 * 1000));
+                const closeWarningTime = new Date(closeTime.getTime() - (cafeConfig.beforeCloseNotifMinutes * 60 * 1000));
+                const orderLimitTime = new Date(closeTime.getTime() - (cafeConfig.orderLimitMinutes * 60 * 1000));
+
+                const dateKey = now.toDateString();
+
+                // 1. Shift warning (15m before shift change)
+                if (now >= shiftWarningTime && now < shiftChangeTime) {
+                    const key = `shift_warning_${dateKey}`;
+                    if (!localStorage.getItem(key)) {
+                        localStorage.setItem(key, 'true');
+                        showOpAlert('Peringatan Shift Kerja', `Perhatian! ${cafeConfig.beforeShiftNotifMinutes} menit lagi adalah waktu ganti shift kerja.`);
+                    }
+                }
+
+                // 2. Shift change time
+                if (now >= shiftChangeTime && now < new Date(shiftChangeTime.getTime() + 60000)) {
+                    const key = `shift_change_${dateKey}`;
+                    if (!localStorage.getItem(key)) {
+                        localStorage.setItem(key, 'true');
+                        showOpAlert('Waktu Ganti Shift', 'Waktu ganti shift kerja! Harap lakukan serah terima operasional kasir.', true);
+                    }
+                }
+
+                // 3. Cafe close warning (15m before closing)
+                if (now >= closeWarningTime && now < closeTime) {
+                    const key = `close_warning_${dateKey}`;
+                    if (!localStorage.getItem(key)) {
+                        localStorage.setItem(key, 'true');
+                        showOpAlert('Peringatan Kafe Tutup', `Perhatian! Kafe akan tutup dalam ${cafeConfig.beforeCloseNotifMinutes} menit.`);
+                    }
+                }
+
+                // 4. Order limit warning (10m before closing)
+                if (now >= orderLimitTime && now < closeTime) {
+                    const key = `order_limit_${dateKey}`;
+                    if (!localStorage.getItem(key)) {
+                        localStorage.setItem(key, 'true');
+                        showOpAlert('Batas Akhir Pemesanan', `Batas akhir pemesanan telah tercapai (${cafeConfig.orderLimitMinutes} menit sebelum tutup). Pemesanan baru ditolak.`, true);
+                    }
+                }
+
+                // Update countdown display
+                if (now < closeTime && now >= openTime) {
+                    const diffMs = closeTime - now;
+                    const diffHours = Math.floor(diffMs / 3600000);
+                    const diffMins = Math.floor((diffMs % 3600000) / 60000);
+                    const diffSecs = Math.floor((diffMs % 60000) / 1000);
+                    
+                    const hoursPad = String(diffHours).padStart(2, '0');
+                    const minsPad = String(diffMins).padStart(2, '0');
+                    const secsPad = String(diffSecs).padStart(2, '0');
+                    
+                    timerEl.innerText = `Tutup: ${hoursPad}:${minsPad}:${secsPad}`;
+                    timerEl.parentElement.style.color = '#DC2626'; // Text danger red
+                } else {
+                    timerEl.innerText = 'Kafe Tutup';
+                    timerEl.parentElement.style.color = '#6B7280'; // Text secondary gray
+                }
+            }
+
+            setInterval(updateTimers, 1000);
+            updateTimers();
+        });
+        </script>
+        @endif
+
         @php
             $pendingNotifs = \App\Models\Order::where('status', 'pending')
                                 ->orWhere('payment_status', 'pending')

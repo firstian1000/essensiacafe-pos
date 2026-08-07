@@ -256,9 +256,18 @@
                     </div>
 
                     {{-- Bayar --}}
+                    @if(\App\Models\Setting::isOrderingClosed())
+                    <button type="button" class="btn-bayar-sekarang" style="background-color: #6B7280 !important; cursor: not-allowed;" disabled>
+                        <i class="bi bi-lock-fill me-2"></i>Pemesanan Ditutup
+                    </button>
+                    <div class="alert alert-danger mt-3 p-2 text-center" style="font-size: 0.8rem; border-radius: 8px; font-weight: 600;">
+                        Pemesanan sudah ditutup untuk hari ini (melewati batas operasional).
+                    </div>
+                    @else
                     <button type="submit" class="btn-bayar-sekarang">
                         <i class="bi bi-lock-fill me-2"></i>Bayar Sekarang
                     </button>
+                    @endif
 
                     <p class="checkout-terms">
                         Dengan melakukan pembayaran, Anda menyetujui

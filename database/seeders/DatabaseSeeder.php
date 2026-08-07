@@ -61,6 +61,8 @@ class DatabaseSeeder extends Seeder
             );
             \App\Services\QrCodeService::ensureQrExists($table);
         }
+
+        $this->call(SettingSeeder::class);
     }
 }
 

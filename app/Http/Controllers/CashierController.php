@@ -35,6 +35,12 @@ class CashierController extends Controller
             'items.*.qty' => ['required', 'integer', 'min:1'],
         ]);
 
+        if (\App\Models\Setting::isOrderingClosed()) {
+            return back()
+                ->withInput()
+                ->with('error', 'Pemesanan sudah ditutup untuk hari ini karena telah melewati batas jam operasional.');
+        }
+
         $menuIds = collect($data['items'])->pluck('menu_id')->all();
         $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
