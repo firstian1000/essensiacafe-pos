@@ -23,7 +23,7 @@ class CafeTableController extends Controller
         $query->where('status', $request->status);
     }
 
-    $tables = $query->latest()->paginate(9);
+    $tables = $query->orderByRaw('CAST(table_number AS INTEGER) ASC, table_number ASC')->paginate(9);
 
     return view('tables.index', compact('tables'));
 }
