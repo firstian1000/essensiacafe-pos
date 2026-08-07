@@ -246,3 +246,84 @@ body:has(.cashier-page) .content{height:auto!important;overflow:visible!importan
         font-size:14px!important;
     }
 }
+
+@media(min-width: 760px) {
+    /* Lock body and content wrapper scroll */
+    body:has(.cashier-page) {
+        overflow: hidden !important;
+    }
+    body:has(.cashier-page) .content {
+        height: calc(100vh - 90px) !important;
+        overflow: hidden !important;
+        padding: 16px 20px !important;
+    }
+
+    /* Make cashier page take full remaining height */
+    .cashier-page {
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* Force cashier layout to fill height and not overflow */
+    .cashier-layout {
+        flex: 1 !important;
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) 420px !important;
+        gap: 20px !important;
+        align-items: stretch !important;
+    }
+
+    /* Menu panel layout */
+    .cashier-menu-panel {
+        height: 100% !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    .cashier-toolbar {
+        flex: 0 0 auto !important;
+        margin-bottom: 12px !important;
+    }
+    .cashier-menu-grid {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        max-height: none !important;
+        padding-right: 8px !important;
+    }
+
+    /* Cart panel layout */
+    .cashier-cart-panel {
+        height: 100% !important;
+        min-height: 0 !important;
+        position: static !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        padding: 20px !important;
+        max-height: none !important;
+        align-self: stretch !important;
+    }
+    .cashier-cart-head, 
+    .cashier-fields, 
+    .cashier-summary, 
+    .btn-cashier-submit {
+        flex: 0 0 auto !important;
+    }
+    .cashier-cart-items {
+        flex: 1 1 auto !important;
+        min-height: 120px !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+        margin: 12px 0 !important;
+        padding-right: 4px !important;
+    }
+}
