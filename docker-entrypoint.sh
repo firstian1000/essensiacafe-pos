@@ -26,6 +26,9 @@ fi
 php artisan migrate --force || true
 php artisan db:seed --force || true
 
+# Create storage symlink for public assets
+php artisan storage:link --force || true
+
 # Clear cache to reflect env
 php artisan config:clear || true
 php artisan cache:clear || true
