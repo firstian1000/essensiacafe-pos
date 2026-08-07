@@ -57,34 +57,16 @@
 
     {{-- ===== CATEGORY FILTER ===== --}}
     <div class="filter-bar">
-        <button class="filter-pill active" data-group="all">
+        <button class="filter-pill active" data-category-id="all">
             <i class="bi bi-grid-2x2-fill"></i>
             Semua
         </button>
-        <button class="filter-pill" data-group="coffee">
-            <i class="bi bi-cup-hot-fill"></i>
-            Coffee
+        @foreach($categories as $category)
+        <button class="filter-pill" data-category-id="{{ $category->id }}">
+            <i class="bi bi-tag-fill"></i>
+            {{ $category->name }}
         </button>
-        <button class="filter-pill" data-group="noncoffee">
-            <i class="bi bi-cup-straw"></i>
-            Non Coffee
-        </button>
-        <button class="filter-pill" data-group="dimsum">
-            <i class="bi bi-box-seam-fill"></i>
-            Dimsum
-        </button>
-        <button class="filter-pill" data-group="food">
-            <i class="bi bi-egg-fried"></i>
-            Makanan & Snack
-        </button>
-        <button class="filter-pill" data-group="vape">
-            <i class="bi bi-fire"></i>
-            Vape & Terea
-        </button>
-        <button class="filter-pill" data-group="other">
-            <i class="bi bi-tags-fill"></i>
-            Lainnya
-        </button>
+        @endforeach
     </div>
 
     {{-- ===== MENU GRID ===== --}}
@@ -108,6 +90,7 @@
 
         <div class="menu-card-wrap menu-item {{ !$menu->status ? 'out-of-stock' : '' }}"
              data-category="{{ strtolower($categoryName) }}"
+             data-category-id="{{ $menu->category_id ?? 0 }}"
              data-group="{{ $groupKey }}">
 
             <div class="menu-card">
@@ -254,13 +237,13 @@ const emptyEl     = document.getElementById('empty-menu');
 function filterMenus() {
     const keyword  = searchInput.value.toLowerCase().trim();
     const activeBtn = document.querySelector('.filter-pill.active');
-    const activeGroup = activeBtn ? activeBtn.dataset.group : 'all';
+    const activeCatId = activeBtn ? activeBtn.dataset.categoryId : 'all';
 
     let visible = 0;
     menuItems.forEach(item => {
         const matchSearch = item.innerText.toLowerCase().includes(keyword);
-        const matchGroup  = activeGroup === 'all' || item.dataset.group === activeGroup;
-        const show = matchSearch && matchGroup;
+        const matchCategory = activeCatId === 'all' || item.dataset.categoryId === activeCatId;
+        const show = matchSearch && matchCategory;
         item.style.display = show ? '' : 'none';
         if (show) visible++;
     });

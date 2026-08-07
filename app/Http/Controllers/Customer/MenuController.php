@@ -13,11 +13,12 @@ class MenuController extends Controller
     $table = CafeTable::where('qr_token',$token)->firstOrFail();
 
     $menus = Menu::with('category')
+        ->where('status', 1)
         ->orderByDesc('is_recommended')
         ->orderBy('name')
         ->get();
 
-    $categories = \App\Models\Category::all();
+    $categories = \App\Models\Category::where('status', 1)->orderBy('name')->get();
 
     session([
     'table_id'     => $table->id,

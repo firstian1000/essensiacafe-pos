@@ -15,6 +15,10 @@ class CartController extends Controller
 
         $menu = Menu::findOrFail($request->menu_id);
 
+        if (!$menu->status) {
+            return back()->with('error', 'Menu ini sedang tidak tersedia / habis.');
+        }
+
         $cart = session()->get('cart', []);
 
         if (isset($cart[$menu->id])) {

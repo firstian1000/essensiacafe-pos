@@ -53,9 +53,10 @@ class CheckoutController extends Controller
                 ->with('error', 'Pemesanan sudah ditutup untuk hari ini karena telah melewati batas jam operasional.');
         }
 
-        if (! session('table_id')) {
+        $table = \App\Models\CafeTable::find(session('table_id'));
+        if (!$table) {
             return redirect()->route('cart.index')
-                ->with('error', 'Silakan scan QR meja terlebih dahulu.');
+                ->with('error', 'Meja tidak ditemukan, silakan scan ulang QR Code meja Anda.');
         }
 
         if (empty($cart)) {
@@ -68,14 +69,29 @@ class CheckoutController extends Controller
         try {
 
             $total = 0;
+            $validatedItems = [];
 
             foreach ($cart as $item) {
-                $total += $item['price'] * $item['qty'];
+                $dbMenu = \App\Models\Menu::find($item['id']);
+                if (!$dbMenu || !$dbMenu->status) {
+                    throw new \Exception("Menu '{$item['name']}' sedang tidak tersedia / habis. Silakan hapus dari keranjang.");
+                }
+
+                $realPrice = (int) $dbMenu->price;
+                $subtotal = $realPrice * $item['qty'];
+                $total += $subtotal;
+
+                $validatedItems[] = [
+                    'menu_id' => $dbMenu->id,
+                    'qty' => $item['qty'],
+                    'price' => $realPrice,
+                    'subtotal' => $subtotal,
+                ];
             }
 
             $order = Order::create([
                 'invoice' => OrderService::generateInvoice(),
-                'cafe_table_id' => session('table_id'),
+                'cafe_table_id' => $table->id,
                 'customer_name' => $request->customer_name,
                 'phone' => $request->phone,
                 'total' => $total,
@@ -84,17 +100,18 @@ class CheckoutController extends Controller
                 'payment_status' => 'pending',
             ]);
 
-            // Simpan item pesanan
-            foreach ($cart as $item) {
+            // Update status meja menjadi terisi (occupied)
+            $table->update(['status' => 'occupied']);
 
+            // Simpan item pesanan
+            foreach ($validatedItems as $vItem) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'menu_id' => $item['id'],
-                    'qty' => $item['qty'],
-                    'price' => $item['price'],
-                    'subtotal' => $item['price'] * $item['qty'],
+                    'menu_id' => $vItem['menu_id'],
+                    'qty' => $vItem['qty'],
+                    'price' => $vItem['price'],
+                    'subtotal' => $vItem['subtotal'],
                 ]);
-
             }
 
             // Generate Snap Token jika Midtrans

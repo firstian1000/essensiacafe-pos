@@ -49,7 +49,7 @@
                 <i class="bi bi-cash-stack"></i>
                 <div>
                     <span>Metode Pembayaran</span>
-                    <strong>{{ $methodLabel }}</strong>
+                    <strong>{{ $methodLabel }} ({{ $order->payment_status === 'paid' ? 'Lunas' : 'Bayar di Kasir' }})</strong>
                 </div>
             </div>
         </div>

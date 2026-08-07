@@ -61,6 +61,8 @@ public function complete(Order $order)
         'status' => 'completed'
     ]);
 
+    $this->checkAndResetTableStatus($order);
+
     return redirect()
         ->route('orders.show', $order)
         ->with('success', 'Pesanan selesai.');
@@ -73,8 +75,27 @@ public function paid(Order $order)
         'status'         => 'completed',
     ]);
 
+    $this->checkAndResetTableStatus($order);
+
     return redirect()
         ->route('payments.receipt', $order)
         ->with('success', 'Pembayaran berhasil dikonfirmasi.');
+}
+
+protected function checkAndResetTableStatus(Order $order)
+{
+    if ($order->cafe_table_id) {
+        $hasActiveOrders = Order::where('cafe_table_id', $order->cafe_table_id)
+            ->where('id', '!=', $order->id)
+            ->where(function ($q) {
+                $q->where('status', '!=', 'completed')
+                  ->orWhere('payment_status', '!=', 'paid');
+            })
+            ->exists();
+
+        if (!$hasActiveOrders && $order->table) {
+            $order->table->update(['status' => 'available']);
+        }
+    }
 }
 }
