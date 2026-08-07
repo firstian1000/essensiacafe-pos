@@ -97,3 +97,33 @@
     .main-content:not(.full){margin-left:280px!important}
     .main-content:not(.full) .topbar{left:280px!important}
 }
+
+/* Sidebar Desktop & Mobile Scrollable Fix */
+.sidebar {
+    overflow-y: auto !important;
+    max-height: 100vh !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent !important;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25) !important;
+    border-radius: 999px !important;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.45) !important;
+}
+
+.sidebar-menu {
+    overflow-y: auto !important;
+}
+

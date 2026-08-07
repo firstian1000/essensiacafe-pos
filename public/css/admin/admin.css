@@ -84,6 +84,7 @@ ul {
 
     width: 280px;
     height: 100vh;
+    overflow-y: auto;
 
     background: var(--sidebar);
 
