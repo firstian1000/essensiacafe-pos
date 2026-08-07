@@ -123,4 +123,53 @@ protected function checkAndResetTableStatus(Order $order)
         }
     }
 }
+
+    public function checkNew(Request $request)
+    {
+        $lastId = (int) $request->get('last_id', 0);
+
+        $newOrders = Order::with('table')
+            ->where('id', '>', $lastId)
+            ->orderBy('id', 'asc')
+            ->get();
+
+        if ($newOrders->isEmpty()) {
+            $maxId = Order::max('id') ?: 0;
+            return response()->json([
+                'has_new' => false,
+                'latest_id' => max($lastId, $maxId),
+                'orders' => []
+            ]);
+        }
+
+        $latestId = $newOrders->last()->id;
+
+        $formattedOrders = $newOrders->map(function ($order) {
+            $tableNum = $order->table ? $order->table->table_number : null;
+            $tableLabel = $tableNum ? "Meja {$tableNum}" : "Kasir Take Away";
+            $speechText = $tableNum 
+                ? "Pesanan dari meja nomor {$tableNum} telah masuk" 
+                : "Pesanan baru di kasir telah masuk";
+
+            return [
+                'id' => $order->id,
+                'invoice' => $order->invoice ?? ('#' . $order->id),
+                'customer_name' => $order->customer_name ?: 'Pelanggan',
+                'table_number' => $tableNum,
+                'table_label' => $tableLabel,
+                'total_amount' => 'Rp ' . number_format($order->total_amount, 0, ',', '.'),
+                'status' => $order->status,
+                'payment_status' => $order->payment_status,
+                'time' => $order->created_at ? $order->created_at->format('H:i') : date('H:i'),
+                'speech_text' => $speechText,
+                'url' => route('orders.show', $order->id),
+            ];
+        });
+
+        return response()->json([
+            'has_new' => true,
+            'latest_id' => $latestId,
+            'orders' => $formattedOrders
+        ]);
+    }
 }

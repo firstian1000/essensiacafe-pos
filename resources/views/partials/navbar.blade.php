@@ -196,6 +196,14 @@
                                 ->get();
         @endphp
 
+        <!-- Voice Order Notification Toggle Button -->
+        <div class="d-flex align-items-center me-2">
+            <button type="button" id="btn-audio-toggle" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1" style="font-size: 0.82rem; transition: all 0.2s ease;">
+                <i class="bi bi-volume-up-fill" id="audio-toggle-icon"></i>
+                <span id="audio-toggle-text">Suara: ON</span>
+            </button>
+        </div>
+
         <div class="dropdown">
             <button class="notification" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative;">
                 <i class="bi bi-bell"></i>
@@ -235,6 +243,173 @@
                 </li>
             </ul>
         </div>
+
+        <!-- Floating Realtime Order Toast Popup Container -->
+        <div id="order-toast-container" style="position: fixed; top: 75px; right: 25px; z-index: 9999; max-width: 380px; width: 100%; pointer-events: none;"></div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let latestOrderId = @json(\App\Models\Order::max('id') ?: 0);
+            let soundEnabled = localStorage.getItem('order_sound_enabled') !== 'false';
+
+            const toggleBtn = document.getElementById('btn-audio-toggle');
+            const toggleIcon = document.getElementById('audio-toggle-icon');
+            const toggleText = document.getElementById('audio-toggle-text');
+
+            function updateAudioButtonUI() {
+                if (!toggleBtn) return;
+                if (soundEnabled) {
+                    toggleBtn.className = 'btn btn-sm btn-primary rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1 shadow-sm';
+                    toggleIcon.className = 'bi bi-volume-up-fill';
+                    toggleText.innerText = 'Suara: ON';
+                } else {
+                    toggleBtn.className = 'btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1';
+                    toggleIcon.className = 'bi bi-volume-mute-fill';
+                    toggleText.innerText = 'Suara: OFF';
+                }
+            }
+
+            if (toggleBtn) {
+                updateAudioButtonUI();
+                toggleBtn.addEventListener('click', function () {
+                    soundEnabled = !soundEnabled;
+                    localStorage.setItem('order_sound_enabled', soundEnabled);
+                    updateAudioButtonUI();
+
+                    if (soundEnabled) {
+                        playChimeSound();
+                        speakIndonesianVoice("Suara notifikasi pesanan diaktifkan");
+                    }
+                });
+            }
+
+            // Play Bell Chime Sound via Web Audio API
+            function playChimeSound() {
+                if (!soundEnabled) return;
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    osc1.type = 'sine';
+                    osc2.type = 'triangle';
+
+                    osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
+                    osc1.frequency.setValueAtTime(880.00, ctx.currentTime + 0.15);
+
+                    osc2.frequency.setValueAtTime(1174.66, ctx.currentTime);
+                    osc2.frequency.setValueAtTime(1760.00, ctx.currentTime + 0.15);
+
+                    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc1.start(ctx.currentTime);
+                    osc2.start(ctx.currentTime);
+                    osc1.stop(ctx.currentTime + 0.8);
+                    osc2.stop(ctx.currentTime + 0.8);
+                } catch (e) {
+                    console.log('Audio Context Error:', e);
+                }
+            }
+
+            // Speak Voice in Indonesian using SpeechSynthesisUtterance
+            function speakIndonesianVoice(text) {
+                if (!soundEnabled || !('speechSynthesis' in window)) return;
+                try {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'id-ID';
+                    utterance.rate = 0.95;
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                } catch (e) {
+                    console.log('Speech Synthesis Error:', e);
+                }
+            }
+
+            // Show Toast Notification Banner
+            function showOrderToast(order) {
+                const container = document.getElementById('order-toast-container');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                toast.className = 'card border-0 shadow-lg mb-2 text-dark bg-white overflow-hidden animate__animated animate__fadeInRight';
+                toast.style.cssText = 'border-radius: 16px; border-left: 6px solid #2563EB !important; pointer-events: auto; transform: translateY(-5px); transition: all 0.3s ease;';
+
+                toast.innerHTML = `
+                    <div class="card-body p-3">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-primary text-white px-2 py-1 rounded-pill" style="font-size: 0.75rem;">
+                                    <i class="bi bi-bell-fill me-1"></i> PESANAN BARU!
+                                </span>
+                                <small class="text-muted" style="font-size: 0.8rem;">${order.time}</small>
+                            </div>
+                            <button type="button" class="btn-close" style="font-size: 0.75rem;" onclick="this.closest('.card').remove()"></button>
+                        </div>
+                        <h6 class="fw-bold mb-1 text-dark" style="font-size: 1rem;">
+                            ${order.table_label} - <span class="text-primary">${order.customer_name}</span>
+                        </h6>
+                        <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
+                            <span class="fw-bold text-success" style="font-size: 0.95rem;">${order.total_amount}</span>
+                            <a href="${order.url}" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold" style="font-size: 0.8rem;">
+                                <i class="bi bi-eye-fill me-1"></i> Lihat Detail
+                            </a>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(toast);
+
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.style.opacity = '0';
+                        setTimeout(() => toast.remove(), 300);
+                    }
+                }, 12000);
+            }
+
+            // Poll server every 5 seconds for new orders
+            function checkNewOrders() {
+                fetch("{{ route('orders.checkNew') }}?last_id=" + latestOrderId, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.has_new && data.orders.length > 0) {
+                        latestOrderId = data.latest_id;
+
+                        data.orders.forEach((order, index) => {
+                            setTimeout(() => {
+                                playChimeSound();
+                                speakIndonesianVoice(order.speech_text);
+                                showOrderToast(order);
+                            }, index * 2500);
+                        });
+
+                        if (window.location.pathname.includes('/orders') && !window.location.pathname.includes('/orders/')) {
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 4000);
+                        }
+                    } else if (data.latest_id) {
+                        latestOrderId = data.latest_id;
+                    }
+                })
+                .catch(err => console.log('Check order error:', err));
+            }
+
+            setInterval(checkNewOrders, 5000);
+        });
+        </script>
 
         <div class="admin-profile">
 

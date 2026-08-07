@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/tables/print/all', [QrCodeController::class, 'printAll'])
         ->name('tables.print.all');
 
+    Route::get('/orders/check-new', [OrderController::class, 'checkNew'])->name('orders.checkNew');
     Route::resource('orders', OrderController::class);
 
     Route::get('/orders/{order}/process', [OrderController::class, 'process'])
