@@ -100,7 +100,7 @@
                             name="search"
                             value="{{ request('search') }}"
                             placeholder="Cari menu..."
-                            style="background-color: transparent;">
+                            style="background-color: transparent; border: none !important; outline: none !important; box-shadow: none !important; width: 100%; height: 100%; font-size: 15px;">
 
                     </div>
                     <button type="submit" class="btn-save" style="width: auto; height: 48px; padding: 0 24px; border-radius: 12px; margin: 0;">
