@@ -28,9 +28,9 @@
 
         <section class="cashier-menu-panel">
             <div class="cashier-toolbar">
-                <div class="search-box">
-                    <i class="bi bi-search"></i>
-                    <input type="search" id="cashierSearch" placeholder="Cari menu...">
+                <div class="search-box" style="border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC; max-width: 360px; width: 100%;">
+                    <i class="bi bi-search" style="color: #2563EB; font-weight: bold;"></i>
+                    <input type="search" id="cashierSearch" placeholder="Cari menu..." style="background-color: transparent;">
                 </div>
 
                 <div class="cashier-category-filter" id="cashierCategoryFilter">

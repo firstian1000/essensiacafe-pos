@@ -90,15 +90,16 @@
                     </select>
                 </div>
 
-                <div class="search-box" style="flex: initial; width: 300px; margin-bottom: 0;">
+                <div class="search-box" style="flex: initial; width: 300px; margin-bottom: 0; border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC;">
 
-                    <i class="bi bi-search"></i>
+                    <i class="bi bi-search" style="color: #2563EB; font-weight: bold;"></i>
 
                     <input
                         type="text"
                         name="search"
                         value="{{ request('search') }}"
-                        placeholder="Cari menu...">
+                        placeholder="Cari menu..."
+                        style="background-color: transparent;">
 
                 </div>
 
@@ -138,7 +139,7 @@
 
                 <div class="number" data-label="No">
 
-                    {{ $loop->iteration }}
+                    {{ ($menus->currentPage() - 1) * $menus->perPage() + $loop->iteration }}
 
                 </div>
 
