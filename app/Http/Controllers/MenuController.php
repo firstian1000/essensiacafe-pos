@@ -12,6 +12,11 @@ class MenuController extends Controller
 {
     public function index(Request $request)
 {
+    $perPage = (int) $request->get('per_page', 15);
+    if (!in_array($perPage, [10, 15, 20, 25])) {
+        $perPage = 15;
+    }
+
     $menus = Menu::with('category')
 
         ->when($request->search, function ($query) use ($request) {
@@ -21,7 +26,7 @@ class MenuController extends Controller
         })
 
         ->orderByDesc('is_recommended')
-        ->paginate(10);
+        ->paginate($perPage);
 
     return view('menus.index', compact('menus'));
 }

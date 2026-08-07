@@ -73,9 +73,24 @@
             <form
                 action="{{ route('menus.index') }}"
                 method="GET"
-                class="toolbar-form">
+                class="toolbar-form"
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 15px; flex-wrap: wrap;">
 
-                <div class="search-box">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 15px; font-weight: 600; color: #4B5563;">Tampilkan:</span>
+                    <select
+                        name="per_page"
+                        class="status-select"
+                        style="width: 80px; height: 48px; border-radius: 12px; border: 1px solid #D1D5DB; padding: 0 12px; font-size: 14px; background-color: #fff; cursor: pointer;"
+                        onchange="this.form.submit()">
+                        <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
+                        <option value="15" {{ request('per_page', '15') == '15' ? 'selected' : '' }}>15</option>
+                        <option value="20" {{ request('per_page') == '20' ? 'selected' : '' }}>20</option>
+                        <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25</option>
+                    </select>
+                </div>
+
+                <div class="search-box" style="flex: initial; width: 300px; margin-bottom: 0;">
 
                     <i class="bi bi-search"></i>
 
