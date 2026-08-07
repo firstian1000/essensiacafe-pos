@@ -91,7 +91,7 @@
                 </div>
 
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <div class="search-box" style="flex: initial; width: 280px; margin-bottom: 0; border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC;">
+                    <div class="search-box" style="flex: initial; width: 280px; margin-bottom: 0; border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC !important; overflow: hidden;">
 
                         <i class="bi bi-search" style="color: #2563EB; font-weight: bold;"></i>
 
@@ -100,7 +100,7 @@
                             name="search"
                             value="{{ request('search') }}"
                             placeholder="Cari menu..."
-                            style="background-color: transparent; border: none !important; outline: none !important; box-shadow: none !important; width: 100%; height: 100%; font-size: 15px;">
+                            style="background-color: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; width: 100%; height: 100%; font-size: 15px; background: transparent !important;">
 
                     </div>
                     <button type="submit" class="btn-save" style="width: auto; height: 48px; padding: 0 24px; border-radius: 12px; margin: 0;">

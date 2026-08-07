@@ -29,9 +29,9 @@
         <section class="cashier-menu-panel">
             <div class="cashier-toolbar">
                 <div style="display: flex; gap: 10px; align-items: center; max-width: 480px; width: 100%;">
-                    <div class="search-box" style="border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC; flex: 1; margin: 0;">
+                    <div class="search-box" style="border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC !important; flex: 1; margin: 0; overflow: hidden;">
                         <i class="bi bi-search" style="color: #2563EB; font-weight: bold;"></i>
-                        <input type="search" id="cashierSearch" placeholder="Cari menu..." style="background-color: transparent; border: none !important; outline: none !important; box-shadow: none !important; width: 100%; height: 100%; font-size: 15px;">
+                        <input type="search" id="cashierSearch" placeholder="Cari menu..." style="background-color: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; width: 100%; height: 100%; font-size: 15px; background: transparent !important;">
                     </div>
                     <button type="button" id="btnCashierSearch" class="btn btn-primary" style="height: 46px; border-radius: 12px; background-color: #2563EB; border: none; font-weight: 600; padding: 0 20px;">
                         Cari
