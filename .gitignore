@@ -4,6 +4,7 @@
 .env.*
 !.env.example
 *.sqlite
+!database/database.sqlite
 *.db
 .phpactor.json
 .phpunit.result.cache
