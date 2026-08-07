@@ -73,18 +73,25 @@
             <form
                 action="{{ route('categories.index') }}"
                 method="GET"
-                class="toolbar-form">
+                class="toolbar-form"
+                style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 15px; flex-wrap: wrap;">
 
-                <div class="search-box">
+                <div style="display: flex; gap: 10px; align-items: center; width: 100%; max-width: 480px;">
+                    <div class="search-box" style="flex: 1; margin-bottom: 0; border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC !important; overflow: hidden; height: 55px; border-radius: 16px; display: flex; align-items: center; padding: 0 18px; gap: 12px;">
 
-                    <i class="bi bi-search"></i>
+                        <i class="bi bi-search" style="color: #2563EB; font-weight: bold;"></i>
 
-                    <input
-                        type="text"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="Cari kategori...">
+                        <input
+                            type="text"
+                            name="search"
+                            value="{{ request('search') }}"
+                            placeholder="Cari kategori..."
+                            style="background-color: transparent !important; border: none !important; outline: none !important; box-shadow: none !important; width: 100%; height: 100%; font-size: 15px; background: transparent !important;">
 
+                    </div>
+                    <button type="submit" class="btn-add" style="width: auto; height: 48px; padding: 0 24px; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+                        Cari
+                    </button>
                 </div>
 
             </form>
@@ -115,7 +122,7 @@
 
                 <div class="number" data-label="No">
 
-                    {{ $loop->iteration }}
+                    {{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}
 
                 </div>
 
