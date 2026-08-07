@@ -19,6 +19,7 @@
     <div class="page-header">
         <div>
             <h1>Daftar Pesanan</h1>
+            <p style="color: #64748B; font-size: 14px; margin: 4px 0 8px 0; font-weight: 500;">Data pesanan online lewat meja.</p>
             <div class="breadcrumb-custom">
                 <a href="{{ route('dashboard') }}">Dashboard</a>
                 <span>></span>

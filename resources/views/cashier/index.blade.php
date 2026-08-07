@@ -11,6 +11,7 @@
     <div class="page-header">
         <div>
             <h1>Kasir</h1>
+            <p style="color: #64748B; font-size: 14px; margin: 4px 0 8px 0; font-weight: 500;">Pemesanan langsung di kasir untuk take away</p>
             <div class="breadcrumb-custom">
                 <a href="{{ route('dashboard') }}">Dashboard</a>
                 <span>></span>
