@@ -30,7 +30,11 @@ class CafeTableController extends Controller
 
     public function create()
     {
-        return view('tables.create');
+        // Auto-increment: ambil nomor meja terakhir + 1
+        $lastNumber = CafeTable::selectRaw('MAX(CAST(table_number AS INTEGER)) as max_num')->value('max_num');
+        $nextNumber = $lastNumber ? $lastNumber + 1 : 1;
+
+        return view('tables.create', compact('nextNumber'));
     }
 
   public function store(Request $request)

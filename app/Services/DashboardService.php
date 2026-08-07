@@ -53,6 +53,16 @@ class DashboardService
                                 ->take(5)
                                 ->get();
 
+        // Transaksi gagal / cancelled terbaru
+        $recentFailedOrders = Order::with('table')
+                                ->where(function($q) {
+                                    $q->where('payment_status', 'failed')
+                                      ->orWhere('status', 'cancelled');
+                                })
+                                ->latest()
+                                ->take(5)
+                                ->get();
+
         // Menu terlaris
         $menuTerlaris = OrderItem::select(
                             'menu_id',
@@ -77,6 +87,7 @@ class DashboardService
             'failedOrders'      => $failedOrders,
             'processOrders'     => $processOrders,
             'pesananTerbaru'    => $pesananTerbaru,
+            'recentFailedOrders'=> $recentFailedOrders,
             'menuTerlaris'      => $menuTerlaris,
             'chartLabels'       => $labels,
             'chartData'         => $data,

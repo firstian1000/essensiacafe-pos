@@ -30,6 +30,32 @@
         </div>
     </div>
 
+    <!-- Notifikasi Transaksi Gagal -->
+    @if($recentFailedOrders->isNotEmpty())
+    <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="background-color: #FEE2E2; border-left: 4px solid #EF4444 !important; color: #991B1B; padding-right: 3rem;">
+        <div class="d-flex align-items-center">
+            <i class="bi bi-exclamation-triangle-fill fs-3 me-3" style="color: #EF4444;"></i>
+            <div>
+                <h5 class="alert-heading mb-1 fw-bold" style="color: #991B1B;">Pemberitahuan Transaksi Gagal / Dibatalkan</h5>
+                <p class="mb-0">Terdapat <strong>{{ $recentFailedOrders->count() }}</strong> transaksi terbaru yang gagal atau dibatalkan. Segera periksa detail pesanan.</p>
+            </div>
+        </div>
+        <hr class="my-2" style="border-top-color: #FCA5A5; opacity: 0.3;">
+        <ul class="mb-0 ps-3">
+            @foreach($recentFailedOrders as $failedOrder)
+            <li class="mb-1">
+                Invoice: <strong><a href="{{ route('orders.show', $failedOrder->id) }}" style="color: #B91C1C; text-decoration: underline;">{{ $failedOrder->invoice }}</a></strong> | 
+                Nama: <strong>{{ $failedOrder->customer_name ?? '-' }}</strong> | 
+                Meja: <strong>{{ optional($failedOrder->table)->table_number ?? 'Kasir (Takeaway)' }}</strong> | 
+                Total: <strong>Rp {{ number_format($failedOrder->total, 0, ',', '.') }}</strong> | 
+                Status: <span class="badge bg-danger">{{ ucfirst($failedOrder->payment_status ?: $failedOrder->status) }}</span>
+            </li>
+            @endforeach
+        </ul>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 1rem; top: 1rem; border: none; background: none; font-size: 1.2rem;"></button>
+    </div>
+    @endif
+
     <!-- Statistik -->
     <div class="row g-4 mb-4">
 

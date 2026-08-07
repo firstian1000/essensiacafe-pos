@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
         );
 
         // Tables
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 6; $i++) {
             $table = CafeTable::firstOrCreate(
                 ['table_number' => (string)$i],
                 [

@@ -66,7 +66,7 @@
                         type="text"
                         name="table_number"
                         class="form-control"
-                        value="{{ old('table_number') }}"
+                        value="{{ old('table_number', $nextNumber) }}"
                         placeholder="Contoh : Meja 1"
                         required>
 
