@@ -97,9 +97,19 @@
                     iconEl.className = 'bi bi-bell-fill text-warning fs-1';
                 }
 
-                const modal = new bootstrap.Modal(modalEl);
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
                 modal.show();
                 playNotifSound();
+            }
+
+            const modalEl = document.getElementById('opAlertModal');
+            if (modalEl) {
+                modalEl.addEventListener('hidden.bs.modal', function () {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                });
             }
 
             function parseTimeToday(timeStr) {
@@ -407,7 +417,16 @@
                 .catch(err => console.log('Check order error:', err));
             }
 
-            setInterval(checkNewOrders, 5000);
+            // Poll server every 2 seconds for instant real-time order sound
+            setInterval(checkNewOrders, 2000);
+
+            // Instantly check orders when tab becomes active/focused
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) {
+                    checkNewOrders();
+                }
+            });
+            window.addEventListener('focus', checkNewOrders);
         });
         </script>
 
