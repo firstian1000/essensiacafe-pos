@@ -260,8 +260,8 @@
             <div class="qr-wrapper">
 
                 <img
-                    src="{{ $table->qr_image ? asset('storage/qrcodes/'.$table->qr_image) : asset('images/no-image.png') }}"
-                    alt="QR Code">
+                    src="{{ $table->qr_image_url }}"
+                    alt="QR Code {{ $table->table_number }}">
 
             </div>
 

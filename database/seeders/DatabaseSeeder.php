@@ -31,34 +31,35 @@ class DatabaseSeeder extends Seeder
         // Menus
         Menu::firstOrCreate(
             ['name' => 'Espresso Single'],
-            ['category_id' => $catKopi->id, 'price' => 18000, 'description' => 'Rich concentrated coffee shot', 'status' => 'available', 'is_recommended' => true]
+            ['category_id' => $catKopi->id, 'price' => 18000, 'description' => 'Rich concentrated coffee shot', 'status' => true, 'is_recommended' => true]
         );
         Menu::firstOrCreate(
             ['name' => 'Iced Cappuccino'],
-            ['category_id' => $catKopi->id, 'price' => 25000, 'description' => 'Espresso with steamed milk foam and ice', 'status' => 'available', 'is_recommended' => true]
+            ['category_id' => $catKopi->id, 'price' => 25000, 'description' => 'Espresso with steamed milk foam and ice', 'status' => true, 'is_recommended' => true]
         );
         Menu::firstOrCreate(
             ['name' => 'Matcha Latte'],
-            ['category_id' => $catNonKopi->id, 'price' => 28000, 'description' => 'Premium Uji Matcha with fresh milk', 'status' => 'available', 'is_recommended' => false]
+            ['category_id' => $catNonKopi->id, 'price' => 28000, 'description' => 'Premium Uji Matcha with fresh milk', 'status' => true, 'is_recommended' => false]
         );
         Menu::firstOrCreate(
             ['name' => 'Nasi Goreng Special'],
-            ['category_id' => $catFood->id, 'price' => 32000, 'description' => 'Indonesian fried rice with fried egg and chicken', 'status' => 'available', 'is_recommended' => true]
+            ['category_id' => $catFood->id, 'price' => 32000, 'description' => 'Indonesian fried rice with fried egg and chicken', 'status' => true, 'is_recommended' => true]
         );
         Menu::firstOrCreate(
             ['name' => 'French Fries'],
-            ['category_id' => $catSnack->id, 'price' => 20000, 'description' => 'Crispy golden potato fries', 'status' => 'available', 'is_recommended' => false]
+            ['category_id' => $catSnack->id, 'price' => 20000, 'description' => 'Crispy golden potato fries', 'status' => true, 'is_recommended' => false]
         );
 
         // Tables
         for ($i = 1; $i <= 5; $i++) {
-            CafeTable::firstOrCreate(
+            $table = CafeTable::firstOrCreate(
                 ['table_number' => (string)$i],
                 [
                     'qr_token' => Str::random(16),
                     'status' => 'available',
                 ]
             );
+            \App\Services\QrCodeService::ensureQrExists($table);
         }
     }
 }

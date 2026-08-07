@@ -29,4 +29,10 @@ class CafeTable extends Model
 
         return preg_match('/^meja\b/i', $number) ? $number : 'Meja ' . $number;
     }
+
+    public function getQrImageUrlAttribute(): string
+    {
+        $qrImage = \App\Services\QrCodeService::ensureQrExists($this);
+        return asset('storage/qrcodes/' . $qrImage);
+    }
 }

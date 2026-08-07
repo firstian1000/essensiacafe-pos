@@ -77,7 +77,7 @@
 
     </div>
 
-    <img src="{{ public_path('storage/qrcodes/'.$table->qr_image) }}">
+    <img src="{{ storage_path('app/public/qrcodes/' . \App\Services\QrCodeService::ensureQrExists($table)) }}">
 
     <div class="footer">
 

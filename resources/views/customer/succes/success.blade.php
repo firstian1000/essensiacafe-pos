@@ -129,10 +129,16 @@
             </div>
         </div>
 
+        @if($order->table && $order->table->qr_token)
         <div class="success-bottom-actions">
             <a href="{{ route('customer.menu', $order->table->qr_token) }}" class="outline"><i class="bi bi-house-door"></i> Kembali ke Menu</a>
             <a href="{{ route('customer.menu', $order->table->qr_token) }}" class="primary"><i class="bi bi-cart-plus"></i> Pesan Lagi</a>
         </div>
+        @else
+        <div class="success-bottom-actions">
+            <a href="{{ route('cashier.index') }}" class="primary"><i class="bi bi-shop"></i> Kembali ke Kasir</a>
+        </div>
+        @endif
     </div>
 </section>
 

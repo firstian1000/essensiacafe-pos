@@ -11,6 +11,8 @@ class QrCodeController extends Controller
     // Download QR Code
 public function download(CafeTable $table)
 {
+    \App\Services\QrCodeService::ensureQrExists($table);
+
     $pdf = Pdf::loadView('tables.qr-pdf', compact('table'));
 
     $pdf->setPaper('a4', 'portrait');

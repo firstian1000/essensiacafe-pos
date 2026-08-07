@@ -10,6 +10,9 @@
 
     <title>Essensia Koffie - Order</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
     <meta name="description" content="Pesan menu favoritmu di Essensia Koffie. Fresh Coffee, Good Vibes.">
 
 

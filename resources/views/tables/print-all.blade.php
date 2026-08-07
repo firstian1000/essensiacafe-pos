@@ -71,17 +71,9 @@
 
     <div class="qr-box">
 
-        @if($table->qr_image)
-
-            <img
-                src="{{ asset('storage/qrcodes/'.$table->qr_image) }}"
-                alt="{{ $table->table_number }}">
-
-        @else
-
-            {!! QrCode::size(220)->generate(route('customer.menu',$table->qr_token)) !!}
-
-        @endif
+        <img
+            src="{{ $table->qr_image_url }}"
+            alt="Meja {{ $table->table_number }}">
 
     </div>
 
