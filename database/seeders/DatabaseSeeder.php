@@ -23,10 +23,10 @@ class DatabaseSeeder extends Seeder
         );
 
         // Categories
-        $catKopi = Category::firstOrCreate(['name' => 'Coffee'], ['status' => 'active']);
-        $catNonKopi = Category::firstOrCreate(['name' => 'Non-Coffee'], ['status' => 'active']);
-        $catFood = Category::firstOrCreate(['name' => 'Main Course'], ['status' => 'active']);
-        $catSnack = Category::firstOrCreate(['name' => 'Snacks'], ['status' => 'active']);
+        $catKopi = Category::firstOrCreate(['name' => 'Coffee'], ['status' => true]);
+        $catNonKopi = Category::firstOrCreate(['name' => 'Non-Coffee'], ['status' => true]);
+        $catFood = Category::firstOrCreate(['name' => 'Main Course'], ['status' => true]);
+        $catSnack = Category::firstOrCreate(['name' => 'Snacks'], ['status' => true]);
 
         // Menus
         Menu::firstOrCreate(
