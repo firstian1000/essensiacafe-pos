@@ -1,0 +1,65 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\User;
+use App\Models\Category;
+use App\Models\Menu;
+use App\Models\CafeTable;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Admin User
+        $user = User::firstOrCreate(
+            ['email' => 'admin@cafe.com'],
+            [
+                'name' => 'Admin Cafe',
+                'password' => bcrypt('password'),
+            ]
+        );
+
+        // Categories
+        $catKopi = Category::firstOrCreate(['name' => 'Coffee'], ['status' => 'active']);
+        $catNonKopi = Category::firstOrCreate(['name' => 'Non-Coffee'], ['status' => 'active']);
+        $catFood = Category::firstOrCreate(['name' => 'Main Course'], ['status' => 'active']);
+        $catSnack = Category::firstOrCreate(['name' => 'Snacks'], ['status' => 'active']);
+
+        // Menus
+        Menu::firstOrCreate(
+            ['name' => 'Espresso Single'],
+            ['category_id' => $catKopi->id, 'price' => 18000, 'description' => 'Rich concentrated coffee shot', 'status' => 'available', 'is_recommended' => true]
+        );
+        Menu::firstOrCreate(
+            ['name' => 'Iced Cappuccino'],
+            ['category_id' => $catKopi->id, 'price' => 25000, 'description' => 'Espresso with steamed milk foam and ice', 'status' => 'available', 'is_recommended' => true]
+        );
+        Menu::firstOrCreate(
+            ['name' => 'Matcha Latte'],
+            ['category_id' => $catNonKopi->id, 'price' => 28000, 'description' => 'Premium Uji Matcha with fresh milk', 'status' => 'available', 'is_recommended' => false]
+        );
+        Menu::firstOrCreate(
+            ['name' => 'Nasi Goreng Special'],
+            ['category_id' => $catFood->id, 'price' => 32000, 'description' => 'Indonesian fried rice with fried egg and chicken', 'status' => 'available', 'is_recommended' => true]
+        );
+        Menu::firstOrCreate(
+            ['name' => 'French Fries'],
+            ['category_id' => $catSnack->id, 'price' => 20000, 'description' => 'Crispy golden potato fries', 'status' => 'available', 'is_recommended' => false]
+        );
+
+        // Tables
+        for ($i = 1; $i <= 5; $i++) {
+            CafeTable::firstOrCreate(
+                ['table_number' => (string)$i],
+                [
+                    'qr_token' => Str::random(16),
+                    'status' => 'available',
+                ]
+            );
+        }
+    }
+}
+

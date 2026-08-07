@@ -1,0 +1,158 @@
+/* Final customer responsive normalization loaded last. */
+
+.customer-main{width:100%;max-width:1280px;margin:0 auto;padding-left:24px;padding-right:24px}.menu-grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important}.reko-grid{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))!important}.menu-card,.reko-card,.cart-items-card,.checkout-section-card,.summary-card-new{border:1px solid #E7EDF3!important;border-radius:18px!important;box-shadow:0 10px 32px rgba(46,125,184,.08)!important}.menu-card-img{height:clamp(150px,22vw,210px)!important}.cart-layout,.checkout-layout{grid-template-columns:minmax(0,1fr) minmax(300px,360px)!important}.cart-item-info,.checkout-item-info,.summary-card-new{min-width:0!important}.summary-total-price,.menu-card-price,.reko-price{overflow-wrap:anywhere!important}.float-bar{padding-bottom:calc(14px + env(safe-area-inset-bottom))!important}@media(max-width:980px){.cart-layout,.checkout-layout{grid-template-columns:1fr!important}.summary-sticky{position:static!important}.customer-main{padding:24px 18px 96px!important}}
+
+@media(max-width:720px){.customer-navbar-inner{height:64px!important;padding:0 14px!important}.brand-logo-img{height:48px!important;max-height:48px!important}.hamburger-btn{display:none!important}.cart-btn-text,.table-pill .small{display:none!important}.cart-btn-nav,.table-pill{height:42px!important;min-width:42px!important;border-radius:999px!important;padding:0 12px!important;justify-content:center!important}.customer-main{padding:18px 14px 104px!important}.menu-hero{gap:14px!important;margin-bottom:18px!important}.hero-heading,.cart-heading,.checkout-heading{font-size:26px!important;line-height:1.15!important}.hero-sub br{display:none!important}.filter-bar{margin-left:-14px!important;margin-right:-14px!important;padding-left:14px!important}.menu-grid,.reko-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}.menu-card-body,.reko-body{padding:14px!important}.menu-card-name{font-size:15px!important}.menu-card-img{height:145px!important}.cart-item-row,.checkout-item-row{gap:12px!important}.cart-item-img{width:82px!important;height:82px!important}.checkout-item-img{width:72px!important;height:72px!important}.cart-item-top,.cart-item-bottom,.checkout-item-top{align-items:flex-start!important;flex-direction:column!important}.cart-item-subtotal,.checkout-item-right{text-align:left!important}.cart-item-actions,.checkout-item-controls{width:100%!important;justify-content:space-between!important}.payment-card{align-items:flex-start!important}.float-bar{flex-wrap:wrap!important;padding:10px 14px calc(10px + env(safe-area-inset-bottom))!important}.float-bar-mid{display:none!important}.float-bar-btn{width:100%!important;justify-content:center!important;border-radius:14px!important}}@media(max-width:420px){.menu-grid,.reko-grid{grid-template-columns:1fr!important}.menu-card-img{height:180px!important}}
+
+/* Customer menu hero enhancement */.menu-hero{position:relative!important;align-items:center!important;gap:24px!important;margin:-8px 0 26px!important;padding:26px 28px!important;border:1px solid #D7E9F8!important;border-radius:24px!important;background:linear-gradient(135deg,#FFFFFF 0%,#F6FBFF 58%,#EAF4FB 100%)!important;box-shadow:0 16px 44px rgba(46,125,184,.08)!important;overflow:hidden!important}.menu-hero::after{content:"";position:absolute;right:28%;top:-70px;width:220px;height:220px;border-radius:999px;background:rgba(46,125,184,.08);pointer-events:none}
+
+.menu-hero-left{position:relative!important;z-index:1!important;display:grid!important;grid-template-columns:auto 1fr!important;grid-template-areas:"badge greet" "badge title" "badge sub";column-gap:18px!important;align-items:center!important}.menu-hero-left::before{content:"";grid-area:badge;width:74px;height:74px;border-radius:20px;background:url("/images/logo.png") center/contain no-repeat,#EAF4FB;box-shadow:inset 0 0 0 1px #D7E9F8}.hero-greeting{grid-area:greet!important;font-size:14px!important;font-weight:800!important;color:#2E7DB8!important;margin:0 0 4px!important}.hero-heading{grid-area:title!important;font-size:36px!important;margin:0 0 6px!important;color:#0F172A!important}.hero-sub{grid-area:sub!important;margin:0!important;color:#64748B!important;max-width:520px!important}
+
+.menu-hero-right{position:relative!important;z-index:1!important;width:min(460px,42%)!important}.search-input{height:58px!important;border:1px solid #DDE7F1!important;border-radius:18px!important;box-shadow:0 14px 32px rgba(31,41,55,.08)!important;font-weight:600!important}.search-icon{color:#2E7DB8!important}.menu-hero-right::after{content:"Fresh Coffee • Good Vibes";display:block;margin-top:10px;text-align:right;font-size:12px;font-weight:800;color:#7A4A2C;opacity:.75}@media(max-width:900px){.menu-hero{padding:22px!important}.menu-hero-right{width:100%!important}.menu-hero-left{grid-template-columns:auto 1fr!important}.hero-heading{font-size:30px!important}.menu-hero-right::after{text-align:left}}@media(max-width:560px){.menu-hero{padding:18px!important;border-radius:18px!important}.menu-hero-left{grid-template-columns:1fr!important;grid-template-areas:"badge" "greet" "title" "sub";row-gap:6px!important}.menu-hero-left::before{width:62px;height:62px}.hero-heading{font-size:26px!important}.search-input{height:52px!important;border-radius:16px!important}}
+
+/* Customer navbar enhancement */.customer-navbar{background:rgba(255,255,255,.92)!important;border-bottom:1px solid #E5EDF6!important;box-shadow:0 8px 28px rgba(31,41,55,.06)!important}.customer-navbar-inner{height:78px!important}.navbar-brand-custom{display:inline-flex!important;align-items:center!important;gap:12px!important}.navbar-brand-custom::after{content:"Essensia Koffie";font-size:15px;font-weight:900;color:#0F172A;letter-spacing:0}.brand-logo-img{height:58px!important;max-height:58px!important;filter:drop-shadow(0 8px 16px rgba(46,125,184,.18))}.navbar-controls{gap:12px!important}
+
+.table-pill,.cart-btn-nav,.hamburger-btn{border:1px solid #DDE7F1!important;background:#F8FBFF!important;box-shadow:0 8px 20px rgba(31,41,55,.04)!important}.table-pill{height:52px!important;padding:0 18px!important;border-radius:18px!important;font-size:15px!important}.table-pill i:first-child{font-size:20px!important}.cart-btn-nav{height:52px!important;padding:0 20px!important;border-radius:22px!important}.cart-btn-nav.has-items{background:#2E7DB8!important;border-color:#2E7DB8!important;box-shadow:0 12px 28px rgba(46,125,184,.28)!important}.cart-btn-nav i{font-size:20px!important}.cart-label{font-size:15px!important}.cart-total-nav{font-size:13px!important}.cart-badge-nav{top:-9px!important;right:-8px!important;width:24px!important;height:24px!important;background:#DC3545!important;font-size:12px!important}.hamburger-btn{width:52px!important;height:52px!important;border-radius:16px!important;color:#243145!important}.hamburger-btn:hover,.table-pill:hover{background:#EAF4FB!important;color:#2E7DB8!important}
+
+@media(max-width:820px){.customer-navbar-inner{height:68px!important}.navbar-brand-custom::after{display:none!important}.brand-logo-img{height:50px!important;max-height:50px!important}.table-pill,.cart-btn-nav,.hamburger-btn{height:44px!important}.table-pill{padding:0 12px!important}.cart-btn-nav{padding:0 14px!important;border-radius:18px!important}.hamburger-btn{width:44px!important}.cart-label{font-size:0!important}.cart-label::after{content:"Cart";font-size:13px}.cart-total-nav{display:none!important}}@media(max-width:520px){.customer-navbar-inner{padding:0 12px!important;gap:8px!important}.navbar-controls{gap:8px!important}.brand-logo-img{height:44px!important;max-height:44px!important}.table-pill span{max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cart-btn-nav{min-width:44px!important;padding:0 12px!important}.cart-btn-nav .cart-btn-text{display:none!important}}
+
+
+
+/* Customer footer */
+.customer-footer{max-width:1280px;margin:20px auto 0;padding:22px 24px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;color:#64748B}
+.customer-footer-brand{display:flex;align-items:center;gap:12px}.customer-footer-brand img{width:48px;height:48px;border-radius:50%;object-fit:cover;box-shadow:0 8px 18px rgba(46,125,184,.14)}.customer-footer strong{display:block;color:#0F172A;font-weight:900}.customer-footer small{display:block;font-weight:600}.customer-footer-info{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:13px;font-weight:800}.customer-footer-info span{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #E3ECF5;border-radius:999px;background:#fff}
+@media(max-width:720px){.customer-footer{align-items:flex-start;flex-direction:column;padding:18px 14px 104px}.customer-footer-info{width:100%;gap:8px}.customer-footer-info span{flex:1 1 auto;justify-content:center}}
+
+
+/* Remove customer menu hero logo */
+.menu-hero-left{
+    grid-template-columns:1fr!important;
+    grid-template-areas:"greet" "title" "sub"!important;
+    column-gap:0!important;
+}
+.menu-hero-left::before{
+    display:none!important;
+    content:none!important;
+}
+
+
+/* Customer navbar subtitle */
+.navbar-brand-custom{
+    gap:14px!important;
+}
+.navbar-brand-custom::after{
+    content:"Essensia Koffie\A Coffee & Space"!important;
+    white-space:pre!important;
+    line-height:1.15!important;
+    font-size:18px!important;
+    font-weight:950!important;
+    color:#0F172A!important;
+}
+.navbar-brand-custom::first-line{
+    font-size:18px!important;
+    font-weight:950!important;
+}
+@media(max-width:720px){
+    .navbar-brand-custom::after{
+        font-size:14px!important;
+        line-height:1.15!important;
+    }
+}
+
+
+/* Customer navbar subtitle softer style */
+.navbar-brand-custom::after{
+    color:#0F172A!important;
+    font-size:18px!important;
+    font-weight:950!important;
+    line-height:1.22!important;
+}
+.navbar-brand-custom::after{
+    text-shadow:0 1.22em 0 #64748B;
+}
+.navbar-brand-custom{
+    overflow:hidden!important;
+}
+@supports (-webkit-background-clip:text){
+    .navbar-brand-custom::after{
+        background:linear-gradient(#0F172A 0 48%, #64748B 48% 100%)!important;
+        -webkit-background-clip:text!important;
+        background-clip:text!important;
+        color:transparent!important;
+        text-shadow:none!important;
+    }
+}
+@media(max-width:720px){
+    .navbar-brand-custom::after{
+        font-size:14px!important;
+    }
+}
+
+
+/* Customer navbar real brand copy */
+.navbar-brand-custom::after{
+    content:none!important;
+    display:none!important;
+}
+.brand-copy{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    line-height:1.2!important;
+}
+.brand-copy strong{
+    color:#0F172A!important;
+    font-size:18px!important;
+    font-weight:950!important;
+    letter-spacing:0!important;
+}
+.brand-copy small{
+    margin-top:3px!important;
+    color:#64748B!important;
+    font-size:16px!important;
+    font-weight:500!important;
+    letter-spacing:0!important;
+}
+@media(max-width:720px){
+    .brand-copy strong{font-size:15px!important}
+    .brand-copy small{font-size:13px!important}
+}
+@media(max-width:430px){
+    .brand-copy small{display:none!important}
+}
+
+
+/* Customer navbar brand smaller */
+.brand-copy strong{
+    font-size:16px!important;
+}
+.brand-copy small{
+    font-size:14px!important;
+    margin-top:2px!important;
+}
+@media(max-width:720px){
+    .brand-copy strong{font-size:14px!important}
+    .brand-copy small{font-size:12px!important}
+}
+
+
+/* Customer navbar subtitle 12px */
+.brand-copy small{
+    font-size:12px!important;
+}
+@media(max-width:720px){
+    .brand-copy small{font-size:12px!important}
+}
+
+
+/* Customer navbar title 18px final */
+.brand-copy strong{
+    font-size:18px!important;
+}
+.brand-copy small{
+    font-size:12px!important;
+}
+@media(max-width:720px){
+    .brand-copy strong{font-size:18px!important}
+    .brand-copy small{font-size:12px!important}
+}
