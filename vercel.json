@@ -1,18 +1,13 @@
 {
     "version": 2,
     "framework": null,
-    "buildCommand": "composer install --no-dev --optimize-autoloader && npm install && npm run build",
     "functions": {
         "api/index.php": { "runtime": "vercel-php@0.7.4" }
     },
     "routes": [
         {
-            "src": "/(images|css|js|build|vendor|storage)/(.*)",
+            "src": "/(images|vendor|css|js|build|storage)/(.*)",
             "dest": "/public/$1/$2"
-        },
-        {
-            "src": "/(favicon\\.ico|favicon\\.png|robots\\.txt)$",
-            "dest": "/public/$1"
         },
         {
             "src": "/(.*)",
@@ -21,17 +16,17 @@
     ],
     "env": {
         "APP_ENV": "production",
-        "APP_DEBUG": "false",
+        "APP_DEBUG": "true",
         "APP_URL": "https://essensiakoffie.vercel.app",
 
-        "APP_CONFIG_CACHE": "/tmp/bootstrap/cache/config.php",
-        "APP_EVENTS_CACHE": "/tmp/bootstrap/cache/events.php",
-        "APP_PACKAGES_CACHE": "/tmp/bootstrap/cache/packages.php",
-        "APP_ROUTES_CACHE": "/tmp/bootstrap/cache/routes.php",
-        "APP_SERVICES_CACHE": "/tmp/bootstrap/cache/services.php",
-        "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+        "APP_CONFIG_CACHE": "/tmp/config.php",
+        "APP_EVENTS_CACHE": "/tmp/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/services.php",
+        "VIEW_COMPILED_PATH": "/tmp",
 
-        "CACHE_STORE": "array",
+        "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
     }
