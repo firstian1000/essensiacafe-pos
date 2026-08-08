@@ -7,7 +7,7 @@
         </button>
 
         <div class="page-title">
-            <h3>Cafe Management</h3>
+            <h3>{{ auth()->user()?->role === 'cashier' ? 'Kasir Management' : 'Admin Management' }}</h3>
         </div>
 
     </div>
@@ -206,6 +206,7 @@
                                 ->get();
         @endphp
 
+        @if(auth()->user()?->role === 'cashier')
         <!-- Voice Order Notification Toggle Button -->
         <div class="d-flex align-items-center me-2">
             <button type="button" id="btn-audio-toggle" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1" style="font-size: 0.82rem; transition: all 0.2s ease;">
@@ -213,6 +214,7 @@
                 <span id="audio-toggle-text">Suara: ON</span>
             </button>
         </div>
+        @endif
 
         <div class="dropdown">
             <button class="notification" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="position: relative;">
@@ -257,6 +259,7 @@
         <!-- Floating Realtime Order Toast Popup Container -->
         <div id="order-toast-container" style="position: fixed; top: 75px; right: 25px; z-index: 9999; max-width: 380px; width: 100%; pointer-events: none;"></div>
 
+        @if(auth()->user()?->role === 'cashier')
         <script>
         document.addEventListener('DOMContentLoaded', function () {
             let latestOrderId = @json(\App\Models\Order::max('id') ?: 0);
@@ -429,23 +432,24 @@
             window.addEventListener('focus', checkNewOrders);
         });
         </script>
+        @endif
 
         <div class="admin-profile">
 
             <div class="avatar">
-                <i class="bi bi-person-fill"></i>
+                <i class="bi {{ auth()->user()?->role === 'cashier' ? 'bi-calculator-fill' : 'bi-person-fill' }}"></i>
             </div>
 
             <div>
 
                 <h6>{{ auth()->user()->name ?? 'Admin' }}</h6>
 
-                <small>Essensia Koffie</small>
+                <small>{{ auth()->user()?->role === 'cashier' ? 'Kasir Essensia' : 'Admin Essensia' }}</small>
 
             </div>
 
         </div>
-        <a href="{{ route('logout.get') }}" class="topbar-logout-link" title="Keluar">
+        <a href="{{ route('logout.get', ['redirect' => auth()->user()?->role === 'cashier' ? 'cashier' : 'admin']) }}" class="topbar-logout-link" title="Keluar">
             <i class="bi bi-box-arrow-right"></i>
             <span>Keluar</span>
         </a>
@@ -453,4 +457,3 @@
     </div>
 
 </nav>
-

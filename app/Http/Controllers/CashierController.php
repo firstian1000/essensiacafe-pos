@@ -28,7 +28,7 @@ class CashierController extends Controller
     {
         $data = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:100'],
-            'payment_method' => ['required', 'in:cash,qris,card'],
+            'payment_method' => ['required', 'in:cash,qris,ewallet'],
             'paid_amount' => ['required', 'numeric', 'min:0'],
             'items' => ['required', 'array', 'min:1'],
             'items.*.menu_id' => ['required', 'exists:menus,id'],

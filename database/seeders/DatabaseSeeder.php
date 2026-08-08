@@ -19,6 +19,17 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Admin Cafe',
                 'password' => bcrypt('password'),
+                'role' => 'admin',
+            ]
+        );
+        $user->update(['role' => 'admin']);
+
+        User::firstOrCreate(
+            ['email' => 'kasir@essensia.test'],
+            [
+                'name' => 'Kasir Cafe',
+                'password' => bcrypt('password'),
+                'role' => 'cashier',
             ]
         );
 
@@ -65,4 +76,3 @@ class DatabaseSeeder extends Seeder
         $this->call(SettingSeeder::class);
     }
 }
-

@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/admin/login.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/admin/login.css') }}?v=2">
 </head>
 <body>
     <main class="login-page">
@@ -55,14 +55,21 @@
                     </div>
                 @endif
 
-                <form action="{{ route('login') }}" method="POST" class="login-form">
+                <a href="{{ route('login.google') }}" class="btn-google">
+                    <i class="bi bi-google"></i>
+                    Masuk dengan Google
+                </a>
+
+                <div class="login-divider"><span>atau masuk dengan email</span></div>
+
+                <form action="{{ route('login') }}" method="POST" class="login-form" autocomplete="off">
                     @csrf
 
                     <label class="field-group">
                         <span>Email</span>
                         <div class="input-shell">
                             <i class="bi bi-envelope"></i>
-                            <input type="email" name="email" value="{{ old('email') }}" placeholder="admin@essensia.test" autocomplete="email" required autofocus>
+                            <input type="email" name="email" value="" placeholder="essensia@gmail.com" autocomplete="off" required autofocus>
                         </div>
                     </label>
 
@@ -70,7 +77,10 @@
                         <span>Password</span>
                         <div class="input-shell">
                             <i class="bi bi-key"></i>
-                            <input type="password" name="password" placeholder="Masukkan password" autocomplete="current-password" required>
+                            <input id="password" type="password" name="password" placeholder="password" autocomplete="new-password" required>
+                            <button type="button" class="password-toggle" aria-label="Tampilkan password" aria-pressed="false">
+                                <i class="bi bi-eye"></i>
+                            </button>
                         </div>
                     </label>
 
@@ -87,5 +97,18 @@
             </div>
         </section>
     </main>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.querySelector('.password-toggle');
+
+        passwordToggle?.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            passwordToggle.setAttribute('aria-pressed', String(isPassword));
+            passwordToggle.setAttribute('aria-label', isPassword ? 'Sembunyikan password' : 'Tampilkan password');
+            passwordToggle.querySelector('i').className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+    </script>
 </body>
 </html>

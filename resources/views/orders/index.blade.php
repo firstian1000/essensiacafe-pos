@@ -21,8 +21,10 @@
             <h1>Daftar Pesanan</h1>
             <p style="color: #64748B; font-size: 14px; margin: 4px 0 8px 0; font-weight: 500;">Data pesanan online lewat meja.</p>
             <div class="breadcrumb-custom">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <span>></span>
+                @if(auth()->user()?->role === 'admin')
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <span>></span>
+                @endif
                 <span>Pesanan</span>
             </div>
         </div>
@@ -100,7 +102,11 @@
                 </div>
                 <div class="time" data-label="Waktu">{{ $order->created_at->format('d M H:i') }}</div>
                 <div data-label="Aksi" class="action-buttons">
-                    @if($order->status == 'pending')
+                    @if(auth()->user()?->role === 'admin')
+                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                            <i class="bi bi-eye-fill"></i> Detail
+                        </a>
+                    @elseif($order->status == 'pending')
                         <a href="{{ route('orders.process', $order) }}" class="btn-action-text btn-action-process" title="Mulai Proses Pesanan">
                             <i class="bi bi-play-fill"></i> Proses
                         </a>

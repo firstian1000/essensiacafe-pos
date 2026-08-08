@@ -15,8 +15,10 @@
         <div>
             <h1>Manajemen Pembayaran</h1>
             <div class="breadcrumb-custom">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <span>></span>
+                @if(auth()->user()?->role === 'admin')
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <span>></span>
+                @endif
                 <span>Pembayaran</span>
             </div>
         </div>
@@ -204,12 +206,12 @@
                                 <a href="{{ route('payments.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Transaksi">
                                     <i class="bi bi-eye-fill"></i> Detail
                                 </a>
-                                @if($order->payment_status == 'pending')
+                                @if(auth()->user()?->role === 'cashier' && $order->payment_status == 'pending')
                                 <a href="{{ route('orders.paid', $order) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Lunas & Cetak Nota"
                                    onclick="return confirm('Konfirmasi pembayaran lunas untuk pesanan ini?')">
                                     <i class="bi bi-check-circle-fill"></i> Lunasi
                                 </a>
-                                @elseif($order->payment_status == 'paid')
+                                @elseif(auth()->user()?->role === 'cashier' && $order->payment_status == 'paid')
                                 <a href="{{ route('payments.receipt', $order) }}" class="btn-action-text btn-action-print" title="Cetak Struk">
                                     <i class="bi bi-printer-fill"></i> Struk
                                 </a>

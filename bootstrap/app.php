@@ -4,6 +4,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use App\Http\Middleware\EnsureUserRole;
+use App\Http\Middleware\RedirectIfRoleAuthenticated;
 
 $app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,6 +15,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
     )
 
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'role' => EnsureUserRole::class,
+            'guest.role' => RedirectIfRoleAuthenticated::class,
+        ]);
+
         $middleware->trustProxies(at: '*');
         $middleware->validateCsrfTokens(except: [
             'midtrans/callback',

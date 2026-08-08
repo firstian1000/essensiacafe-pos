@@ -3,7 +3,7 @@
 @section('title','Kasir')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=18">
+<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=19">
 @endpush
 
 @section('content')
@@ -12,11 +12,13 @@
         <div>
             <h1>Kasir</h1>
             <p style="color: #64748B; font-size: 14px; margin: 4px 0 8px 0; font-weight: 500;">Pemesanan langsung di kasir untuk take away</p>
-            <div class="breadcrumb-custom">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <span>></span>
-                <span>Kasir</span>
-            </div>
+            @if(auth()->user()?->role === 'admin')
+                <div class="breadcrumb-custom">
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <span>></span>
+                    <span>Kasir</span>
+                </div>
+            @endif
         </div>
     </div>
 
@@ -85,10 +87,10 @@
                 </label>
                 <label>
                     <span>Metode</span>
-                    <select name="payment_method" required>
+                    <select name="payment_method" id="paymentMethod" required>
                         <option value="cash">Cash</option>
                         <option value="qris">QRIS</option>
-                        <option value="card">Kartu / E-Wallet</option>
+                        <option value="ewallet">E-Wallet</option>
                     </select>
                 </label>
             </div>
@@ -102,14 +104,14 @@
             <div class="cashier-summary">
                 <div><span>Total Item</span><strong id="totalItems">0</strong></div>
                 <div><span>Total</span><strong id="grandTotal">Rp 0</strong></div>
-                <label class="paid-field">
+                <label class="paid-field" id="paidField">
                     <span>Uang Diterima</span>
                     <div class="money-input">
                         <span>Rp</span>
                         <input type="number" id="paidAmount" min="0" value="0">
                     </div>
                 </label>
-                <div class="change-row"><span>Kembalian</span><strong id="changeTotal">Rp 0</strong></div>
+                <div class="change-row" id="changeRow"><span>Kembalian</span><strong id="changeTotal">Rp 0</strong></div>
             </div>
 
 
@@ -137,6 +139,9 @@ const totalItemsEl = document.getElementById('totalItems');
 const paidEl = document.getElementById('paidAmount');
 const paidHiddenEl = document.getElementById('paidAmountHidden');
 const changeEl = document.getElementById('changeTotal');
+const changeRowEl = document.getElementById('changeRow');
+const paidFieldEl = document.getElementById('paidField');
+const paymentMethodEl = document.getElementById('paymentMethod');
 const searchEl = document.getElementById('cashierSearch');
 const paginationEl = document.getElementById('cashierPagination');
 const paginationInfoEl = document.getElementById('cashierPaginationInfo');
@@ -178,6 +183,7 @@ document.querySelectorAll('#cashierCategoryFilter button').forEach(button => {
 });
 
 paidEl.addEventListener('input', renderTotals);
+paymentMethodEl.addEventListener('change', renderTotals);
 
 function filterMenus() {
     const keyword = searchEl.value.toLowerCase();
@@ -289,9 +295,12 @@ function renderTotals() {
     const items = Array.from(cart.values());
     const total = items.reduce((sum, item) => sum + item.price * item.qty, 0);
     const qty = items.reduce((sum, item) => sum + item.qty, 0);
-    const paid = Number(paidEl.value || 0);
+    const isCash = paymentMethodEl.value === 'cash';
+    const paid = isCash ? Number(paidEl.value || 0) : total;
 
     paidHiddenEl.value = paid;
+    paidFieldEl.style.display = isCash ? '' : 'none';
+    changeRowEl.style.display = isCash ? '' : 'none';
     totalItemsEl.textContent = qty;
     grandEl.textContent = money(total);
     changeEl.textContent = money(Math.max(paid - total, 0));
@@ -303,6 +312,8 @@ document.getElementById('cashierForm').addEventListener('submit', e => {
         alert('Pilih minimal satu menu.');
         return;
     }
+
+    renderTotals();
 
     if (typeof cafeConfig !== 'undefined') {
         const now = new Date();
@@ -328,8 +339,6 @@ document.getElementById('cashierForm').addEventListener('submit', e => {
 filterMenus();
 </script>
 @endpush
-
-
 
 
 

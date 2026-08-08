@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=1">
 </head>
 <body class="receipt-body">
+    @php
+        $paymentLabels = [
+            'cash' => 'Cash',
+            'qris' => 'QRIS',
+            'ewallet' => 'E-Wallet',
+            'card' => 'E-Wallet',
+            'midtrans' => 'QRIS',
+        ];
+        $paymentLabel = $paymentLabels[$order->payment_method] ?? strtoupper($order->payment_method ?? 'Cash');
+    @endphp
+
     <main class="thermal-receipt">
         <div class="receipt-logo">Essensia<br>Koffie</div>
         <h1>Essensia Koffie</h1>
@@ -40,9 +51,11 @@
         <div class="receipt-totals">
             <div><span>Items count:</span><strong>{{ $order->items->sum('qty') }}</strong></div>
             <div class="grand"><span>TOTAL:</span><strong>Rp{{ number_format($order->total,0,',','.') }}</strong></div>
-            <div><span>{{ strtoupper($order->payment_method ?? 'cash') }}:</span><strong>Rp{{ number_format($order->total,0,',','.') }}</strong></div>
+            <div><span>{{ strtoupper($paymentLabel) }}:</span><strong>Rp{{ number_format($order->total,0,',','.') }}</strong></div>
+            @if($order->payment_method == 'cash')
             <div><span>Paid amount:</span><strong>Rp{{ number_format($paidAmount,0,',','.') }}</strong></div>
             <div><span>Change:</span><strong>Rp{{ number_format(max($paidAmount - $order->total, 0),0,',','.') }}</strong></div>
+            @endif
         </div>
 
         <div class="barcode">

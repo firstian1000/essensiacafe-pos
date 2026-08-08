@@ -46,6 +46,8 @@ class OrderController extends Controller
 
     public function process(Order $order)
     {
+        $this->ensureCashierCanUpdateStatus();
+
         $order->update([
             'status' => 'processing'
         ]);
@@ -57,6 +59,8 @@ class OrderController extends Controller
 
     public function unprocess(Order $order)
     {
+        $this->ensureCashierCanUpdateStatus();
+
         $order->update([
             'status' => 'pending'
         ]);
@@ -68,6 +72,8 @@ class OrderController extends Controller
 
     public function complete(Order $order)
     {
+        $this->ensureCashierCanUpdateStatus();
+
         $order->update([
             'status' => 'completed'
         ]);
@@ -81,6 +87,8 @@ class OrderController extends Controller
 
     public function cancel(Order $order)
     {
+        $this->ensureCashierCanUpdateStatus();
+
         $order->update([
             'status' => 'cancelled',
             'payment_status' => $order->payment_status === 'paid' ? 'paid' : 'failed',
@@ -95,6 +103,8 @@ class OrderController extends Controller
 
     public function paid(Order $order)
     {
+        $this->ensureCashierCanUpdateStatus();
+
         $order->update([
             'payment_status' => 'paid',
             'status'         => $order->status === 'cancelled' ? 'cancelled' : 'completed',
@@ -105,6 +115,13 @@ class OrderController extends Controller
         return redirect()
             ->route('payments.receipt', $order)
             ->with('success', 'Pembayaran berhasil dikonfirmasi.');
+    }
+
+    protected function ensureCashierCanUpdateStatus(): void
+    {
+        if (auth()->user()?->role !== 'cashier') {
+            abort(403);
+        }
     }
 
 protected function checkAndResetTableStatus(Order $order)

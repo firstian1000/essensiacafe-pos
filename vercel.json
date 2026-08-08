@@ -1,37 +1,38 @@
 {
-  "version": 2,
-  "outputDirectory": "public",
-  "functions": {
-    "api/index.php": {
-      "runtime": "vercel-php@0.7.2"
+    "version": 2,
+    "framework": null,
+    "buildCommand": "composer install --no-dev --optimize-autoloader && npm install && npm run build",
+    "functions": {
+        "api/index.php": { "runtime": "vercel-php@0.7.4" }
+    },
+    "routes": [
+        {
+            "src": "/(images|css|js|build|vendor|storage)/(.*)",
+            "dest": "/public/$1/$2"
+        },
+        {
+            "src": "/(favicon\\.ico|favicon\\.png|robots\\.txt)$",
+            "dest": "/public/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/index.php"
+        }
+    ],
+    "env": {
+        "APP_ENV": "production",
+        "APP_DEBUG": "false",
+        "APP_URL": "https://essensiakoffie.vercel.app",
+
+        "APP_CONFIG_CACHE": "/tmp/bootstrap/cache/config.php",
+        "APP_EVENTS_CACHE": "/tmp/bootstrap/cache/events.php",
+        "APP_PACKAGES_CACHE": "/tmp/bootstrap/cache/packages.php",
+        "APP_ROUTES_CACHE": "/tmp/bootstrap/cache/routes.php",
+        "APP_SERVICES_CACHE": "/tmp/bootstrap/cache/services.php",
+        "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
+
+        "CACHE_STORE": "array",
+        "LOG_CHANNEL": "stderr",
+        "SESSION_DRIVER": "cookie"
     }
-  },
-  "routes": [
-    {
-      "src": "/(css|images|js|vendor|build|storage)/(.*)",
-      "dest": "/public/$1/$2"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/public/favicon.ico"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/public/robots.txt"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/api/index.php"
-    }
-  ],
-  "env": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "true",
-    "LOG_CHANNEL": "stderr",
-    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views",
-    "CACHE_STORE": "array",
-    "SESSION_DRIVER": "cookie",
-    "DB_CONNECTION": "sqlite",
-    "DB_DATABASE": "/tmp/database.sqlite"
-  }
 }

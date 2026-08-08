@@ -20,8 +20,10 @@
         <div>
             <h1>Detail Pembayaran</h1>
             <div class="breadcrumb-custom">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <span>></span>
+                @if(auth()->user()?->role === 'admin')
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <span>></span>
+                @endif
                 <a href="{{ route('payments.index') }}">Pembayaran</a>
                 <span>></span>
                 <span>Detail</span>
@@ -96,7 +98,7 @@
                     <div><span>Total Bayar</span><strong class="price-big">Rp {{ number_format($order->total, 0, ',', '.') }}</strong></div>
                 </div>
 
-                @if($order->payment_status == 'pending')
+                @if(auth()->user()?->role === 'cashier' && $order->payment_status == 'pending')
                     <a href="{{ route('orders.paid', $order) }}"
                        class="btn-confirm-pay clean"
                        onclick="return confirm('Konfirmasi pembayaran lunas?')">
@@ -110,11 +112,13 @@
                         <i class="bi bi-patch-check-fill"></i>
                         LUNAS
                     </div>
+                    @if(auth()->user()?->role === 'cashier')
                     <a href="{{ route('payments.receipt', $order) }}"
                        class="btn-confirm-pay clean" style="background:#2E7DB8; margin-top:10px;">
                         <i class="bi bi-printer-fill"></i>
                         Cetak Nota
                     </a>
+                    @endif
                 @endif
             </section>
         </div>

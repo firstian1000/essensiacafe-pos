@@ -20,8 +20,10 @@
         <div>
             <h1>Detail Pesanan</h1>
             <div class="breadcrumb-custom">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <span>></span>
+                @if(auth()->user()?->role === 'admin')
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <span>></span>
+                @endif
                 <a href="{{ route('orders.index') }}">Pesanan</a>
                 <span>></span>
                 <span>Detail</span>
@@ -91,7 +93,7 @@
             </div>
         </div>
 
-        @if($order->payment_method == 'cash' && $order->payment_status == 'pending' && $order->status != 'cancelled')
+        @if(auth()->user()?->role === 'cashier' && $order->payment_method == 'cash' && $order->payment_status == 'pending' && $order->status != 'cancelled')
             <div class="detail-action-strip">
                 <span>Konfirmasi pembayaran cash jika uang sudah diterima.</span>
                 <a href="{{ route('orders.paid', $order) }}" class="btn-detail-action primary">
@@ -132,6 +134,7 @@
             </table>
         </div>
 
+        @if(auth()->user()?->role === 'cashier')
         <div class="detail-footer-actions" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
             @if($order->status == 'pending')
                 <a href="{{ route('orders.process', $order->id) }}" class="btn-detail-action primary">
@@ -160,6 +163,7 @@
                 </button>
             @endif
         </div>
+        @endif
     </div>
 </div>
 @endsection

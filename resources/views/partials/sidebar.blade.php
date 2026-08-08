@@ -15,6 +15,7 @@
     <!-- Menu -->
     <ul class="sidebar-menu">
 
+        @if(auth()->user()?->role === 'admin')
         <li>
             <a href="{{ route('dashboard') }}"
                class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -46,14 +47,33 @@
                 <span>Meja</span>
             </a>
         </li>
+        @endif
 
-        <li>
-            <a href="{{ route('cashier.index') }}"
-               class="{{ request()->routeIs('cashier.*') ? 'active' : '' }}">
-                <i class="bi bi-calculator"></i>
-                <span>Kasir</span>
-            </a>
-        </li>
+        @if(auth()->user()?->role === 'cashier')
+            <li>
+                <a href="{{ route('categories.index') }}"
+                   class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                    <i class="bi bi-folder2-open"></i>
+                    <span>Kategori</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('tables.index') }}"
+                   class="{{ request()->routeIs('tables.*') ? 'active' : '' }}">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Meja</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('cashier.index') }}"
+                   class="{{ request()->routeIs('cashier.*') ? 'active' : '' }}">
+                    <i class="bi bi-calculator"></i>
+                    <span>Kasir</span>
+                </a>
+            </li>
+        @endif
 
         <li>
             <a href="{{ route('orders.index') }}"
@@ -71,13 +91,15 @@
             </a>
         </li>
 
-        <li>
-            <a href="{{ route('settings.index') }}"
-               class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
-                <i class="bi bi-gear-fill"></i>
-                <span>Pengaturan</span>
-            </a>
-        </li>
+        @if(auth()->user()?->role === 'cashier')
+            <li>
+                <a href="{{ route('settings.index') }}"
+                   class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Pengaturan</span>
+                </a>
+            </li>
+        @endif
 
     </ul>
 

@@ -1,6 +1,11 @@
-/vendor
 /node_modules
-.env
-.env.backup
-.git
-.github
+/tests
+/storage/logs
+/storage/framework/cache/data
+/storage/framework/sessions
+/storage/framework/views
+/.git
+/.env.example
+/phpunit.xml
+/README.md
+/vendor

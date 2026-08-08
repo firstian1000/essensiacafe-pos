@@ -18,8 +18,12 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\SettingController;
 
-Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->middleware('guest')->name('login');
-Route::post('/login', [AdminLoginController::class, 'login'])->middleware('guest');
+Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AdminLoginController::class, 'login']);
+Route::get('/login/google', [AdminLoginController::class, 'redirectToGoogle'])->middleware('guest.role')->name('login.google');
+Route::get('/login/google/callback', [AdminLoginController::class, 'handleGoogleCallback'])->middleware('guest.role')->name('login.google.callback');
+Route::get('/kasir/login', [AdminLoginController::class, 'showCashierLoginForm'])->name('cashier.login.form');
+Route::post('/kasir/login', [AdminLoginController::class, 'cashierLogin'])->name('cashier.login');
 Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
 Route::get('/logout', [AdminLoginController::class, 'logout'])->name('logout.get');
 
@@ -29,25 +33,31 @@ Route::get('/logout', [AdminLoginController::class, 'logout'])->name('logout.get
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])
-        ->name('dashboard');
+Route::middleware('auth')->get('/', function () {
+    return auth()->user()?->role === 'cashier'
+        ? redirect()->route('cashier.index')
+        : app(DashboardController::class)->index(request());
+})->name('dashboard');
 
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
 
-    Route::resource('categories', CategoryController::class);
-
     Route::resource('menus', MenuController::class);
-
-    Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
-    Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.store');
-    Route::get('/cashier/receipt/{order}', [CashierController::class, 'receipt'])->name('cashier.receipt');
 
     Route::put('/menus/{menu}/status', [MenuController::class, 'updateStatus'])
         ->name('menus.status');
 
     Route::put('/menus/{menu}/recommendation', [MenuController::class, 'updateRecommendation'])
         ->name('menus.recommendation');
+
+});
+
+Route::middleware(['auth', 'role:admin,cashier'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+
+    Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
+    Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.store');
+    Route::get('/cashier/receipt/{order}', [CashierController::class, 'receipt'])->name('cashier.receipt');
 
     Route::resource('tables', CafeTableController::class);
 
@@ -147,4 +157,3 @@ Route::get('/order/success/{order}', [OrderSuccessController::class, 'index'])
 
 Route::post('/midtrans/callback', [MidtransController::class, 'callback'])
     ->name('midtrans.callback');
-

@@ -424,12 +424,23 @@ body {
 </head>
 <body>
 
+@php
+    $paymentLabels = [
+        'cash' => 'Cash',
+        'qris' => 'QRIS',
+        'ewallet' => 'E-Wallet',
+        'card' => 'E-Wallet',
+        'midtrans' => 'QRIS',
+    ];
+    $paymentLabel = $paymentLabels[$order->payment_method] ?? strtoupper($order->payment_method ?? 'Cash');
+@endphp
+
 {{-- ====================================================
      SUCCESS BAR (screen only)
 ===================================================== --}}
 <div class="success-bar">
     <i class="bi bi-check-circle-fill"></i>
-    Pembayaran {{ $order->payment_method == 'cash' ? 'Cash' : 'Midtrans' }} Dikonfirmasi Lunas — Nota siap dicetak
+    Pembayaran {{ $paymentLabel }} Dikonfirmasi Lunas - Nota siap dicetak
 </div>
 
 {{-- ====================================================
@@ -442,7 +453,7 @@ body {
         <div class="nota-head">
             <div class="nota-head-left">
                 <h2>Nota Kasir</h2>
-                <p>Pembayaran {{ $order->payment_method == 'cash' ? 'cash' : 'Midtrans' }} telah dikonfirmasi lunas</p>
+                <p>Pembayaran {{ $paymentLabel }} telah dikonfirmasi lunas</p>
             </div>
             <button class="btn-print-head" onclick="window.print()" title="Cetak Nota">
                 <i class="bi bi-printer-fill"></i>
@@ -467,7 +478,7 @@ body {
                             </span>
                         @else
                             <span class="badge-cash" style="background:#e0f2fe; color:#0369a1;">
-                                <i class="bi bi-qr-code" style="margin-right:4px"></i>Midtrans
+                                <i class="bi bi-qr-code" style="margin-right:4px"></i>{{ $paymentLabel }}
                             </span>
                         @endif
                     </div>
@@ -624,9 +635,10 @@ body {
                 <strong>Rp{{ number_format($order->total, 0, ',', '.') }}</strong>
             </div>
             <div class="t-total-row">
-                <span>{{ strtoupper($order->payment_method ?? 'CASH') }}:</span>
+                <span>{{ strtoupper($paymentLabel) }}:</span>
                 <strong>Rp{{ number_format($order->total, 0, ',', '.') }}</strong>
             </div>
+            @if($order->payment_method == 'cash')
             <div class="t-total-row">
                 <span>Paid amount:</span>
                 <strong id="t_paid_amount">Rp{{ number_format(request('paid', $order->total), 0, ',', '.') }}</strong>
@@ -635,6 +647,7 @@ body {
                 <span>Change:</span>
                 <strong id="t_change_amount">Rp{{ number_format(max(0, request('paid', $order->total) - $order->total), 0, ',', '.') }}</strong>
             </div>
+            @endif
         </div>
 
         {{-- Barcode --}}
