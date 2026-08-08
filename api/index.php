@@ -27,4 +27,12 @@ putenv('APP_PACKAGES_CACHE=/tmp/bootstrap/cache/packages.php');
 putenv('APP_ROUTES_CACHE=/tmp/bootstrap/cache/routes.php');
 putenv('APP_SERVICES_CACHE=/tmp/bootstrap/cache/services.php');
 
-require __DIR__ . '/../public/index.php';
+try {
+    require __DIR__ . '/../public/index.php';
+} catch (Throwable $exception) {
+    error_log('[Vercel Laravel Error] '.$exception::class.': '.$exception->getMessage());
+    error_log($exception->getTraceAsString());
+
+    http_response_code(500);
+    echo 'Server Error';
+}
