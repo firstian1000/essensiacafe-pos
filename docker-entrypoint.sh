@@ -33,6 +33,11 @@ php artisan storage:link --force || true
 php artisan config:clear || true
 php artisan cache:clear || true
 
+# Railway provides the public listen port through PORT.
+APACHE_PORT="${PORT:-8080}"
+sed -ri "s/^Listen .*/Listen ${APACHE_PORT}/" /etc/apache2/ports.conf
+sed -ri "s/<VirtualHost \*:.*>/<VirtualHost *:${APACHE_PORT}>/" /etc/apache2/sites-available/*.conf
+
 # Keep Apache on one MPM before the foreground process starts.
 rm -f /etc/apache2/mods-enabled/mpm_event.load \
     /etc/apache2/mods-enabled/mpm_event.conf \

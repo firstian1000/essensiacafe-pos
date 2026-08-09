@@ -36,6 +36,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-ava
 # Default Environment Variables
 ENV APP_ENV=production
 ENV APP_DEBUG=true
+ENV PORT=8080
 ENV DB_CONNECTION=pgsql
 ENV APP_KEY=base64:7vFwV8h6aN+wK1Q6XG8Yy1bY9Pz+7z/x0N5k9j5a8B4=
 
@@ -58,6 +59,6 @@ RUN chmod +x /var/www/html/docker-entrypoint.sh
 # Set permissions
 RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database
 
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
