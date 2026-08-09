@@ -33,5 +33,12 @@ php artisan storage:link --force || true
 php artisan config:clear || true
 php artisan cache:clear || true
 
+# Keep Apache on one MPM before the foreground process starts.
+rm -f /etc/apache2/mods-enabled/mpm_event.load \
+    /etc/apache2/mods-enabled/mpm_event.conf \
+    /etc/apache2/mods-enabled/mpm_worker.load \
+    /etc/apache2/mods-enabled/mpm_worker.conf
+a2enmod mpm_prefork rewrite >/dev/null 2>&1 || true
+
 # Start Apache in foreground
 exec apache2-foreground
