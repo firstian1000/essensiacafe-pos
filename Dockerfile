@@ -22,7 +22,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install pdo pdo_pgsql pgsql pdo_sqlite pdo_mysql mbstring exif pcntl bcmath gd
 
 # Enable Apache rewrite module and keep a single PHP-compatible MPM loaded
-RUN a2dismod mpm_event mpm_worker || true \
+RUN rm -f /etc/apache2/mods-enabled/mpm_event.load \
+    /etc/apache2/mods-enabled/mpm_event.conf \
+    /etc/apache2/mods-enabled/mpm_worker.load \
+    /etc/apache2/mods-enabled/mpm_worker.conf \
     && a2enmod mpm_prefork rewrite
 
 # Set Apache DocumentRoot to /var/www/html/public
@@ -33,8 +36,7 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/conf-ava
 # Default Environment Variables
 ENV APP_ENV=production
 ENV APP_DEBUG=true
-ENV DB_CONNECTION=sqlite
-ENV DB_DATABASE=/var/www/html/database/database.sqlite
+ENV DB_CONNECTION=pgsql
 ENV APP_KEY=base64:7vFwV8h6aN+wK1Q6XG8Yy1bY9Pz+7z/x0N5k9j5a8B4=
 
 # Set working directory
