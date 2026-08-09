@@ -139,17 +139,9 @@
 
                 <div class="qr-box">
 
-                    @if($table->qr_image)
-
-                        <img
-    src="{{ asset('storage/qrcodes/'.$table->qr_image) }}"
-    alt="QR Code">
-
-                    @else
-
-                        {!! QrCode::size(170)->generate(route('customer.order',$table->qr_token)) !!}
-
-                    @endif
+                    <img
+                        src="{{ $table->qr_image_url }}"
+                        alt="QR Code">
 
                 </div>
 

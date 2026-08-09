@@ -32,7 +32,12 @@ class CafeTable extends Model
 
     public function getQrImageUrlAttribute(): string
     {
-        $qrImage = \App\Services\QrCodeService::ensureQrExists($this);
-        return asset('storage/qrcodes/' . $qrImage);
+        $token = $this->qr_token ?: \Illuminate\Support\Str::random(10);
+
+        if (!$this->qr_token) {
+            $this->forceFill(['qr_token' => $token])->save();
+        }
+
+        return \App\Services\QrCodeService::dataUri($token);
     }
 }

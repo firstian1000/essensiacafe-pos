@@ -8,7 +8,7 @@ use App\Models\CafeTable;
 
 class QrCodeService
 {
-    public static function generate(string $token): string
+    public static function svg(string $token): string
     {
         $result = (new Builder())->build(
             writer: new SvgWriter(),
@@ -17,6 +17,16 @@ class QrCodeService
             margin: 10
         );
 
+        return $result->getString();
+    }
+
+    public static function dataUri(string $token): string
+    {
+        return 'data:image/svg+xml;base64,' . base64_encode(self::svg($token));
+    }
+
+    public static function generate(string $token): string
+    {
         $fileName = $token . '.svg';
         $directory = storage_path('app/public/qrcodes');
 
@@ -24,7 +34,7 @@ class QrCodeService
             mkdir($directory, 0755, true);
         }
 
-        $result->saveToFile($directory . '/' . $fileName);
+        file_put_contents($directory . '/' . $fileName, self::svg($token));
 
         return $fileName;
     }
@@ -51,4 +61,4 @@ class QrCodeService
 
         return $fileName;
     }
-}
+}
