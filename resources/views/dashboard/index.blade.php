@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=3">
+<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=13">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endpush
 
@@ -17,49 +17,12 @@
             <h1>Selamat datang kembali, Admin! 👋</h1>
             <p>Berikut ringkasan aktivitas operasional Essensia Koffie hari ini.</p>
         </div>
-        <div class="dashboard-actions">
-            <a href="{{ route('dashboard.export', ['date' => $selectedDate]) }}" class="btn-export-excel">
-                <i class="bi bi-file-earmark-excel"></i>
-                <span>Download Rekap Excel</span>
-            </a>
-            <form action="{{ route('dashboard') }}" method="GET" id="dateFilterForm" class="d-inline">
-                <div class="position-relative">
-                    <input type="text" name="date" class="btn-date" id="flatpickr-date" value="{{ \Carbon\Carbon::parse($selectedDate)->format('Y-m-d') }}" style="cursor: pointer; min-width: 150px; text-align: center;">
-                </div>
-            </form>
-        </div>
     </div>
-
-    <!-- Notifikasi Transaksi Gagal -->
-    @if($recentFailedOrders->isNotEmpty())
-    <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert" style="background-color: #FEE2E2; border-left: 4px solid #EF4444 !important; color: #991B1B; padding-right: 3rem;">
-        <div class="d-flex align-items-center">
-            <i class="bi bi-exclamation-triangle-fill fs-3 me-3" style="color: #EF4444;"></i>
-            <div>
-                <h5 class="alert-heading mb-1 fw-bold" style="color: #991B1B;">Pemberitahuan Transaksi Gagal / Dibatalkan</h5>
-                <p class="mb-0">Terdapat <strong>{{ $recentFailedOrders->count() }}</strong> transaksi terbaru yang gagal atau dibatalkan. Segera periksa detail pesanan.</p>
-            </div>
-        </div>
-        <hr class="my-2" style="border-top-color: #FCA5A5; opacity: 0.3;">
-        <ul class="mb-0 ps-3">
-            @foreach($recentFailedOrders as $failedOrder)
-            <li class="mb-1">
-                Invoice: <strong><a href="{{ route('orders.show', $failedOrder->id) }}" style="color: #B91C1C; text-decoration: underline;">{{ $failedOrder->invoice }}</a></strong> | 
-                Nama: <strong>{{ $failedOrder->customer_name ?? '-' }}</strong> | 
-                Meja: <strong>{{ optional($failedOrder->table)->table_number ?? 'Kasir (Takeaway)' }}</strong> | 
-                Total: <strong>Rp {{ number_format($failedOrder->total, 0, ',', '.') }}</strong> | 
-                Status: <span class="badge bg-danger">{{ ucfirst($failedOrder->payment_status ?: $failedOrder->status) }}</span>
-            </li>
-            @endforeach
-        </ul>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="position: absolute; right: 1rem; top: 1rem; border: none; background: none; font-size: 1.2rem;"></button>
-    </div>
-    @endif
 
     <!-- Statistik -->
-    <div class="row g-4 mb-4">
+    <div class="dashboard-stats-grid mb-4">
 
-        <div class="col-lg-3 col-sm-6">
+        <div>
             <div class="dashboard-card stat-card">
                 <div class="stat-icon blue">
                     <i class="bi bi-folder2-open"></i>
@@ -72,7 +35,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-sm-6">
+        <div>
             <div class="dashboard-card stat-card">
                 <div class="stat-icon green">
                     <i class="bi bi-cup-hot"></i>
@@ -85,7 +48,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-sm-6">
+        <div>
             <div class="dashboard-card stat-card">
                 <div class="stat-icon orange">
                     <i class="bi bi-grid"></i>
@@ -98,7 +61,7 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-sm-6">
+        <div>
             <div class="dashboard-card stat-card">
                 <div class="stat-icon purple">
                     <i class="bi bi-receipt"></i>
@@ -112,47 +75,150 @@
         </div>
 
     </div>
+    <div class="dashboard-money-grid mb-4">
+        <div class="dashboard-card stat-card money-stat-card">
+            <div class="stat-icon purple">
+                <i class="bi bi-credit-card-2-front"></i>
+            </div>
+            <div>
+                <small>Total Pengeluaran</small>
+                <h2 class="money-stat-value money-red">Rp {{ number_format($totalPengeluaran, 0, ',', '.') }}</h2>
+                <a href="{{ route('expenses.index') }}">Kelola Pengeluaran</a>
+            </div>
+        </div>
 
-    <!-- Pendapatan -->
+        <div class="dashboard-card stat-card revenue-card money-stat-card">
+            <div class="stat-icon" style="background:#FFF8E1; color:#F59E0B; flex-shrink:0;">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div>
+                <small>Total Pendapatan</small>
+                <h2 class="money-stat-value money-green">Rp {{ number_format($pendapatan, 0, ',', '.') }}</h2>
+                <a href="{{ route('orders.index') }}">Lihat Pesanan</a>
+            </div>
+        </div>
+
+        <div class="dashboard-card stat-card money-stat-card">
+            <div class="stat-icon {{ $keuntungan >= 0 ? 'blue' : 'red' }}">
+                <i class="bi {{ $keuntungan >= 0 ? 'bi-graph-up-arrow' : 'bi-graph-down-arrow' }}"></i>
+            </div>
+            <div>
+                <small>Keuntungan</small>
+                <h2 class="money-stat-value {{ $keuntungan >= 0 ? 'profit-plus' : 'profit-minus' }}">
+                    {{ $keuntungan >= 0 ? '+' : '-' }} Rp {{ number_format(abs($keuntungan), 0, ',', '.') }}
+                </h2>
+                <span class="mini-caption">Pendapatan dikurangi pengeluaran</span>
+            </div>
+        </div>
+    </div>
+    <div class="dashboard-card mb-4">
+        <form action="{{ route('dashboard') }}" method="GET" class="dashboard-filter-row">
+            <label>
+                <span>Kalender</span>
+                <input type="text" name="date" class="btn-date" id="flatpickr-date" value="{{ \Carbon\Carbon::parse($selectedDate)->format('Y-m-d') }}">
+            </label>
+            <label>
+                <span>Pembayaran</span>
+                <select name="payment_filter" onchange="this.form.submit()">
+                    <option value="all" {{ $paymentFilter === 'all' ? 'selected' : '' }}>Semua</option>
+                    <option value="cash" {{ $paymentFilter === 'cash' ? 'selected' : '' }}>Tunai</option>
+                    <option value="non_cash" {{ $paymentFilter === 'non_cash' ? 'selected' : '' }}>Non Tunai</option>
+                </select>
+            </label>
+            <label>
+                <span>Brand</span>
+                <select name="brand_filter" onchange="this.form.submit()">
+                    <option value="all" {{ $brandFilter === 'all' ? 'selected' : '' }}>Semua</option>
+                    <option value="essensia" {{ $brandFilter === 'essensia' ? 'selected' : '' }}>Essensia</option>
+                    <option value="buncha" {{ $brandFilter === 'buncha' ? 'selected' : '' }}>Buncha</option>
+                </select>
+            </label>
+            <button type="submit" class="btn-filter-apply">
+                <i class="bi bi-funnel-fill"></i>
+                Terapkan
+            </button>
+            <a href="{{ route('dashboard', ['date' => $selectedDate]) }}" class="btn-filter-reset">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Reset
+            </a>
+            <a href="{{ route('dashboard.export', [
+                'date' => $selectedDate,
+                'payment_filter' => $paymentFilter,
+                'brand_filter' => $brandFilter,
+            ]) }}" class="btn-export-excel" title="Download Rekap Excel" aria-label="Download Rekap Excel">
+                <i class="bi bi-download"></i>
+                <i class="bi bi-file-earmark-excel"></i>
+            </a>
+        </form>
+    </div>
+
     <div class="row g-4 mb-4">
-
-        <div class="col-lg-6">
-            <div class="dashboard-card stat-card revenue-card">
-                <div class="stat-icon" style="background:#FFF8E1; color:#F59E0B; flex-shrink:0;">
-                    <i class="bi bi-cash-stack"></i>
+        <div class="col-12">
+            <div class="dashboard-card">
+                <div class="card-header-dashboard">
+                    <h4>Ringkasan Stok</h4>
+                    <a href="{{ route('stocks.index') }}">Lihat Semua</a>
                 </div>
-                <div>
-                    <small>Total Pendapatan (Paid)</small>
-                    <h2 class="revenue-amount">Rp {{ number_format($pendapatan, 0, ',', '.') }}</h2>
-                    <a href="{{ route('orders.index') }}">Lihat Semua Pesanan →</a>
+                <div class="stock-alert-strip">
+                    <div><strong>{{ $lowStockCount }}</strong><span>Stok Rendah</span></div>
+                    <div><strong>{{ $emptyStockCount }}</strong><span>Stok Habis</span></div>
+                </div>
+                <div class="dashboard-stock-list">
+                    @forelse($stockMenus as $menu)
+                    @php
+                        $stockStatus = $menu->stock <= 0 ? 'Stok Habis' : ($menu->stock <= 5 ? 'Stok Rendah' : 'Aman');
+                        $stockClass = $menu->stock <= 0 ? 'danger' : ($menu->stock <= 5 ? 'warning' : 'success');
+                    @endphp
+                    <div class="dashboard-stock-item">
+                        <span class="dashboard-stock-icon"><i class="bi bi-box-seam"></i></span>
+                        <div>
+                            <strong>{{ $menu->name }}</strong>
+                            <span>Stok internal</span>
+                        </div>
+                        <b>{{ $menu->stock }}</b>
+                        <em class="{{ $stockClass }}">{{ $stockStatus }}</em>
+                    </div>
+                    @empty
+                    <div class="text-center py-4 text-muted">Belum ada stok yang dibatasi.</div>
+                    @endforelse
                 </div>
             </div>
         </div>
-
-        <div class="col-lg-6">
-            <div class="dashboard-card stat-card revenue-card">
-                <div class="stat-icon" style="background:#E8F5E9; color:#22C55E; flex-shrink:0;">
-                    <i class="bi bi-graph-up-arrow"></i>
-                </div>
-                <div>
-                    <small>Pesanan Hari Ini</small>
-                    <h2>{{ $pesananHariIni }}</h2>
-                    <small class="text-muted" style="color:#64748B;">
-                        Pendapatan: <strong>Rp {{ number_format($pendapatanHariIni, 0, ',', '.') }}</strong>
-                    </small>
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <!-- Grafik & Status -->
     <div class="row g-4">
 
-        <div class="col-lg-8">
+        <div class="col-lg-6">
             <div class="dashboard-card">
                 <div class="card-header-dashboard">
-                    <h4>Grafik Penjualan</h4>
+                    <div>
+                        <h4>Pemasukan Berdasarkan Filter</h4>
+                        <small style="color:#64748B;font-weight:800;">
+                            {{ $paymentFilter === 'cash' ? 'Tunai' : ($paymentFilter === 'non_cash' ? 'Non Tunai' : 'Semua Pembayaran') }}
+                            -
+                            {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand') }}
+                        </small>
+                    </div>
+                    <span class="btn-filter">Total: Rp {{ number_format($filteredRevenueTotal, 0, ',', '.') }}</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="filteredRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="dashboard-card">
+                <div class="card-header-dashboard">
+                    <div>
+                        <h4>Grafik Penjualan</h4>
+                        <small style="color:#64748B;font-weight:800;">
+                            {{ $paymentFilter === 'cash' ? 'Tunai' : ($paymentFilter === 'non_cash' ? 'Non Tunai' : 'Semua Pembayaran') }}
+                            -
+                            {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand') }}
+                        </small>
+                    </div>
                     <span class="btn-filter">7 Hari Terakhir</span>
                 </div>
                 <div class="chart-wrapper">
@@ -161,13 +227,53 @@
             </div>
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-lg-6">
+            <div class="dashboard-card h-100">
+                <div class="card-header-dashboard">
+                    <h4>Penjualan per Kategori</h4>
+                    <span class="btn-filter">{{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}</span>
+                </div>
+                @if($categorySales->sum('total_revenue') > 0)
+                <div class="category-sales-layout">
+                    <div class="category-donut">
+                        <canvas id="categorySalesChart"></canvas>
+                    </div>
+                    <div class="category-sales-list">
+                        @foreach($categorySales as $category)
+                        @php
+                            $categoryTotal = max(1, $categorySales->sum('total_revenue'));
+                            $percent = round(((int) $category->total_revenue / $categoryTotal) * 100);
+                        @endphp
+                        <div class="category-sales-item">
+                            <span>
+                                <i style="background: {{ ['#2563EB','#16A34A','#F59E0B','#8B5CF6','#EF4444','#14B8A6'][$loop->index % 6] }}"></i>
+                                {{ $category->category_name }}
+                            </span>
+                            <strong>{{ $percent }}%</strong>
+                            <em>Rp {{ number_format($category->total_revenue, 0, ',', '.') }}</em>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @else
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-pie-chart fs-1 d-block mb-2"></i>
+                    Belum ada penjualan paid di tanggal ini
+                </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-lg-6">
             <div class="dashboard-card">
                 <div class="card-header-dashboard">
-                    <h4>Status Pesanan</h4>
+                    <div>
+                        <h4>Status Pesanan</h4>
+                        <small style="color:#64748B;font-weight:800;">Mengikuti filter aktif</small>
+                    </div>
                 </div>
 
-                @if($totalPesanan > 0)
+                @if($filteredStatusTotal > 0)
                 <div class="status-chart">
                     <canvas id="statusChart"></canvas>
                 </div>
@@ -300,7 +406,7 @@
         altFormat: "d M Y",
         altInputClass: "btn-date m-0",
         onChange: function(selectedDates, dateStr, instance) {
-            document.getElementById('dateFilterForm').submit();
+            instance.input.closest('form').submit();
         }
     });
 </script>
@@ -310,6 +416,61 @@
 
 @push('scripts')
 <script>
+// =====================
+// Filtered Revenue Chart (Bar)
+// =====================
+const filteredRevenueCtx = document.getElementById('filteredRevenueChart');
+if (filteredRevenueCtx) {
+    new Chart(filteredRevenueCtx, {
+        type: 'bar',
+        data: {
+            labels: @json($chartLabels),
+            datasets: [{
+                label: 'Pemasukan (Rp)',
+                data: @json($filteredRevenueData),
+                backgroundColor: '#F59E0B',
+                borderColor: '#D97706',
+                borderWidth: 1,
+                borderRadius: 10,
+                maxBarThickness: 58,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return ' Rp ' + context.parsed.y.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 13 }, color: '#64748B' }
+                },
+                y: {
+                    grid: { color: '#F1F5F9' },
+                    ticks: {
+                        font: { size: 13 },
+                        color: '#64748B',
+                        callback: function(value) {
+                            if (value >= 1000000) return 'Rp ' + (value/1000000).toFixed(1) + 'jt';
+                            if (value >= 1000) return 'Rp ' + (value/1000).toFixed(0) + 'rb';
+                            return 'Rp ' + value;
+                        }
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
 // =====================
 // Sales Chart (Line)
 // =====================
@@ -370,6 +531,47 @@ if (salesCtx) {
             }
         }
     });
+}
+
+// =====================
+// Category Sales Chart (Doughnut)
+// =====================
+const categorySalesCtx = document.getElementById('categorySalesChart');
+if (categorySalesCtx) {
+    const categorySales = @json($categorySales->pluck('total_revenue')->map(fn ($value) => (int) $value)->values());
+    const categoryLabels = @json($categorySales->pluck('category_name')->values());
+    const categoryTotal = categorySales.reduce((sum, value) => sum + Number(value || 0), 0);
+
+    if (categoryTotal > 0) {
+        new Chart(categorySalesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categorySales,
+                    backgroundColor: ['#2563EB', '#16A34A', '#F59E0B', '#8B5CF6', '#EF4444', '#14B8A6'],
+                    borderColor: '#fff',
+                    borderWidth: 4,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '64%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const pct = categoryTotal > 0 ? ((context.parsed / categoryTotal) * 100).toFixed(1) : 0;
+                                return ' ' + context.label + ': Rp ' + context.parsed.toLocaleString('id-ID') + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
 }
 
 // =====================

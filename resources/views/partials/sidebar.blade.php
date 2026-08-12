@@ -1,4 +1,11 @@
 <div class="sidebar" id="sidebar">
+    @php
+        $isCashierArea = request()->is('cashier', 'cashier/*', 'kasir/*') || request('area') === 'cashier';
+        $currentUser = $isCashierArea && auth('cashier')->check()
+            ? auth('cashier')->user()
+            : (auth('admin')->user() ?? auth('cashier')->user());
+        $activeArea = $currentUser?->role === 'cashier' ? 'cashier' : 'admin';
+    @endphp
 
     <!-- Logo -->
     <div class="sidebar-logo">
@@ -15,7 +22,7 @@
     <!-- Menu -->
     <ul class="sidebar-menu">
 
-        @if(auth()->user()?->role === 'admin')
+        @if($currentUser?->role === 'admin')
         <li>
             <a href="{{ route('dashboard') }}"
                class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
@@ -25,7 +32,7 @@
         </li>
 
         <li>
-            <a href="{{ route('categories.index') }}"
+            <a href="{{ route('categories.index', ['area' => $activeArea]) }}"
                class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
                 <i class="bi bi-folder2-open"></i>
                 <span>Kategori</span>
@@ -33,7 +40,7 @@
         </li>
 
         <li>
-            <a href="{{ route('menus.index') }}"
+            <a href="{{ route('menus.index', ['area' => $activeArea]) }}"
                class="{{ request()->routeIs('menus.*') ? 'active' : '' }}">
                 <i class="bi bi-cup-hot"></i>
                 <span>Menu</span>
@@ -41,7 +48,23 @@
         </li>
 
         <li>
-            <a href="{{ route('tables.index') }}"
+            <a href="{{ route('stocks.index') }}"
+               class="{{ request()->routeIs('stocks.*') ? 'active' : '' }}">
+                <i class="bi bi-box-seam"></i>
+                <span>Stok</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ route('expenses.index') }}"
+               class="{{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                <i class="bi bi-wallet2"></i>
+                <span>Pengeluaran</span>
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ route('tables.index', ['area' => $activeArea]) }}"
                class="{{ request()->routeIs('tables.*') ? 'active' : '' }}">
                 <i class="bi bi-grid-3x3-gap"></i>
                 <span>Meja</span>
@@ -49,9 +72,9 @@
         </li>
         @endif
 
-        @if(auth()->user()?->role === 'cashier')
+        @if($currentUser?->role === 'cashier')
             <li>
-                <a href="{{ route('categories.index') }}"
+                <a href="{{ route('categories.index', ['area' => $activeArea]) }}"
                    class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
                     <i class="bi bi-folder2-open"></i>
                     <span>Kategori</span>
@@ -59,7 +82,15 @@
             </li>
 
             <li>
-                <a href="{{ route('tables.index') }}"
+                <a href="{{ route('menus.index', ['area' => $activeArea]) }}"
+                   class="{{ request()->routeIs('menus.*') ? 'active' : '' }}">
+                    <i class="bi bi-cup-hot"></i>
+                    <span>Menu</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('tables.index', ['area' => $activeArea]) }}"
                    class="{{ request()->routeIs('tables.*') ? 'active' : '' }}">
                     <i class="bi bi-grid-3x3-gap"></i>
                     <span>Meja</span>
@@ -76,22 +107,14 @@
         @endif
 
         <li>
-            <a href="{{ route('orders.index') }}"
+            <a href="{{ route('orders.index', ['area' => $activeArea]) }}"
                class="{{ request()->routeIs('orders.*') ? 'active' : '' }}">
                 <i class="bi bi-receipt-cutoff"></i>
                 <span>Pesanan</span>
             </a>
         </li>
 
-        <li>
-            <a href="{{ route('payments.index') }}"
-               class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">
-                <i class="bi bi-credit-card-2-front"></i>
-                <span>Pembayaran</span>
-            </a>
-        </li>
-
-        @if(auth()->user()?->role === 'cashier')
+        @if($currentUser?->role === 'admin')
             <li>
                 <a href="{{ route('settings.index') }}"
                    class="{{ request()->routeIs('settings.*') ? 'active' : '' }}">

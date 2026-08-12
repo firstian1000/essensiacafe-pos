@@ -19,8 +19,13 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $date = $request->get('date', now()->format('Y-m-d'));
-        $data = $this->dashboardService->getDashboardData($date);
+        $paymentFilter = $request->get('payment_filter', 'all');
+        $brandFilter = $request->get('brand_filter', 'all');
+
+        $data = $this->dashboardService->getDashboardData($date, $paymentFilter, $brandFilter);
         $data['selectedDate'] = $date;
+        $data['paymentFilter'] = $paymentFilter;
+        $data['brandFilter'] = $brandFilter;
 
         return view('dashboard.index', $data);
     }
@@ -29,11 +34,31 @@ class DashboardController extends Controller
     public function export(Request $request): StreamedResponse
     {
         $date = $request->get('date', now()->format('Y-m-d'));
-        $data = $this->dashboardService->getDashboardData($date);
-        $orders = Order::with(['table', 'items.menu'])
+        $paymentFilter = $request->get('payment_filter', 'all');
+        $brandFilter = $request->get('brand_filter', 'all');
+
+        $data = $this->dashboardService->getDashboardData($date, $paymentFilter, $brandFilter);
+        $ordersQuery = Order::with(['table', 'items.menu.category'])
             ->whereDate('created_at', $date)
-            ->latest()
-            ->get();
+            ->latest();
+
+        if ($paymentFilter === 'cash') {
+            $ordersQuery->where('payment_method', 'cash');
+        } elseif ($paymentFilter === 'non_cash') {
+            $ordersQuery->where('payment_method', '!=', 'cash');
+        }
+
+        if ($brandFilter === 'buncha') {
+            $ordersQuery->whereHas('items.menu.category', function ($category) {
+                $category->whereRaw('LOWER(name) LIKE ?', ['%dimsum%']);
+            });
+        } elseif ($brandFilter === 'essensia') {
+            $ordersQuery->whereDoesntHave('items.menu.category', function ($category) {
+                $category->whereRaw('LOWER(name) LIKE ?', ['%dimsum%']);
+            });
+        }
+
+        $orders = $ordersQuery->get();
 
         $filename = 'rekap-essensia-koffie-' . $date . '.xls';
 
@@ -42,6 +67,8 @@ class DashboardController extends Controller
                 ...$data,
                 'orders' => $orders,
                 'selectedDate' => $date,
+                'paymentFilter' => $paymentFilter,
+                'brandFilter' => $brandFilter,
                 'generatedAt' => now()->format('d/m/Y H:i'),
             ])->render();
         }, $filename, [
@@ -49,4 +76,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-

@@ -1,3 +1,11 @@
+@php
+    $isCashierArea = request()->is('cashier', 'cashier/*', 'kasir/*') || request('area') === 'cashier';
+    $navbarUser = $isCashierArea && auth('cashier')->check()
+        ? auth('cashier')->user()
+        : (auth('admin')->user() ?? auth('cashier')->user());
+    $navbarArea = $navbarUser?->role === 'cashier' ? 'cashier' : 'admin';
+@endphp
+
 <nav class="topbar">
 
     <div class="topbar-left">
@@ -7,7 +15,7 @@
         </button>
 
         <div class="page-title">
-            <h3>{{ auth()->user()?->role === 'cashier' ? 'Kasir Management' : 'Admin Management' }}</h3>
+            <h3>{{ $navbarUser?->role === 'cashier' ? 'Kasir Management' : 'Admin Management' }}</h3>
         </div>
 
     </div>
@@ -55,9 +63,12 @@
             if (!clockEl || !timerEl) return;
 
             const cafeConfig = {
+                operationalEnabled: "{{ $cafeSettings['operational_settings_enabled'] ?? '1' }}" === '1',
                 openTime: "{{ $cafeSettings['cafe_open_time'] ?? '08:00' }}",
                 closeTime: "{{ $cafeSettings['cafe_close_time'] ?? '22:00' }}",
+                shiftEnabled: "{{ $cafeSettings['shift_settings_enabled'] ?? '1' }}" === '1',
                 shiftDurationHours: parseInt("{{ $cafeSettings['shift_duration_hours'] ?? '7' }}"),
+                closeOrderEnabled: "{{ $cafeSettings['close_order_settings_enabled'] ?? '1' }}" === '1',
                 beforeShiftNotifMinutes: parseInt("{{ $cafeSettings['before_shift_notif_minutes'] ?? '15' }}"),
                 beforeCloseNotifMinutes: parseInt("{{ $cafeSettings['before_close_notif_minutes'] ?? '15' }}"),
                 orderLimitMinutes: parseInt("{{ $cafeSettings['order_limit_minutes'] ?? '10' }}")
@@ -126,6 +137,14 @@
                 const timeString = now.toTimeString().split(' ')[0];
                 clockEl.innerText = timeString;
 
+                if (!cafeConfig.operationalEnabled) {
+                    timerEl.innerText = 'Operasional Aktif';
+                    timerEl.parentElement.classList.remove('text-danger');
+                    timerEl.parentElement.classList.add('text-success');
+                    timerEl.parentElement.style.color = '#16A34A';
+                    return;
+                }
+
                 const openTime = parseTimeToday(cafeConfig.openTime);
                 const closeTime = parseTimeToday(cafeConfig.closeTime);
                 
@@ -138,7 +157,7 @@
                 const dateKey = now.toDateString();
 
                 // 1. Shift warning (15m before shift change)
-                if (now >= shiftWarningTime && now < shiftChangeTime) {
+                if (cafeConfig.shiftEnabled && now >= shiftWarningTime && now < shiftChangeTime) {
                     const key = `shift_warning_${dateKey}`;
                     if (!localStorage.getItem(key)) {
                         localStorage.setItem(key, 'true');
@@ -147,7 +166,7 @@
                 }
 
                 // 2. Shift change time
-                if (now >= shiftChangeTime && now < new Date(shiftChangeTime.getTime() + 60000)) {
+                if (cafeConfig.shiftEnabled && now >= shiftChangeTime && now < new Date(shiftChangeTime.getTime() + 60000)) {
                     const key = `shift_change_${dateKey}`;
                     if (!localStorage.getItem(key)) {
                         localStorage.setItem(key, 'true');
@@ -156,7 +175,7 @@
                 }
 
                 // 3. Cafe close warning (15m before closing)
-                if (now >= closeWarningTime && now < closeTime) {
+                if (cafeConfig.closeOrderEnabled && now >= closeWarningTime && now < closeTime) {
                     const key = `close_warning_${dateKey}`;
                     if (!localStorage.getItem(key)) {
                         localStorage.setItem(key, 'true');
@@ -165,7 +184,7 @@
                 }
 
                 // 4. Order limit warning (10m before closing)
-                if (now >= orderLimitTime && now < closeTime) {
+                if (cafeConfig.closeOrderEnabled && now >= orderLimitTime && now < closeTime) {
                     const key = `order_limit_${dateKey}`;
                     if (!localStorage.getItem(key)) {
                         localStorage.setItem(key, 'true');
@@ -185,9 +204,13 @@
                     const secsPad = String(diffSecs).padStart(2, '0');
                     
                     timerEl.innerText = `Tutup: ${hoursPad}:${minsPad}:${secsPad}`;
+                    timerEl.parentElement.classList.remove('text-success');
+                    timerEl.parentElement.classList.add('text-danger');
                     timerEl.parentElement.style.color = '#DC2626'; // Text danger red
                 } else {
                     timerEl.innerText = 'Kafe Tutup';
+                    timerEl.parentElement.classList.remove('text-success');
+                    timerEl.parentElement.classList.add('text-danger');
                     timerEl.parentElement.style.color = '#6B7280'; // Text secondary gray
                 }
             }
@@ -206,7 +229,7 @@
                                 ->get();
         @endphp
 
-        @if(auth()->user()?->role === 'cashier')
+        @if($navbarUser?->role === 'cashier')
         <!-- Voice Order Notification Toggle Button -->
         <div class="d-flex align-items-center me-2">
             <button type="button" id="btn-audio-toggle" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 fw-bold d-flex align-items-center gap-1" style="font-size: 0.82rem; transition: all 0.2s ease;">
@@ -231,7 +254,7 @@
                 </li>
                 @forelse($pendingNotifs as $notif)
                 <li>
-                    <a class="dropdown-item py-2 border-bottom" href="{{ route('orders.show', $notif->id) }}">
+                    <a class="dropdown-item py-2 border-bottom" href="{{ route('orders.show', ['order' => $notif->id, 'area' => $navbarArea]) }}">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
                                 <i class="bi bi-exclamation-circle text-warning fs-4"></i>
@@ -249,7 +272,7 @@
                 <li><span class="dropdown-item py-3 text-center text-muted">Belum ada notifikasi baru</span></li>
                 @endforelse
                 <li>
-                    <a class="dropdown-item text-center py-2 text-primary fw-bold" style="border-radius: 0 0 12px 12px;" href="{{ route('orders.index') }}">
+                    <a class="dropdown-item text-center py-2 text-primary fw-bold" style="border-radius: 0 0 12px 12px;" href="{{ route('orders.index', ['area' => $navbarArea]) }}">
                         Lihat Semua Pesanan
                     </a>
                 </li>
@@ -259,11 +282,14 @@
         <!-- Floating Realtime Order Toast Popup Container -->
         <div id="order-toast-container" style="position: fixed; top: 75px; right: 25px; z-index: 9999; max-width: 380px; width: 100%; pointer-events: none;"></div>
 
-        @if(auth()->user()?->role === 'cashier')
+        @if($navbarUser?->role === 'cashier')
         <script>
         document.addEventListener('DOMContentLoaded', function () {
             let latestOrderId = @json(\App\Models\Order::max('id') ?: 0);
             let soundEnabled = localStorage.getItem('order_sound_enabled') !== 'false';
+            let isCheckingNewOrders = false;
+            const notifiedStorageKey = 'essensia_notified_order_ids';
+            const notifiedOrderIds = new Set(JSON.parse(localStorage.getItem(notifiedStorageKey) || '[]'));
 
             const toggleBtn = document.getElementById('btn-audio-toggle');
             const toggleIcon = document.getElementById('audio-toggle-icon');
@@ -387,8 +413,17 @@
                 }, 12000);
             }
 
+            function rememberNotifiedOrder(orderId) {
+                notifiedOrderIds.add(Number(orderId));
+                const recentIds = Array.from(notifiedOrderIds).slice(-100);
+                localStorage.setItem(notifiedStorageKey, JSON.stringify(recentIds));
+            }
+
             // Poll server every 5 seconds for new orders
             function checkNewOrders() {
+                if (isCheckingNewOrders) return;
+                isCheckingNewOrders = true;
+
                 fetch("{{ route('orders.checkNew') }}?last_id=" + latestOrderId, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
@@ -400,7 +435,16 @@
                     if (data.has_new && data.orders.length > 0) {
                         latestOrderId = data.latest_id;
 
-                        data.orders.forEach((order, index) => {
+                        const freshOrders = data.orders.filter(order => {
+                            const orderId = Number(order.id);
+                            if (notifiedOrderIds.has(orderId)) {
+                                return false;
+                            }
+                            rememberNotifiedOrder(orderId);
+                            return true;
+                        });
+
+                        freshOrders.forEach((order, index) => {
                             setTimeout(() => {
                                 playChimeSound();
                                 speakIndonesianVoice(order.speech_text);
@@ -417,7 +461,10 @@
                         latestOrderId = data.latest_id;
                     }
                 })
-                .catch(err => console.log('Check order error:', err));
+                .catch(err => console.log('Check order error:', err))
+                .finally(() => {
+                    isCheckingNewOrders = false;
+                });
             }
 
             // Poll server every 2 seconds for instant real-time order sound
@@ -437,19 +484,19 @@
         <div class="admin-profile">
 
             <div class="avatar">
-                <i class="bi {{ auth()->user()?->role === 'cashier' ? 'bi-calculator-fill' : 'bi-person-fill' }}"></i>
+                <i class="bi {{ $navbarUser?->role === 'cashier' ? 'bi-calculator-fill' : 'bi-person-fill' }}"></i>
             </div>
 
             <div>
 
-                <h6>{{ auth()->user()->name ?? 'Admin' }}</h6>
+                <h6>{{ $navbarUser?->name ?? 'Admin' }}</h6>
 
-                <small>{{ auth()->user()?->role === 'cashier' ? 'Kasir Essensia' : 'Admin Essensia' }}</small>
+                <small>{{ $navbarUser?->role === 'cashier' ? 'Kasir Essensia' : 'Admin Essensia' }}</small>
 
             </div>
 
         </div>
-        <a href="{{ route('logout.get', ['redirect' => auth()->user()?->role === 'cashier' ? 'cashier' : 'admin']) }}" class="topbar-logout-link" title="Keluar">
+        <a href="{{ route('logout.get', ['redirect' => $navbarArea]) }}" class="topbar-logout-link" title="Keluar">
             <i class="bi bi-box-arrow-right"></i>
             <span>Keluar</span>
         </a>

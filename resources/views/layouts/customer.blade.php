@@ -21,11 +21,11 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="{{ asset('css/customer/cafe.css') }}?v=17">
+    <link rel="stylesheet" href="{{ asset('css/customer/cafe.css') }}?v=29">
 
 
 
-    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=12">
+    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=13">
 
     @stack('head')
 
@@ -89,7 +89,7 @@
 
                 $cartCount = collect($cartNav)->sum('qty');
 
-                $cartTotal = collect($cartNav)->sum(fn($i) => $i['price'] * $i['qty']);
+                $cartTotal = collect($cartNav)->sum(fn($i) => ((int) $i['price'] + (int) ($i['add_on_price'] ?? 0)) * $i['qty']);
 
             @endphp
 
@@ -119,18 +119,6 @@
 
             </a>
 
-
-
-            {{-- Menu Hamburger --}}
-
-            <button class="hamburger-btn">
-
-                <i class="bi bi-list"></i>
-
-            </button>
-
-
-
         </div>
 
 
@@ -157,10 +145,62 @@
 
 @stack('scripts')
 
+<script>
+(function () {
+    const refreshEveryMs = 15000;
+    const lastRefreshKey = 'essensia_customer_last_auto_refresh';
+    const skippedPathPatterns = [
+        /\/cart\/?$/,
+        /\/checkout\/?$/,
+    ];
+
+    const initialFormState = Array.from(document.querySelectorAll('form')).map(form => new FormData(form).toString()).join('&');
+
+    function isFormDirty() {
+        const currentFormState = Array.from(document.querySelectorAll('form')).map(form => new FormData(form).toString()).join('&');
+        return currentFormState !== initialFormState;
+    }
+
+    function isUserEditing() {
+        const active = document.activeElement;
+        if (!active) return false;
+
+        return ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName) || active.isContentEditable;
+    }
+
+    function shouldSkipAutoRefresh() {
+        const path = window.location.pathname;
+
+        return document.hidden
+            || skippedPathPatterns.some(pattern => pattern.test(path))
+            || isUserEditing()
+            || isFormDirty();
+    }
+
+    function autoRefreshPage() {
+        if (shouldSkipAutoRefresh()) return;
+
+        const now = Date.now();
+        const lastRefresh = Number(sessionStorage.getItem(lastRefreshKey) || 0);
+
+        if (now - lastRefresh < refreshEveryMs - 1000) return;
+
+        sessionStorage.setItem(lastRefreshKey, String(now));
+        window.location.reload();
+    }
+
+    setInterval(autoRefreshPage, refreshEveryMs);
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            setTimeout(autoRefreshPage, 800);
+        }
+    });
+})();
+</script>
+
 
 
 </body>
 
 </html>
-
-

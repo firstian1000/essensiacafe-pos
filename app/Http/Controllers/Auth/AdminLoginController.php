@@ -14,18 +14,8 @@ class AdminLoginController extends Controller
 {
     public function showLoginForm()
     {
-        if (Auth::check()) {
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('dashboard');
-            }
-
-            Auth::logout();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
-
-            return redirect()->route('login')->withErrors([
-                'email' => 'Session kasir sudah keluar. Silakan login admin.',
-            ]);
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('dashboard');
         }
 
         return view('admin.auth.login');
@@ -33,18 +23,8 @@ class AdminLoginController extends Controller
 
     public function showCashierLoginForm()
     {
-        if (Auth::check()) {
-            if (Auth::user()->role === 'cashier') {
-                return redirect()->route('cashier.index');
-            }
-
-            Auth::logout();
-            request()->session()->invalidate();
-            request()->session()->regenerateToken();
-
-            return redirect()->route('cashier.login.form')->withErrors([
-                'email' => 'Session admin sudah keluar. Silakan login kasir.',
-            ]);
+        if (Auth::guard('cashier')->check()) {
+            return redirect()->route('cashier.index');
         }
 
         return view('cashier.auth.login');
@@ -129,7 +109,9 @@ class AdminLoginController extends Controller
             ],
         );
 
-        Auth::login($user, true);
+        $guard = $user->role === 'cashier' ? 'cashier' : 'admin';
+        Auth::guard($guard)->login($user, true);
+        Auth::shouldUse($guard);
         $request->session()->regenerate();
 
         return redirect()->route($user->role === 'cashier' ? 'cashier.index' : 'dashboard');
@@ -137,24 +119,17 @@ class AdminLoginController extends Controller
 
     public function login(Request $request)
     {
-        if (Auth::check()) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-        }
-
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
+            Auth::shouldUse('admin');
             $request->session()->regenerate();
 
-            if (Auth::user()->role !== 'admin') {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+            if (Auth::guard('admin')->user()->role !== 'admin') {
+                Auth::guard('admin')->logout();
 
                 return back()
                     ->withErrors(['email' => 'Akun ini bukan akun admin.'])
@@ -171,24 +146,17 @@ class AdminLoginController extends Controller
 
     public function cashierLogin(Request $request)
     {
-        if (Auth::check()) {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-        }
-
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::guard('cashier')->attempt($credentials, $request->boolean('remember'))) {
+            Auth::shouldUse('cashier');
             $request->session()->regenerate();
 
-            if (Auth::user()->role !== 'cashier') {
-                Auth::logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
+            if (Auth::guard('cashier')->user()->role !== 'cashier') {
+                Auth::guard('cashier')->logout();
 
                 return back()
                     ->withErrors(['email' => 'Akun ini bukan akun kasir.'])
@@ -205,13 +173,14 @@ class AdminLoginController extends Controller
 
     public function logout(Request $request)
     {
-        $loginRoute = $request->query('redirect') === 'cashier' || Auth::user()?->role === 'cashier'
+        $guard = $request->query('redirect') === 'cashier' ? 'cashier' : 'admin';
+        $user = Auth::guard($guard)->user() ?? Auth::user();
+        $loginRoute = $request->query('redirect') === 'cashier' || $user?->role === 'cashier'
             ? 'cashier.login.form'
             : 'login';
 
-        Auth::logout();
+        Auth::guard($guard)->logout();
 
-        $request->session()->invalidate();
         $request->session()->regenerateToken();
 
         return redirect()->route($loginRoute);

@@ -9,13 +9,13 @@
 <body class="receipt-body">
     @php
         $paymentLabels = [
-            'cash' => 'Cash',
-            'qris' => 'QRIS',
-            'ewallet' => 'E-Wallet',
-            'card' => 'E-Wallet',
-            'midtrans' => 'QRIS',
+            'cash' => 'Tunai',
+            'midtrans' => 'Non Tunai',
         ];
-        $paymentLabel = $paymentLabels[$order->payment_method] ?? strtoupper($order->payment_method ?? 'Cash');
+        $paymentLabel = $paymentLabels[$order->payment_method] ?? strtoupper($order->payment_method ?? 'Tunai');
+        $serviceLabel = ($order->service_type ?? 'take_away') === 'dine_in' ? 'Dine In' : 'Take Away';
+        $wifiUsername = \App\Models\Setting::get('wifi_username', 'Harina Studio');
+        $wifiPassword = \App\Models\Setting::get('wifi_password', '-');
     @endphp
 
     <main class="thermal-receipt">
@@ -32,6 +32,8 @@
             <div><span>{{ $order->created_at->format('d/m/Y H.i.s') }}</span></div>
             <div><span>User</span><strong>Admin Essensia</strong></div>
             <div><span>Order No.</span><strong>{{ $order->customer_name }}</strong></div>
+            <div><span>Metode</span><strong>{{ $paymentLabel }}</strong></div>
+            <div><span>Layanan</span><strong>{{ $serviceLabel }}</strong></div>
         </div>
 
         <div class="receipt-line"></div>
@@ -39,6 +41,9 @@
         <div class="receipt-items">
             @foreach($order->items as $item)
                 <div class="receipt-item-name">{{ strtoupper($item->menu->name ?? 'MENU') }}</div>
+                @if($item->variant_name)
+                    <div class="receipt-item-note">Varian: {{ $item->variant_name }}</div>
+                @endif
                 <div class="receipt-item-row">
                     <span>{{ $item->qty }} x Rp{{ number_format($item->price,0,',','.') }}</span>
                     <strong>Rp{{ number_format($item->subtotal,0,',','.') }}</strong>
@@ -51,6 +56,8 @@
         <div class="receipt-totals">
             <div><span>Items count:</span><strong>{{ $order->items->sum('qty') }}</strong></div>
             <div class="grand"><span>TOTAL:</span><strong>Rp{{ number_format($order->total,0,',','.') }}</strong></div>
+            <div><span>Metode:</span><strong>{{ $paymentLabel }}</strong></div>
+            <div><span>Layanan:</span><strong>{{ $serviceLabel }}</strong></div>
             <div><span>{{ strtoupper($paymentLabel) }}:</span><strong>Rp{{ number_format($order->total,0,',','.') }}</strong></div>
             @if($order->payment_method == 'cash')
             <div><span>Paid amount:</span><strong>Rp{{ number_format($paidAmount,0,',','.') }}</strong></div>
@@ -63,8 +70,8 @@
         </div>
 
         <p class="receipt-wifi">
-            WIFI: Harina Studio<br>
-            Password: -
+            WIFI: {{ $wifiUsername ?: '-' }}<br>
+            Password: {{ $wifiPassword ?: '-' }}
         </p>
     </main>
 

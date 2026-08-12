@@ -8,6 +8,10 @@
 
 @section('content')
 
+@php
+    $activeArea = auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+@endphp
+
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show m-3">
     {{ session('success') }}
@@ -33,6 +37,7 @@
     <div class="order-card">
         <div class="toolbar">
             <form action="{{ route('orders.index') }}" method="GET" class="toolbar-form admin-filter-row">
+                <input type="hidden" name="area" value="{{ $activeArea }}">
                 <div class="search-box">
                     <i class="bi bi-search"></i>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari invoice / meja / customer...">
@@ -50,14 +55,14 @@
                     <option value="failed" {{ request('payment_status') == 'failed' ? 'selected' : '' }}>Gagal</option>
                 </select>
                 <button type="submit" class="btn-search"><i class="bi bi-arrow-clockwise"></i> Filter</button>
-                <a href="{{ route('orders.index') }}" class="btn-reset-modern"><i class="bi bi-arrow-counterclockwise"></i> Reset</a>
+                <a href="{{ route('orders.index', ['area' => $activeArea]) }}" class="btn-reset-modern"><i class="bi bi-arrow-counterclockwise"></i> Reset</a>
             </form>
         </div>
 
         <div class="table-wrapper">
             <div class="table-header">
                 <div>Invoice</div>
-                <div>Meja</div>
+                <div>Layanan</div>
                 <div>Customer</div>
                 <div>Total</div>
                 <div>Metode Bayar</div>
@@ -70,7 +75,9 @@
             @forelse($orders as $order)
             <div class="order-item">
                 <div class="invoice-num" data-label="Invoice">#{{ $order->invoice }}</div>
-                <div data-label="Meja">{{ optional($order->table)->display_name ?? '-' }}</div>
+                <div data-label="Layanan">
+                    {{ ($order->service_type ?? 'dine_in') === 'take_away' ? 'Take Away' : (optional($order->table)->display_name ?? 'Dine In') }}
+                </div>
                 <div class="customer-name" data-label="Customer">{{ $order->customer_name }}</div>
                 <div class="price" data-label="Total">Rp {{ number_format($order->total, 0, ',', '.') }}</div>
                 <div data-label="Metode Bayar">
@@ -103,46 +110,56 @@
                 <div class="time" data-label="Waktu">{{ $order->created_at->format('d M H:i') }}</div>
                 <div data-label="Aksi" class="action-buttons">
                     @if(auth()->user()?->role === 'admin')
-                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                        <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
                             <i class="bi bi-eye-fill"></i> Detail
                         </a>
                     @elseif($order->status == 'pending')
-                        <a href="{{ route('orders.process', $order) }}" class="btn-action-text btn-action-process" title="Mulai Proses Pesanan">
+                        <a href="{{ route('orders.process', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-process" title="Mulai Proses Pesanan">
                             <i class="bi bi-play-fill"></i> Proses
                         </a>
-                        <a href="{{ route('orders.cancel', $order) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" onclick="return confirm('Yakin ingin membatalkan pesanan #{{ $order->invoice }}?')">
+                        @if(auth()->user()?->role === 'cashier' && $order->payment_method == 'cash' && $order->payment_status == 'pending')
+                        <a href="{{ route('orders.paid', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Cash Lunas" onclick="return confirm('Konfirmasi pembayaran cash sudah lunas?')">
+                            <i class="bi bi-cash-coin"></i> Lunas
+                        </a>
+                        @endif
+                        <a href="{{ route('orders.cancel', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" onclick="return confirm('Yakin ingin membatalkan pesanan #{{ $order->invoice }}?')">
                             <i class="bi bi-x-circle"></i> Batal
                         </a>
-                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                        <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
                             <i class="bi bi-eye-fill"></i> Detail
                         </a>
                     @elseif($order->status == 'processing')
-                        <a href="{{ route('orders.complete', $order) }}" class="btn-action-text btn-action-complete" title="Pesanan Selesai / Sampai ke Meja">
+                        <a href="{{ route('orders.complete', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-complete" title="Pesanan Selesai / Sampai ke Meja">
                             <i class="bi bi-check-lg"></i> Sampai
                         </a>
-                        <a href="{{ route('orders.unprocess', $order) }}" class="btn-action-text btn-action-unprocess" title="Kembalikan ke Pending" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
+                        @if(auth()->user()?->role === 'cashier' && $order->payment_method == 'cash' && $order->payment_status == 'pending')
+                        <a href="{{ route('orders.paid', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Cash Lunas" onclick="return confirm('Konfirmasi pembayaran cash sudah lunas?')">
+                            <i class="bi bi-cash-coin"></i> Lunas
+                        </a>
+                        @endif
+                        <a href="{{ route('orders.unprocess', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-unprocess" title="Kembalikan ke Pending" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
                             <i class="bi bi-arrow-counterclockwise"></i> Batal Proses
                         </a>
-                        <a href="{{ route('orders.cancel', $order) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" onclick="return confirm('Yakin ingin membatalkan pesanan #{{ $order->invoice }}?')">
+                        <a href="{{ route('orders.cancel', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" onclick="return confirm('Yakin ingin membatalkan pesanan #{{ $order->invoice }}?')">
                             <i class="bi bi-x-circle"></i> Batal
                         </a>
-                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                        <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
                             <i class="bi bi-eye-fill"></i> Detail
                         </a>
                     @elseif($order->status == 'completed')
-                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                        <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
                             <i class="bi bi-eye-fill"></i> Detail
                         </a>
                         <a href="{{ route('payments.receipt', $order) }}" class="btn-action-text btn-action-print" title="Cetak Struk">
                             <i class="bi bi-printer-fill"></i> Struk
                         </a>
-                        @if($order->payment_status == 'pending')
-                        <a href="{{ route('orders.paid', $order) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Bayar" onclick="return confirm('Konfirmasi pembayaran lunas?')">
-                            <i class="bi bi-cash-coin"></i> Bayar
+                        @if(auth()->user()?->role === 'cashier' && $order->payment_method == 'cash' && $order->payment_status == 'pending')
+                        <a href="{{ route('orders.paid', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Cash Lunas" onclick="return confirm('Konfirmasi pembayaran cash sudah lunas?')">
+                            <i class="bi bi-cash-coin"></i> Lunas
                         </a>
                         @endif
                     @elseif($order->status == 'cancelled')
-                        <a href="{{ route('orders.show', $order) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
+                        <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
                             <i class="bi bi-eye-fill"></i> Detail
                         </a>
                     @endif

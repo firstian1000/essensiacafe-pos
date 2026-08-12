@@ -822,3 +822,35 @@ textarea.form-control{
 .menu-page .action-buttons form{margin:0!important;} 
 .menu-page .btn-edit,.menu-page .btn-delete{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:42px!important;min-width:42px!important;height:42px!important;border-radius:12px!important;padding:0!important;} 
 .menu-page .status-select,.menu-page .recommendation-select{width:100%!important;max-width:150px!important;}
+
+/* Menu variants form */
+.variant-field{padding:16px 18px;border:1px solid #DDE8F5;border-radius:16px;background:#F8FBFF}
+.variant-rows{display:grid;gap:10px;margin-bottom:12px}
+.variant-row{display:grid;grid-template-columns:minmax(180px,1fr) minmax(130px,180px) 44px;gap:10px;align-items:center}
+.variant-row .form-control{height:44px!important;border-radius:12px!important}
+.btn-add-variant,.btn-remove-variant{border:0;border-radius:12px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn-add-variant{height:42px;padding:0 16px;background:#EAF4FB;color:#2E7DB8}
+.btn-remove-variant{width:44px;height:44px;background:#FFF1F2;color:#DC2626}
+@media(max-width:720px){.variant-row{grid-template-columns:1fr}.btn-remove-variant{width:100%}}
+
+/* Consistent menu image fit */
+.menu-page .menu-photo{
+    width:78px!important;
+    height:78px!important;
+    border:1px solid #E6EDF5!important;
+    border-radius:14px!important;
+    background:#F8FBFF!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+}
+.menu-page .menu-photo img{
+    width:100%!important;
+    height:100%!important;
+    padding:6px!important;
+    object-fit:contain!important;
+    object-position:center!important;
+    border-radius:12px!important;
+    background:#fff!important;
+}

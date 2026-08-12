@@ -12,7 +12,7 @@ class MenuController extends Controller
 {
     $table = CafeTable::where('qr_token',$token)->firstOrFail();
 
-    $menus = Menu::with('category')
+    $menus = Menu::with(['category', 'variants' => fn ($query) => $query->where('status', true)->orderBy('price')])
         ->where('status', 1)
         ->orderByDesc('is_recommended')
         ->orderBy('name')

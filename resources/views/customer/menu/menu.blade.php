@@ -85,7 +85,7 @@
                 'vape'      => 'badge-snack',
             ];
             $badgeClass = $categoryColors[$groupKey] ?? 'badge-default';
-            $inCart = isset(session('cart', [])[$menu->id]);
+            $inCart = collect(session('cart', []))->contains('id', $menu->id);
         @endphp
 
         <div class="menu-card-wrap menu-item {{ !$menu->status ? 'out-of-stock' : '' }}"
@@ -151,10 +151,22 @@
 
                     {{-- Add to Cart --}}
                     @if($menu->status)
-                    <form action="{{ route('cart.add') }}" method="POST">
+                    <form action="{{ route('cart.add') }}" method="POST" class="js-add-cart-form">
                         @csrf
                         <input type="hidden" name="menu_id" value="{{ $menu->id }}">
-                        <button class="btn-add-cart {{ $inCart ? 'btn-add-cart--active' : '' }}">
+                        @if($menu->variants->isNotEmpty())
+                        <label class="menu-variant-select">
+                            <span>Varian</span>
+                            <select name="variant_id">
+                                @foreach($menu->variants as $variant)
+                                    <option value="{{ $variant->id }}">
+                                        {{ $variant->name }} - Rp {{ number_format($variant->price, 0, ',', '.') }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </label>
+                        @endif
+                        <button type="submit" class="btn-add-cart {{ $inCart ? 'btn-add-cart--active' : '' }}">
                             <i class="bi bi-plus-lg"></i>
                             Tambah
                         </button>
@@ -189,7 +201,7 @@
 @php
     $floatCart = session('cart', []);
     $floatCount = collect($floatCart)->sum('qty');
-    $floatTotal = collect($floatCart)->sum(fn($i) => $i['price'] * $i['qty']);
+    $floatTotal = collect($floatCart)->sum(fn($i) => ((int) $i['price'] + (int) ($i['add_on_price'] ?? 0)) * $i['qty']);
     $floatItems = array_slice(array_values($floatCart), 0, 3);
 @endphp
 
@@ -205,13 +217,11 @@
             <span class="float-bar-sub">Lihat keranjang untuk checkout</span>
         </div>
     </div>
-    <div class="float-bar-mid">
+    <div class="float-bar-mid float-bar-names">
         @foreach($floatItems as $fi)
-        <div class="float-bar-thumb-wrap">
-            @if(!empty($fi['image']))
-            <img src="{{ asset('storage/'.$fi['image']) }}" class="float-bar-thumb" alt="{{ $fi['name'] }}">
-            @endif
-            <span class="float-bar-thumb-count">{{ $fi['qty'] }}</span>
+        <div class="float-bar-name-item">
+            <span>{{ $fi['name'] }}</span>
+            <strong>{{ $fi['qty'] }}</strong>
         </div>
         @endforeach
     </div>
@@ -271,7 +281,115 @@ document.querySelectorAll('.wish-btn').forEach(btn => {
         this.classList.toggle('wished');
     });
 });
+
+// ===== ADD TO CART WITHOUT FULL RELOAD =====
+const rupiah = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+const cartUrl = @json(route('cart.index'));
+const cartStorageKey = 'essensia_customer_cart';
+
+document.querySelectorAll('.js-add-cart-form').forEach(form => {
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const button = form.querySelector('.btn-add-cart');
+        const originalHtml = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '<i class="bi bi-check-lg"></i> Ditambahkan';
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: new FormData(form),
+            });
+
+            const data = await response.json();
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Menu gagal ditambahkan.');
+            }
+
+            button.classList.add('btn-add-cart--active');
+            if (data.cart_items) {
+                localStorage.setItem(cartStorageKey, JSON.stringify(data.cart_items));
+            }
+            updateCartNavbar(data);
+            updateFloatCart(data);
+        } catch (error) {
+            alert(error.message || 'Menu gagal ditambahkan ke keranjang.');
+            button.innerHTML = originalHtml;
+        } finally {
+            setTimeout(() => {
+                button.disabled = false;
+                button.innerHTML = originalHtml;
+            }, 650);
+        }
+    });
+});
+
+function updateCartNavbar(data) {
+    const navCart = document.querySelector('.cart-btn-nav');
+    if (!navCart) return;
+
+    navCart.classList.toggle('has-items', data.cart_count > 0);
+
+    let totalEl = navCart.querySelector('.cart-total-nav');
+    const textWrap = navCart.querySelector('.cart-btn-text');
+    if (!totalEl && textWrap) {
+        totalEl = document.createElement('span');
+        totalEl.className = 'cart-total-nav';
+        textWrap.appendChild(totalEl);
+    }
+    if (totalEl) totalEl.textContent = rupiah(data.cart_total);
+
+    let badge = navCart.querySelector('.cart-badge-nav');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'cart-badge-nav';
+        navCart.appendChild(badge);
+    }
+    badge.textContent = data.cart_count;
+}
+
+function updateFloatCart(data) {
+    let floatBar = document.getElementById('floatBar');
+    if (!floatBar) {
+        floatBar = document.createElement('div');
+        floatBar.id = 'floatBar';
+        floatBar.className = 'float-bar show';
+        document.body.appendChild(floatBar);
+    }
+
+    const items = (data.preview_items || []).map(item => `
+        <div class="float-bar-name-item">
+            <span>${item.name}</span>
+            <strong>${item.qty}</strong>
+        </div>
+    `).join('');
+
+    floatBar.innerHTML = `
+        <div class="float-bar-left">
+            <div class="float-bar-cart-icon">
+                <i class="bi bi-cart3"></i>
+                <span class="float-bar-badge">${data.cart_count}</span>
+            </div>
+            <div class="float-bar-info">
+                <span class="float-bar-label">${data.cart_count} Item di Keranjang</span>
+                <span class="float-bar-sub">Lihat keranjang untuk checkout</span>
+            </div>
+        </div>
+        <div class="float-bar-mid float-bar-names">${items}</div>
+        <div class="float-bar-right">
+            <div class="float-bar-total-label">Total</div>
+            <div class="float-bar-total">${rupiah(data.cart_total)}</div>
+        </div>
+        <a href="${cartUrl}" class="float-bar-btn">
+            Lihat Keranjang <i class="bi bi-arrow-right"></i>
+        </a>
+    `;
+}
 </script>
 @endpush
-
-

@@ -207,7 +207,7 @@
                                     <i class="bi bi-eye-fill"></i> Detail
                                 </a>
                                 @if(auth()->user()?->role === 'cashier' && $order->payment_status == 'pending')
-                                <a href="{{ route('orders.paid', $order) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Lunas & Cetak Nota"
+                                <a href="{{ route('orders.paid', $order) }}" class="btn-action-text btn-action-pay" title="Konfirmasi Pembayaran Lunas"
                                    onclick="return confirm('Konfirmasi pembayaran lunas untuk pesanan ini?')">
                                     <i class="bi bi-check-circle-fill"></i> Lunasi
                                 </a>

@@ -303,28 +303,30 @@ body {
 .thermal-inner {
     width: 58mm;
     font-family: 'Courier New', Courier, monospace;
+    min-height: 100vh;
     font-size: 10px;
-    line-height: 1.22;
+    line-height: 1.18;
     color: #000;
     background: #fff;
-    padding: 3mm 3mm 4mm;
+    padding: 4mm 3mm;
+    margin: 0 auto;
 }
 
 .t-logo {
     text-align: center;
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 900;
     letter-spacing: -1px;
     line-height: .85;
-    margin: 2mm 0 1mm;
+    margin: 2mm 0;
 }
 
 .t-title {
     text-align: center;
-    font-size: 11px;
-    font-weight: 700;
-    margin: 1mm 0 .5mm;
+    font-size: 14px;
+    font-weight: 900;
+    margin: 2mm 0 1mm;
 }
 
 .t-addr {
@@ -349,8 +351,8 @@ body {
 .t-meta-row {
     display: flex;
     justify-content: space-between;
-    gap: 2mm;
-    font-size: 9px;
+    gap: 4px;
+    font-size: 10px;
 }
 
 .t-meta-row span { color: #000; }
@@ -359,16 +361,22 @@ body {
 .t-items { margin: 1mm 0; }
 
 .t-item-name {
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-top: 1mm;
+}
+
+.t-item-note {
     font-size: 9px;
     font-weight: 700;
-    text-transform: uppercase;
-    margin: 1.5mm 0 .3mm;
+    margin: .3mm 0;
 }
 
 .t-item-row {
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    font-size: 10px;
 }
 
 .t-totals { margin-top: 1mm; }
@@ -376,7 +384,7 @@ body {
 .t-total-row {
     display: flex;
     justify-content: space-between;
-    font-size: 9px;
+    font-size: 10px;
     margin: .4mm 0;
 }
 
@@ -389,8 +397,8 @@ body {
 }
 
 .t-barcode {
-    height: 14mm;
-    margin: 3mm 0 1mm;
+    height: 18mm;
+    margin: 3mm 0 2mm;
     background: repeating-linear-gradient(
         90deg,
         #000 0, #000 1px,
@@ -407,17 +415,17 @@ body {
 .t-barcode span {
     background: #fff;
     padding: 0 2px;
-    font-size: 8px;
+    font-size: 12px;
     font-weight: 900;
     letter-spacing: .5px;
 }
 
 .t-wifi {
     text-align: center;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 900;
     margin: 2mm 0 0;
-    line-height: 1.5;
+    line-height: 1.18;
 }
 
     </style>
@@ -426,13 +434,16 @@ body {
 
 @php
     $paymentLabels = [
-        'cash' => 'Cash',
+        'cash' => 'Tunai',
         'qris' => 'QRIS',
         'ewallet' => 'E-Wallet',
         'card' => 'E-Wallet',
-        'midtrans' => 'QRIS',
+        'midtrans' => 'Non Tunai',
     ];
-    $paymentLabel = $paymentLabels[$order->payment_method] ?? strtoupper($order->payment_method ?? 'Cash');
+    $paymentLabel = $paymentLabels[$order->payment_method] ?? strtoupper($order->payment_method ?? 'Tunai');
+    $serviceLabel = ($order->service_type ?? 'take_away') === 'dine_in' ? 'Dine In' : 'Take Away';
+    $wifiUsername = \App\Models\Setting::get('wifi_username', 'Harina Studio');
+    $wifiPassword = \App\Models\Setting::get('wifi_password', '-');
 @endphp
 
 {{-- ====================================================
@@ -474,13 +485,23 @@ body {
                     <div class="field-val">
                         @if($order->payment_method == 'cash')
                             <span class="badge-cash">
-                                <i class="bi bi-cash-coin" style="margin-right:4px"></i>Cash
+                                <i class="bi bi-cash-coin" style="margin-right:4px"></i>Tunai
                             </span>
                         @else
                             <span class="badge-cash" style="background:#e0f2fe; color:#0369a1;">
                                 <i class="bi bi-qr-code" style="margin-right:4px"></i>{{ $paymentLabel }}
                             </span>
                         @endif
+                    </div>
+                </label>
+            </div>
+            <div class="nota-field">
+                <label>
+                    Layanan
+                    <div class="field-val">
+                        <span class="badge-cash" style="background:#EAF4FB; color:#2E7DB8;">
+                            <i class="bi {{ $serviceLabel === 'Dine In' ? 'bi-cup-hot' : 'bi-bag' }}" style="margin-right:4px"></i>{{ $serviceLabel }}
+                        </span>
                     </div>
                 </label>
             </div>
@@ -517,6 +538,14 @@ body {
             <div class="summary-row">
                 <span>Meja</span>
                 <strong>{{ optional($order->table)->table_number ?? 'Kasir' }}</strong>
+            </div>
+            <div class="summary-row">
+                <span>Metode</span>
+                <strong>{{ $paymentLabel }}</strong>
+            </div>
+            <div class="summary-row">
+                <span>Layanan</span>
+                <strong>{{ $serviceLabel }}</strong>
             </div>
             <div class="summary-row total">
                 <span>Total</span>
@@ -576,7 +605,7 @@ body {
      Hidden on screen, shown only when printing
 ===================================================== --}}
 <div class="thermal-print">
-    <div class="thermal-inner">
+    <div class="thermal-inner thermal-receipt-unified">
 
         {{-- Logo --}}
         <div class="t-logo">Essensia<br>Koffie</div>
@@ -607,6 +636,14 @@ body {
                 <span>Order No.</span>
                 <strong>{{ $order->customer_name ?: 'Customer Kasir' }}</strong>
             </div>
+            <div class="t-meta-row">
+                <span>Metode</span>
+                <strong>{{ $paymentLabel }}</strong>
+            </div>
+            <div class="t-meta-row">
+                <span>Layanan</span>
+                <strong>{{ $serviceLabel }}</strong>
+            </div>
         </div>
 
         <hr class="t-line">
@@ -615,6 +652,9 @@ body {
         <div class="t-items">
             @foreach($order->items as $item)
                 <div class="t-item-name">{{ strtoupper($item->menu->name ?? 'MENU') }}</div>
+                @if($item->variant_name)
+                    <div class="t-item-note">Varian: {{ $item->variant_name }}</div>
+                @endif
                 <div class="t-item-row">
                     <span>{{ $item->qty }} x Rp{{ number_format($item->price, 0, ',', '.') }}</span>
                     <strong>Rp{{ number_format($item->subtotal, 0, ',', '.') }}</strong>
@@ -633,6 +673,14 @@ body {
             <div class="t-total-row t-grand">
                 <span>TOTAL:</span>
                 <strong>Rp{{ number_format($order->total, 0, ',', '.') }}</strong>
+            </div>
+            <div class="t-total-row">
+                <span>Metode:</span>
+                <strong>{{ $paymentLabel }}</strong>
+            </div>
+            <div class="t-total-row">
+                <span>Layanan:</span>
+                <strong>{{ $serviceLabel }}</strong>
             </div>
             <div class="t-total-row">
                 <span>{{ strtoupper($paymentLabel) }}:</span>
@@ -657,8 +705,8 @@ body {
 
         {{-- WiFi --}}
         <div class="t-wifi">
-            WIFI: Harina Studio<br>
-            Password: -
+            WIFI: {{ $wifiUsername ?: '-' }}<br>
+            Password: {{ $wifiPassword ?: '-' }}
         </div>
 
     </div>

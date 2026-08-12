@@ -2,6 +2,16 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/menu.css') }}?v=11">
+<style>
+.setting-section-title{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.setting-switch{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:900;color:#64748B}
+.setting-switch input{position:absolute;opacity:0;pointer-events:none}
+.setting-switch-slider{width:58px;height:32px;border-radius:999px;background:#E5E7EB;position:relative;transition:.2s ease}
+.setting-switch-slider::after{content:"";width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:4px;left:4px;box-shadow:0 4px 10px rgba(15,23,42,.18);transition:.2s ease}
+.setting-switch input:checked + .setting-switch-slider{background:#2E7DB8}
+.setting-switch input:checked + .setting-switch-slider::after{transform:translateX(26px)}
+.settings-disabled{opacity:.45;filter:grayscale(.25)}
+</style>
 @endpush
 
 @section('title', 'Pengaturan Operasional')
@@ -34,11 +44,17 @@
         <form action="{{ route('settings.store') }}" method="POST">
             @csrf
 
-            <h4 class="mb-4 fw-bold text-dark border-bottom pb-2">
-                <i class="bi bi-clock-fill text-primary me-2"></i> Jam Operasional Kafe
+            <h4 class="mb-4 fw-bold text-dark border-bottom pb-2 setting-section-title">
+                <span><i class="bi bi-clock-fill text-primary me-2"></i> Jam Operasional Kafe</span>
+                <label class="setting-switch">
+                    <span>Aktif</span>
+                    <input type="hidden" name="operational_settings_enabled" value="0">
+                    <input type="checkbox" name="operational_settings_enabled" value="1" class="js-setting-switch" data-target="operational-settings-fields" {{ old('operational_settings_enabled', $settings['operational_settings_enabled']) === '1' ? 'checked' : '' }}>
+                    <span class="setting-switch-slider"></span>
+                </label>
             </h4>
 
-            <div class="form-row">
+            <div class="form-row" data-setting-fields="operational-settings-fields">
                 <!-- Jam Buka -->
                 <div class="form-group">
                     <label class="form-label" for="cafe_open_time">Jam Buka Kafe</label>
@@ -70,11 +86,17 @@
                 </div>
             </div>
 
-            <h4 class="mt-5 mb-4 fw-bold text-dark border-bottom pb-2">
-                <i class="bi bi-people-fill text-primary me-2"></i> Pergantian Shift Pekerja
+            <h4 class="mt-5 mb-4 fw-bold text-dark border-bottom pb-2 setting-section-title">
+                <span><i class="bi bi-people-fill text-primary me-2"></i> Pergantian Shift Pekerja</span>
+                <label class="setting-switch">
+                    <span>Aktif</span>
+                    <input type="hidden" name="shift_settings_enabled" value="0">
+                    <input type="checkbox" name="shift_settings_enabled" value="1" class="js-setting-switch" data-target="shift-settings-fields" {{ old('shift_settings_enabled', $settings['shift_settings_enabled']) === '1' ? 'checked' : '' }}>
+                    <span class="setting-switch-slider"></span>
+                </label>
             </h4>
 
-            <div class="form-row">
+            <div class="form-row" data-setting-fields="shift-settings-fields">
                 <!-- Durasi Shift (Jam) -->
                 <div class="form-group">
                     <label class="form-label" for="shift_duration_hours">Durasi Shift Kerja (Jam setelah buka)</label>
@@ -116,11 +138,17 @@
                 </div>
             </div>
 
-            <h4 class="mt-5 mb-4 fw-bold text-dark border-bottom pb-2">
-                <i class="bi bi-bell-fill text-primary me-2"></i> Peringatan Tutup & Batas Order
+            <h4 class="mt-5 mb-4 fw-bold text-dark border-bottom pb-2 setting-section-title">
+                <span><i class="bi bi-bell-fill text-primary me-2"></i> Peringatan Tutup & Batas Order</span>
+                <label class="setting-switch">
+                    <span>Aktif</span>
+                    <input type="hidden" name="close_order_settings_enabled" value="0">
+                    <input type="checkbox" name="close_order_settings_enabled" value="1" class="js-setting-switch" data-target="close-order-settings-fields" {{ old('close_order_settings_enabled', $settings['close_order_settings_enabled']) === '1' ? 'checked' : '' }}>
+                    <span class="setting-switch-slider"></span>
+                </label>
             </h4>
 
-            <div class="form-row">
+            <div class="form-row" data-setting-fields="close-order-settings-fields">
                 <!-- Waktu Notifikasi Tutup (Menit) -->
                 <div class="form-group">
                     <label class="form-label" for="before_close_notif_minutes">Peringatan Sebelum Kafe Tutup (Menit)</label>
@@ -162,6 +190,40 @@
                 </div>
             </div>
 
+            <h4 class="mt-5 mb-4 fw-bold text-dark border-bottom pb-2">
+                <i class="bi bi-wifi text-primary me-2"></i> Pengaturan WiFi Nota
+            </h4>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="wifi_username">Username / Nama WiFi</label>
+                    <input
+                        type="text"
+                        id="wifi_username"
+                        name="wifi_username"
+                        class="form-control"
+                        value="{{ old('wifi_username', $settings['wifi_username']) }}"
+                        placeholder="Contoh: Essensia Koffie">
+                    @error('wifi_username')
+                        <small class="text-danger mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="wifi_password">Password WiFi</label>
+                    <input
+                        type="text"
+                        id="wifi_password"
+                        name="wifi_password"
+                        class="form-control"
+                        value="{{ old('wifi_password', $settings['wifi_password']) }}"
+                        placeholder="Masukkan password WiFi">
+                    @error('wifi_password')
+                        <small class="text-danger mt-1">{{ $message }}</small>
+                    @enderror
+                </div>
+            </div>
+
             <!-- Footer Form -->
             <div class="form-footer">
                 <a href="{{ route('dashboard') }}" class="btn-cancel">
@@ -177,3 +239,18 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+document.querySelectorAll('.js-setting-switch').forEach(toggle => {
+    function syncSection() {
+        const target = document.querySelector(`[data-setting-fields="${toggle.dataset.target}"]`);
+        if (!target) return;
+        target.classList.toggle('settings-disabled', !toggle.checked);
+    }
+
+    toggle.addEventListener('change', syncSection);
+    syncSection();
+});
+</script>
+@endpush

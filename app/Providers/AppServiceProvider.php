@@ -36,9 +36,12 @@ class AppServiceProvider extends ServiceProvider
         view()->composer('*', function ($view) {
             if (\Illuminate\Support\Facades\Schema::hasTable('settings')) {
                 $view->with('cafeSettings', [
+                    'operational_settings_enabled' => \App\Models\Setting::get('operational_settings_enabled', '1'),
                     'cafe_open_time' => \App\Models\Setting::get('cafe_open_time', '08:00'),
                     'cafe_close_time' => \App\Models\Setting::get('cafe_close_time', '22:00'),
+                    'shift_settings_enabled' => \App\Models\Setting::get('shift_settings_enabled', '1'),
                     'shift_duration_hours' => \App\Models\Setting::get('shift_duration_hours', '7'),
+                    'close_order_settings_enabled' => \App\Models\Setting::get('close_order_settings_enabled', '1'),
                     'before_close_notif_minutes' => \App\Models\Setting::get('before_close_notif_minutes', '15'),
                     'before_shift_notif_minutes' => \App\Models\Setting::get('before_shift_notif_minutes', '15'),
                     'order_limit_minutes' => \App\Models\Setting::get('order_limit_minutes', '10'),

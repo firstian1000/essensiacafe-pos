@@ -29,6 +29,14 @@ class OrderController extends Controller
 
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
+        }
+
         $orders = $query->latest()->paginate(10);
 
         return view('orders.index', compact('orders'));
@@ -104,22 +112,20 @@ class OrderController extends Controller
     public function paid(Order $order)
     {
         $this->ensureCashierCanUpdateStatus();
+        $area = request('area') === 'cashier' || auth('cashier')->check() ? 'cashier' : 'admin';
 
         $order->update([
             'payment_status' => 'paid',
-            'status'         => $order->status === 'cancelled' ? 'cancelled' : 'completed',
         ]);
 
-        $this->checkAndResetTableStatus($order);
-
         return redirect()
-            ->route('payments.receipt', $order)
-            ->with('success', 'Pembayaran berhasil dikonfirmasi.');
+            ->route('orders.index', ['area' => $area])
+            ->with('success', 'Pembayaran cash untuk pesanan #' . $order->invoice . ' berhasil dikonfirmasi lunas.');
     }
 
     protected function ensureCashierCanUpdateStatus(): void
     {
-        if (auth()->user()?->role !== 'cashier') {
+        if (! auth('cashier')->check() && auth()->user()?->role !== 'cashier') {
             abort(403);
         }
     }
@@ -174,12 +180,12 @@ protected function checkAndResetTableStatus(Order $order)
                 'customer_name' => $order->customer_name ?: 'Pelanggan',
                 'table_number' => $tableNum,
                 'table_label' => $tableLabel,
-                'total_amount' => 'Rp ' . number_format($order->total_amount, 0, ',', '.'),
+                'total_amount' => 'Rp ' . number_format($order->total ?? 0, 0, ',', '.'),
                 'status' => $order->status,
                 'payment_status' => $order->payment_status,
                 'time' => $order->created_at ? $order->created_at->format('H:i') : date('H:i'),
                 'speech_text' => $speechText,
-                'url' => route('orders.show', $order->id),
+                'url' => route('orders.show', ['order' => $order->id, 'area' => 'cashier']),
             ];
         });
 

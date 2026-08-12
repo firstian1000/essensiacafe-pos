@@ -24,6 +24,37 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'midtrans/callback',
         ]);
+
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('cashier', 'cashier/*', 'kasir/*')) {
+                return route('cashier.login.form');
+            }
+
+            $sharedOperationalPaths = [
+                'cashier',
+                'cashier/*',
+                'kasir/*',
+                'categories',
+                'categories/*',
+                'menus',
+                'menus/*',
+                'tables',
+                'tables/*',
+                'orders',
+                'orders/*',
+                'payments',
+                'payments/*',
+                'settings',
+            ];
+
+            foreach ($sharedOperationalPaths as $path) {
+                if ($request->is($path)) {
+                    return route('login');
+                }
+            }
+
+            return route('login');
+        });
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

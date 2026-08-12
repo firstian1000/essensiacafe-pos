@@ -8,6 +8,10 @@
 
 @section('content')
 
+@php
+    $activeArea = auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+@endphp
+
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show m-3">
     {{ session('success') }}
@@ -24,12 +28,12 @@
                     <a href="{{ route('dashboard') }}">Dashboard</a>
                     <span>></span>
                 @endif
-                <a href="{{ route('orders.index') }}">Pesanan</a>
+                <a href="{{ route('orders.index', ['area' => $activeArea]) }}">Pesanan</a>
                 <span>></span>
                 <span>Detail</span>
             </div>
         </div>
-        <a href="{{ route('orders.index') }}" class="btn-back-order">
+        <a href="{{ route('orders.index', ['area' => $activeArea]) }}" class="btn-back-order">
             <i class="bi bi-arrow-left"></i>
             <span>Kembali</span>
         </a>
@@ -60,6 +64,15 @@
             <div class="detail-info-item">
                 <span>Meja</span>
                 <strong>{{ optional($order->table)->display_name ?? '-' }}</strong>
+            </div>
+            <div class="detail-info-item">
+                <span>Layanan</span>
+                <strong>
+                    <span class="badge bg-info text-dark">
+                        <i class="bi {{ ($order->service_type ?? 'dine_in') === 'take_away' ? 'bi-bag-check' : 'bi-cup-hot' }}"></i>
+                        {{ ($order->service_type ?? 'dine_in') === 'take_away' ? 'Take Away' : 'Dine In' }}
+                    </span>
+                </strong>
             </div>
             <div class="detail-info-item">
                 <span>Metode Pembayaran</span>
@@ -96,7 +109,7 @@
         @if(auth()->user()?->role === 'cashier' && $order->payment_method == 'cash' && $order->payment_status == 'pending' && $order->status != 'cancelled')
             <div class="detail-action-strip">
                 <span>Konfirmasi pembayaran cash jika uang sudah diterima.</span>
-                <a href="{{ route('orders.paid', $order) }}" class="btn-detail-action primary">
+                <a href="{{ route('orders.paid', ['order' => $order, 'area' => $activeArea]) }}" class="btn-detail-action primary">
                     <i class="bi bi-cash-coin"></i>
                     Konfirmasi Lunas
                 </a>
@@ -137,20 +150,20 @@
         @if(auth()->user()?->role === 'cashier')
         <div class="detail-footer-actions" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: flex-end;">
             @if($order->status == 'pending')
-                <a href="{{ route('orders.process', $order->id) }}" class="btn-detail-action primary">
+                <a href="{{ route('orders.process', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action primary">
                     <i class="bi bi-play-fill me-1"></i> Proses Pesanan
                 </a>
-                <a href="{{ route('orders.cancel', $order->id) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                <a href="{{ route('orders.cancel', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
                     <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
                 </a>
             @elseif($order->status == 'processing')
-                <a href="{{ route('orders.complete', $order->id) }}" class="btn-detail-action success">
+                <a href="{{ route('orders.complete', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action success">
                     <i class="bi bi-check2-circle me-1"></i> Pesanan Sampai / Selesai
                 </a>
-                <a href="{{ route('orders.unprocess', $order->id) }}" class="btn-detail-action warning" style="background: #FFF7ED; color: #C2410C;" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
+                <a href="{{ route('orders.unprocess', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action warning" style="background: #FFF7ED; color: #C2410C;" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Batal Proses
                 </a>
-                <a href="{{ route('orders.cancel', $order->id) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                <a href="{{ route('orders.cancel', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
                     <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
                 </a>
             @elseif($order->status == 'completed')

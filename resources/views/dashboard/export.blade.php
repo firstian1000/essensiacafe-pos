@@ -15,6 +15,7 @@
 <table>
     <tr><td colspan="8" class="title">Rekap Data Essensia Koffie</td></tr>
     <tr><td colspan="8">Tanggal: {{ \Carbon\Carbon::parse($selectedDate)->format('d/m/Y') }}</td></tr>
+    <tr><td colspan="8">Filter: Pembayaran {{ ucfirst(str_replace('_', ' ', $paymentFilter ?? 'all')) }} | Brand {{ ucfirst($brandFilter ?? 'all') }}</td></tr>
     <tr><td colspan="8">Dicetak: {{ $generatedAt }}</td></tr>
     <tr><td colspan="8"></td></tr>
 
@@ -24,7 +25,7 @@
         <th>Total Menu</th>
         <th>Total Meja</th>
         <th>Total Pesanan</th>
-        <th>Pesanan Hari Ini</th>
+        <th>Pengeluaran Internal</th>
         <th>Pendapatan Paid</th>
         <th>Pendapatan Tanggal Ini</th>
         <th>Pending</th>
@@ -34,7 +35,7 @@
         <td>{{ $totalMenu }}</td>
         <td>{{ $totalMeja }}</td>
         <td>{{ $totalPesanan }}</td>
-        <td>{{ $pesananHariIni }}</td>
+        <td class="money">{{ $totalPengeluaran }}</td>
         <td class="money">{{ $pendapatan }}</td>
         <td class="money">{{ $pendapatanHariIni }}</td>
         <td>{{ $pendingOrders }}</td>

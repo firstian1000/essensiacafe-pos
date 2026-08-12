@@ -154,6 +154,80 @@ syncSidebarForViewport();
 
 </script>
 
+<script>
+(function () {
+    const refreshEveryMs = 15000;
+    const lastRefreshKey = 'essensia_admin_last_auto_refresh';
+    const skippedPathPatterns = [
+        /\/login\/?$/,
+        /\/kasir\/login\/?$/,
+        /\/create\/?$/,
+        /\/edit\/?$/,
+        /\/receipt\//,
+        /\/payments\/[^/]+\/receipt/,
+    ];
+
+    const initialFormState = Array.from(document.querySelectorAll('form')).map(form => new FormData(form).toString()).join('&');
+
+    function isFormDirty() {
+        const currentFormState = Array.from(document.querySelectorAll('form')).map(form => new FormData(form).toString()).join('&');
+        return currentFormState !== initialFormState;
+    }
+
+    function isUserEditing() {
+        const active = document.activeElement;
+        if (!active) return false;
+
+        return ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName) || active.isContentEditable;
+    }
+
+    function hasOpenModal() {
+        return Boolean(document.querySelector('.modal.show, .dropdown-menu.show'));
+    }
+
+    function cashierHasActiveTransaction() {
+        const totalItems = document.getElementById('totalItems');
+        const customerInput = document.querySelector('#cashierForm input[name="customer_name"]');
+        const paidInput = document.querySelector('#cashierForm input[name="paid_amount"]');
+
+        return Number(totalItems?.textContent || 0) > 0
+            || Boolean(customerInput?.value?.trim())
+            || Number(paidInput?.value || 0) > 0;
+    }
+
+    function shouldSkipAutoRefresh() {
+        const path = window.location.pathname;
+
+        return document.hidden
+            || skippedPathPatterns.some(pattern => pattern.test(path))
+            || isUserEditing()
+            || isFormDirty()
+            || hasOpenModal()
+            || cashierHasActiveTransaction();
+    }
+
+    function autoRefreshPage() {
+        if (shouldSkipAutoRefresh()) return;
+
+        const now = Date.now();
+        const lastRefresh = Number(sessionStorage.getItem(lastRefreshKey) || 0);
+
+        if (now - lastRefresh < refreshEveryMs - 1000) return;
+
+        sessionStorage.setItem(lastRefreshKey, String(now));
+        window.location.reload();
+    }
+
+    setInterval(autoRefreshPage, refreshEveryMs);
+
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            setTimeout(autoRefreshPage, 800);
+        }
+    });
+})();
+</script>
+
 
 
 </body>
@@ -161,7 +235,6 @@ syncSidebarForViewport();
 
 
 </html>
-
 
 
 

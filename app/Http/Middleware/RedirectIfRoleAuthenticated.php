@@ -11,8 +11,16 @@ class RedirectIfRoleAuthenticated
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
-            return redirect()->route(Auth::user()->role === 'cashier' ? 'cashier.index' : 'dashboard');
+        if (Auth::guard('admin')->check()) {
+            Auth::shouldUse('admin');
+
+            return redirect()->route('dashboard');
+        }
+
+        if (Auth::guard('cashier')->check()) {
+            Auth::shouldUse('cashier');
+
+            return redirect()->route('cashier.index');
         }
 
         return $next($request);

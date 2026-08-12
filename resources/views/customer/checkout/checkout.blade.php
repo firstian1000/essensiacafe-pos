@@ -16,6 +16,7 @@
     @php
         $total = 0;
         $totalItem = 0;
+        $serviceType = session('service_type', 'dine_in');
     @endphp
 
     <form action="{{ route('checkout.store') }}" method="POST">
@@ -37,7 +38,12 @@
 
                 @foreach($cart as $item)
                 @php
-                    $subtotal   = $item['price'] * $item['qty'];
+                    $categoryName = strtolower(trim($item['category'] ?? ''));
+                    $canUseAddOn = in_array($categoryName, ['main course', 'main cource'], true);
+                    $disableDrinkOptions = in_array($categoryName, ['snack', 'snacks', 'dimsum', 'main course', 'main cource', 'add on', 'addon'], true);
+                    $addOnPrice = $canUseAddOn ? (int) ($item['add_on_price'] ?? 0) : 0;
+                    $unitTotal = $item['price'] + $addOnPrice;
+                    $subtotal   = $unitTotal * $item['qty'];
                     $total     += $subtotal;
                     $totalItem += $item['qty'];
                     $categoryColors = [
@@ -64,12 +70,28 @@
                         <div class="checkout-item-top">
                             <div>
                                 <h4 class="checkout-item-name">{{ $item['name'] }}</h4>
+                                @if(!empty($item['variant_name']))
+                                    <div class="checkout-item-variant">Varian: {{ $item['variant_name'] }}</div>
+                                @endif
                                 @if(!empty($item['category']))
                                 <span class="cat-badge {{ $badgeClass }}">{{ $item['category'] }}</span>
                                 @endif
                                 <div class="checkout-unit-price">
                                     Rp {{ number_format($item['price'],0,',','.') }}
                                     <span class="text-muted">Harga Satuan</span>
+                                </div>
+                                <div class="checkout-item-options">
+                                    @unless($disableDrinkOptions)
+                                        <span>Sugar: {{ ucfirst($item['sugar_level'] ?? 'normal') }}</span>
+                                        <span>Temperature: {{ ucfirst($item['temperature'] ?? 'ice') }}</span>
+                                        <span>Ice: {{ ($item['temperature'] ?? 'ice') === 'hot' ? '-' : ucfirst($item['ice_level'] ?? 'normal') }}</span>
+                                    @endunless
+                                    @if($canUseAddOn && !empty($item['add_on']))
+                                        <span>Add On: {{ $item['add_on'] }} (+Rp {{ number_format($addOnPrice, 0, ',', '.') }})</span>
+                                    @endif
+                                    @if(!empty($item['note']))
+                                        <span class="checkout-item-note">Catatan: {{ $item['note'] }}</span>
+                                    @endif
                                 </div>
                             </div>
                             <div class="checkout-item-right">
@@ -81,16 +103,16 @@
                         <div class="checkout-item-controls">
                             {{-- QTY --}}
                             <div class="qty-box">
-                                <a href="{{ route('cart.decrease', $item['id']) }}" class="qty-btn">
+                                <a href="{{ route('cart.decrease', $item['cart_key'] ?? $item['id']) }}" class="qty-btn">
                                     <i class="bi bi-dash-lg"></i>
                                 </a>
                                 <span class="qty-number">{{ $item['qty'] }}</span>
-                                <a href="{{ route('cart.increase', $item['id']) }}" class="qty-btn qty-plus">
+                                <a href="{{ route('cart.increase', $item['cart_key'] ?? $item['id']) }}" class="qty-btn qty-plus">
                                     <i class="bi bi-plus-lg"></i>
                                 </a>
                             </div>
                             {{-- DELETE --}}
-                            <a href="{{ route('cart.remove', $item['id']) }}"
+                            <a href="{{ route('cart.remove', $item['cart_key'] ?? $item['id']) }}"
                                class="delete-btn"
                                onclick="return confirm('Hapus menu ini?')">
                                 <i class="bi bi-trash3-fill"></i>
@@ -131,14 +153,14 @@
                 </h3>
 
                 <div class="form-group-custom">
-                    <label class="form-label-custom">Nama Lengkap</label>
+                    <label class="form-label-custom">Nama <span style="color:#DC2626;font-weight:900;">*</span></label>
                     <div class="input-wrap-custom">
                         <i class="bi bi-person input-icon-custom"></i>
                         <input
                             type="text"
                             name="customer_name"
                             class="input-custom"
-                            placeholder="Masukkan nama lengkap Anda"
+                            placeholder="Masukkan nama Anda"
                             required>
                     </div>
                 </div>
@@ -152,6 +174,16 @@
                             name="phone"
                             class="input-custom"
                             placeholder="08xxxxxxxxxx">
+                    </div>
+                </div>
+
+                <div class="checkout-info-box">
+                    <i class="bi {{ $serviceType === 'take_away' ? 'bi-bag-check-fill' : 'bi-cup-hot-fill' }}"></i>
+                    <div>
+                        <p class="mb-0">
+                            Pilihan layanan:
+                            <strong>{{ $serviceType === 'take_away' ? 'Take Away' : 'Dine In' }}</strong>
+                        </p>
                     </div>
                 </div>
 
@@ -239,6 +271,10 @@
                     <div class="summary-row">
                         <span class="summary-label">Biaya Layanan</span>
                         <strong class="summary-value text-success-custom">Gratis</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Layanan</span>
+                        <strong class="summary-value">{{ $serviceType === 'take_away' ? 'Take Away' : 'Dine In' }}</strong>
                     </div>
 
                     <div class="summary-divider"></div>

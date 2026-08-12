@@ -17,6 +17,8 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\ExpenseController;
 
 Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AdminLoginController::class, 'login']);
@@ -33,27 +35,40 @@ Route::get('/logout', [AdminLoginController::class, 'logout'])->name('logout.get
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->get('/', function () {
-    return auth()->user()?->role === 'cashier'
-        ? redirect()->route('cashier.index')
-        : app(DashboardController::class)->index(request());
+Route::middleware('auth:admin,cashier')->get('/', function () {
+    if (auth('admin')->check()) {
+        auth()->shouldUse('admin');
+
+        return app(DashboardController::class)->index(request());
+    }
+
+    auth()->shouldUse('cashier');
+
+    return redirect()->route('cashier.index');
 })->name('dashboard');
 
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth:admin', 'role:admin'])->group(function () {
     Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
+    Route::resource('stocks', StockController::class)
+        ->except(['show'])
+        ->parameters(['stocks' => 'stock']);
+    Route::resource('expenses', ExpenseController::class)->except(['show']);
+    Route::get('/settings', [SettingController::class, 'index'])
+        ->name('settings.index');
+    Route::post('/settings', [SettingController::class, 'store'])
+        ->name('settings.store');
+});
 
-    Route::resource('menus', MenuController::class);
+Route::middleware(['auth:admin,cashier', 'role:admin,cashier'])->group(function () {
+    Route::resource('categories', CategoryController::class);
+
+    Route::resource('menus', MenuController::class)->except(['show']);
 
     Route::put('/menus/{menu}/status', [MenuController::class, 'updateStatus'])
         ->name('menus.status');
 
     Route::put('/menus/{menu}/recommendation', [MenuController::class, 'updateRecommendation'])
         ->name('menus.recommendation');
-
-});
-
-Route::middleware(['auth', 'role:admin,cashier'])->group(function () {
-    Route::resource('categories', CategoryController::class);
 
     Route::get('/cashier', [CashierController::class, 'index'])->name('cashier.index');
     Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.store');
@@ -94,10 +109,6 @@ Route::middleware(['auth', 'role:admin,cashier'])->group(function () {
     Route::get('/payments/{order}', [PaymentController::class, 'show'])
         ->name('payments.show');
 
-    Route::get('/settings', [SettingController::class, 'index'])
-        ->name('settings.index');
-    Route::post('/settings', [SettingController::class, 'store'])
-        ->name('settings.store');
 });
 
 /*
@@ -118,6 +129,9 @@ Route::get('/order/{token}', [CustomerMenuController::class, 'index'])
 Route::post('/cart/add', [CartController::class, 'add'])
     ->name('cart.add');
 
+Route::post('/cart/restore', [CartController::class, 'restore'])
+    ->name('cart.restore');
+
 Route::get('/cart', [CartController::class, 'index'])
     ->name('cart.index');
 
@@ -126,6 +140,12 @@ Route::get('/cart/increase/{id}', [CartController::class, 'increase'])
 
 Route::get('/cart/decrease/{id}', [CartController::class, 'decrease'])
     ->name('cart.decrease');
+
+Route::patch('/cart/options/{id}', [CartController::class, 'updateOptions'])
+    ->name('cart.options');
+
+Route::patch('/cart/service-type', [CartController::class, 'updateServiceType'])
+    ->name('cart.service-type');
 
 Route::get('/cart/remove/{id}', [CartController::class, 'remove'])
     ->name('cart.remove');
@@ -147,6 +167,9 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
 
 Route::get('/order/success/{order}', [OrderSuccessController::class, 'index'])
     ->name('order.success');
+
+Route::get('/order/success/{order}/status', [OrderSuccessController::class, 'status'])
+    ->name('order.success.status');
 
 
 /*

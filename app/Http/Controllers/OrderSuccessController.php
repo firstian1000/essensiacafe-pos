@@ -12,4 +12,14 @@ class OrderSuccessController extends Controller
 
         return view('customer.succes.success', compact('order'));
     }
+
+    public function status(Order $order)
+    {
+        return response()->json([
+            'status' => $order->status,
+            'payment_status' => $order->payment_status,
+            'is_cancelled' => $order->status === 'cancelled',
+            'updated_at' => optional($order->updated_at)->format('d M Y - H:i'),
+        ]);
+    }
 }

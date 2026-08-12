@@ -47,6 +47,11 @@ class MenuController extends Controller
         'description' => 'nullable',
         'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         'is_recommended' => 'nullable|boolean',
+        'allow_ice' => 'nullable|boolean',
+        'allow_hot' => 'nullable|boolean',
+        'variants' => 'nullable|array',
+        'variants.*.name' => 'nullable|string|max:100',
+        'variants.*.price' => 'nullable|numeric|min:0',
     ]);
 
     $image = null;
@@ -70,7 +75,9 @@ if ($request->hasFile('image')) {
 
 }
 
-    Menu::create([
+    [$allowIce, $allowHot] = $this->temperatureOptions($request);
+
+    $menu = Menu::create([
         'category_id' => $request->category_id,
         'name' => $request->name,
         'description' => $request->description,
@@ -78,7 +85,11 @@ if ($request->hasFile('image')) {
         'image' => $image,
         'status' => 1,
         'is_recommended' => $request->boolean('is_recommended'),
+        'allow_ice' => $allowIce,
+        'allow_hot' => $allowHot,
     ]);
+
+    $this->syncVariants($menu, $request->input('variants', []));
 
     return redirect()->route('menus.index')
         ->with('success', 'Menu berhasil ditambahkan');
@@ -86,6 +97,7 @@ if ($request->hasFile('image')) {
 
 public function edit(Menu $menu)
 {
+    $menu->load('variants');
     $categories = Category::all();
 
     return view('menus.edit', compact('menu', 'categories'));
@@ -100,6 +112,11 @@ public function update(Request $request, Menu $menu)
         'description' => 'nullable',
         'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         'is_recommended' => 'nullable|boolean',
+        'allow_ice' => 'nullable|boolean',
+        'allow_hot' => 'nullable|boolean',
+        'variants' => 'nullable|array',
+        'variants.*.name' => 'nullable|string|max:100',
+        'variants.*.price' => 'nullable|numeric|min:0',
     ]);
 
     $image = $menu->image;
@@ -129,6 +146,8 @@ public function update(Request $request, Menu $menu)
         );
     }
 
+    [$allowIce, $allowHot] = $this->temperatureOptions($request);
+
     $menu->update([
 
         'category_id' => $request->category_id,
@@ -137,8 +156,12 @@ public function update(Request $request, Menu $menu)
         'price' => $request->price,
         'image' => $image,
         'is_recommended' => $request->boolean('is_recommended'),
+        'allow_ice' => $allowIce,
+        'allow_hot' => $allowHot,
 
     ]);
+
+    $this->syncVariants($menu, $request->input('variants', []));
 
     return redirect()
         ->route('menus.index')
@@ -183,6 +206,38 @@ public function updateRecommendation(Request $request, Menu $menu)
     ]);
 
     return back()->with('success', 'Rekomendasi menu berhasil diperbarui.');
+}
+
+private function syncVariants(Menu $menu, array $variants): void
+{
+    $menu->variants()->delete();
+
+    foreach ($variants as $variant) {
+        $name = trim((string) ($variant['name'] ?? ''));
+        $price = $variant['price'] ?? null;
+
+        if ($name === '' || $price === null || $price === '') {
+            continue;
+        }
+
+        $menu->variants()->create([
+            'name' => $name,
+            'price' => (int) $price,
+            'status' => true,
+        ]);
+    }
+}
+
+private function temperatureOptions(Request $request): array
+{
+    $allowIce = $request->boolean('allow_ice');
+    $allowHot = $request->boolean('allow_hot');
+
+    if (! $allowIce && ! $allowHot) {
+        $allowIce = true;
+    }
+
+    return [$allowIce, $allowHot];
 }
 
 }

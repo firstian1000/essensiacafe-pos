@@ -4,12 +4,25 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserRole
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
+        $requestedArea = $request->query('area');
+
+        if (in_array($requestedArea, ['admin', 'cashier'], true) && Auth::guard($requestedArea)->check()) {
+            Auth::shouldUse($requestedArea);
+        } elseif ($request->is('cashier', 'cashier/*', 'kasir/*') && Auth::guard('cashier')->check()) {
+            Auth::shouldUse('cashier');
+        } elseif (Auth::guard('admin')->check()) {
+            Auth::shouldUse('admin');
+        } elseif (Auth::guard('cashier')->check()) {
+            Auth::shouldUse('cashier');
+        }
+
         $user = $request->user();
 
         if (! $user || ! in_array($user->role, $roles, true)) {

@@ -103,7 +103,7 @@
                        class="btn-confirm-pay clean"
                        onclick="return confirm('Konfirmasi pembayaran lunas?')">
                         <i class="bi bi-check-circle-fill"></i>
-                        Konfirmasi Lunas & Cetak Nota
+                        Konfirmasi Lunas
                     </a>
                 @endif
 

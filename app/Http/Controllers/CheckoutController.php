@@ -33,7 +33,9 @@ class CheckoutController extends Controller
         $total = 0;
 
         foreach ($cart as $item) {
-            $total += $item['price'] * $item['qty'];
+            $canUseAddOn = in_array(strtolower(trim($item['category'] ?? '')), ['main course', 'main cource'], true);
+            $addOnPrice = $canUseAddOn ? (int) ($item['add_on_price'] ?? 0) : 0;
+            $total += ((int) $item['price'] + $addOnPrice) * $item['qty'];
         }
 
         return view('customer.checkout.checkout', compact('cart', 'total'));
@@ -77,15 +79,26 @@ class CheckoutController extends Controller
                     throw new \Exception("Menu '{$item['name']}' sedang tidak tersedia / habis. Silakan hapus dari keranjang.");
                 }
 
-                $realPrice = (int) $dbMenu->price;
-                $subtotal = $realPrice * $item['qty'];
+                $realPrice = (int) $item['price'];
+                $canUseAddOn = in_array(strtolower(trim($item['category'] ?? '')), ['main course', 'main cource'], true);
+                $addOnPrice = $canUseAddOn ? (int) ($item['add_on_price'] ?? 0) : 0;
+                $subtotal = ($realPrice + $addOnPrice) * $item['qty'];
                 $total += $subtotal;
 
                 $validatedItems[] = [
                     'menu_id' => $dbMenu->id,
+                    'menu_variant_id' => $item['variant_id'] ?? null,
+                    'variant_name' => $item['variant_name'] ?? null,
                     'qty' => $item['qty'],
                     'price' => $realPrice,
                     'subtotal' => $subtotal,
+                    'sugar_level' => $item['sugar_level'] ?? 'normal',
+                    'temperature' => $item['temperature'] ?? 'ice',
+                    'ice_level' => $item['ice_level'] ?? 'normal',
+                    'add_on' => $canUseAddOn ? ($item['add_on'] ?? null) : null,
+                    'add_on_menu_id' => $canUseAddOn ? ($item['add_on_menu_id'] ?? null) : null,
+                    'add_on_price' => $addOnPrice,
+                    'note' => $item['note'] ?? null,
                 ];
             }
 
@@ -94,6 +107,7 @@ class CheckoutController extends Controller
                 'cafe_table_id' => $table->id,
                 'customer_name' => $request->customer_name,
                 'phone' => $request->phone,
+                'service_type' => session('service_type', 'dine_in'),
                 'total' => $total,
                 'status' => 'pending',
                 'payment_method' => $request->payment_method,
@@ -108,9 +122,18 @@ class CheckoutController extends Controller
                 OrderItem::create([
                     'order_id' => $order->id,
                     'menu_id' => $vItem['menu_id'],
+                    'menu_variant_id' => $vItem['menu_variant_id'],
+                    'variant_name' => $vItem['variant_name'],
                     'qty' => $vItem['qty'],
                     'price' => $vItem['price'],
                     'subtotal' => $vItem['subtotal'],
+                    'sugar_level' => $vItem['sugar_level'],
+                    'temperature' => $vItem['temperature'],
+                    'ice_level' => $vItem['ice_level'],
+                    'add_on' => $vItem['add_on'],
+                    'add_on_menu_id' => $vItem['add_on_menu_id'],
+                    'add_on_price' => $vItem['add_on_price'],
+                    'note' => $vItem['note'],
                 ]);
             }
 

@@ -36,6 +36,10 @@ class Setting extends Model
 
     public static function isOrderingClosed(): bool
     {
+        if (self::get('operational_settings_enabled', '1') !== '1' || self::get('close_order_settings_enabled', '1') !== '1') {
+            return false;
+        }
+
         $openTimeStr = self::get('cafe_open_time', '08:00');
         $closeTimeStr = self::get('cafe_close_time', '22:00');
         $limitMinutes = (int) self::get('order_limit_minutes', '10');

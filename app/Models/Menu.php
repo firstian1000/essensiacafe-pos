@@ -13,12 +13,18 @@ class Menu extends Model
         'price',
         'image',
         'status',
+        'stock',
         'is_recommended',
+        'allow_ice',
+        'allow_hot',
     ];
 
     protected $casts = [
         'status' => 'boolean',
         'is_recommended' => 'boolean',
+        'allow_ice' => 'boolean',
+        'allow_hot' => 'boolean',
+        'stock' => 'integer',
     ];
 
     public function category()
@@ -29,5 +35,10 @@ class Menu extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(MenuVariant::class);
     }
 }

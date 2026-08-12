@@ -3,7 +3,7 @@
 @section('title','Kasir')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=19">
+<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=24">
 @endpush
 
 @section('content')
@@ -24,6 +24,12 @@
 
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger">
+            {{ $errors->first() }}
+        </div>
     @endif
 
     <form action="{{ route('cashier.store') }}" method="POST" id="cashierForm" class="cashier-layout">
@@ -56,12 +62,20 @@
                         class="cashier-menu-card"
                         data-menu-id="{{ $menu->id }}"
                         data-name="{{ strtolower($menu->name) }}"
-                        data-price="{{ (int) $menu->price }}" data-category-id="{{ $menu->category_id ?? 0 }}">
+                        data-price="{{ (int) $menu->price }}"
+                        data-category-id="{{ $menu->category_id ?? 0 }}">
                         <img src="{{ $menu->image ? asset('storage/'.$menu->image) : asset('images/no-image.png') }}" alt="{{ $menu->name }}">
                         <span class="cashier-menu-name">{{ $menu->name }}</span>
                         <span class="cashier-menu-meta">{{ optional($menu->category)->name ?? 'Tanpa Kategori' }}</span>
                         <strong>Rp {{ number_format($menu->price,0,',','.') }}</strong>
                     </button>
+                    <template id="menu-variants-{{ $menu->id }}">
+                        @foreach($menu->variants as $variant)
+                            <option value="{{ $variant->id }}" data-price="{{ (int) $variant->price }}">
+                                {{ $variant->name }} - Rp {{ number_format($variant->price, 0, ',', '.') }}
+                            </option>
+                        @endforeach
+                    </template>
                 @endforeach
             </div>
 
@@ -82,17 +96,33 @@
 
             <div class="cashier-fields">
                 <label>
-                    <span>Customer</span>
-                    <input type="text" name="customer_name" value="{{ old('customer_name') }}" placeholder="Nama pelanggan">
+                    <span>Customer <small style="color:#DC2626;font-weight:900;">*</small></span>
+                    <input type="text" name="customer_name" value="{{ old('customer_name') }}" placeholder="Nama pelanggan" required>
                 </label>
                 <label>
                     <span>Metode</span>
                     <select name="payment_method" id="paymentMethod" required>
-                        <option value="cash">Cash</option>
-                        <option value="qris">QRIS</option>
-                        <option value="ewallet">E-Wallet</option>
+                        <option value="cash">Tunai</option>
+                        <option value="midtrans">Non Tunai</option>
                     </select>
                 </label>
+            </div>
+
+            <div class="cashier-service-type">
+                <span class="cashier-service-title">
+                    <i class="bi bi-bag-check"></i>
+                    Layanan
+                </span>
+                <div class="cashier-service-options">
+                    <label>
+                        <input type="radio" name="service_type" value="dine_in" {{ old('service_type', 'take_away') === 'dine_in' ? 'checked' : '' }}>
+                        <span><i class="bi bi-cup-hot"></i>Dine In</span>
+                    </label>
+                    <label>
+                        <input type="radio" name="service_type" value="take_away" {{ old('service_type', 'take_away') === 'take_away' ? 'checked' : '' }}>
+                        <span><i class="bi bi-bag"></i>Take Away</span>
+                    </label>
+                </div>
             </div>
 
             <div class="cashier-cart-items" id="cashierCartItems">
@@ -100,6 +130,7 @@
             </div>
 
             <input type="hidden" name="paid_amount" id="paidAmountHidden" value="0">
+            <input type="hidden" name="submit_action" id="submitAction" value="print_receipt">
 
             <div class="cashier-summary">
                 <div><span>Total Item</span><strong id="totalItems">0</strong></div>
@@ -115,10 +146,16 @@
             </div>
 
 
-            <button type="submit" class="btn-cashier-submit">
+            <div class="cashier-action-buttons">
+                <button type="submit" class="btn-cashier-submit btn-midtrans-pay" id="btnMidtransPay" data-submit-action="pay_midtrans">
+                    <i class="bi bi-credit-card"></i>
+                    Bayar Nanti
+                </button>
+                <button type="submit" class="btn-cashier-submit" data-submit-action="print_receipt">
                 <i class="bi bi-receipt-cutoff"></i>
                 Cetak Nota
-            </button>
+                </button>
+            </div>
         </aside>
     </form>
 </div>
@@ -146,18 +183,36 @@ const searchEl = document.getElementById('cashierSearch');
 const paginationEl = document.getElementById('cashierPagination');
 const paginationInfoEl = document.getElementById('cashierPaginationInfo');
 const menuCards = Array.from(document.querySelectorAll('.cashier-menu-card'));
+const submitActionEl = document.getElementById('submitAction');
+const midtransPayBtn = document.getElementById('btnMidtransPay');
 
 menuCards.forEach(card => {
     card.addEventListener('click', () => {
         const id = card.dataset.menuId;
-        const item = cart.get(id) || {
+        const variantTemplate = document.getElementById(`menu-variants-${id}`);
+        const variants = variantTemplate
+            ? Array.from(variantTemplate.content.querySelectorAll('option')).map(option => ({
+                id: option.value,
+                name: option.textContent.split(' - ')[0].trim(),
+                price: Number(option.dataset.price || card.dataset.price),
+                label: option.textContent.trim(),
+            }))
+            : [];
+        const selectedVariant = variants[0] || null;
+        const cartKey = selectedVariant ? `${id}-${selectedVariant.id}` : id;
+        const item = cart.get(cartKey) || {
             id,
+            key: cartKey,
             name: card.querySelector('.cashier-menu-name').textContent.trim(),
-            price: Number(card.dataset.price),
+            basePrice: Number(card.dataset.price),
+            price: selectedVariant ? Number(selectedVariant.price) : Number(card.dataset.price),
+            variantId: selectedVariant ? String(selectedVariant.id) : '',
+            variantName: selectedVariant ? selectedVariant.name : '',
+            variants,
             qty: 0,
         };
         item.qty += 1;
-        cart.set(id, item);
+        cart.set(cartKey, item);
         renderCart();
     });
 });
@@ -184,6 +239,12 @@ document.querySelectorAll('#cashierCategoryFilter button').forEach(button => {
 
 paidEl.addEventListener('input', renderTotals);
 paymentMethodEl.addEventListener('change', renderTotals);
+
+document.querySelectorAll('[data-submit-action]').forEach(button => {
+    button.addEventListener('click', () => {
+        submitActionEl.value = button.dataset.submitAction;
+    });
+});
 
 function filterMenus() {
     const keyword = searchEl.value.toLowerCase();
@@ -262,28 +323,73 @@ function renderCart() {
         return;
     }
 
-    cartEl.innerHTML = Array.from(cart.values()).map((item, index) => `
+    cartEl.innerHTML = Array.from(cart.values()).map((item, index) => {
+        const optionsHtml = item.variants.map(variant => {
+            const selected = String(item.variantId) === String(variant.id) ? 'selected' : '';
+
+            return '<option value="' + variant.id + '" ' + selected + '>' +
+                variant.label +
+                '</option>';
+        }).join('');
+
+        const variantOptions = item.variants.length > 0
+            ? `<label class="cashier-variant-select">
+                    <span>Varian</span>
+                    <select data-action="variant" data-id="${item.key}" name="items[${index}][variant_id]">
+                        ${optionsHtml}
+                    </select>
+                </label>`
+            : `<input type="hidden" name="items[${index}][variant_id]" value="">`;
+
+        return `
         <div class="cashier-cart-item">
             <input type="hidden" name="items[${index}][menu_id]" value="${item.id}">
             <input type="hidden" name="items[${index}][qty]" value="${item.qty}">
             <div>
                 <strong>${item.name}</strong>
+                ${variantOptions}
                 <span>${money(item.price)} x ${item.qty}</span>
             </div>
             <div class="qty-actions">
-                <button type="button" data-action="minus" data-id="${item.id}"><i class="bi bi-dash"></i></button>
+                <button type="button" data-action="minus" data-id="${item.key}"><i class="bi bi-dash"></i></button>
                 <span>${item.qty}</span>
-                <button type="button" data-action="plus" data-id="${item.id}"><i class="bi bi-plus"></i></button>
+                <button type="button" data-action="plus" data-id="${item.key}"><i class="bi bi-plus"></i></button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
-    cartEl.querySelectorAll('button').forEach(btn => {
+    cartEl.querySelectorAll('button[data-action]').forEach(btn => {
         btn.addEventListener('click', () => {
             const item = cart.get(btn.dataset.id);
             if (!item) return;
             item.qty += btn.dataset.action === 'plus' ? 1 : -1;
             if (item.qty <= 0) cart.delete(btn.dataset.id);
+            renderCart();
+        });
+    });
+
+    cartEl.querySelectorAll('select[data-action="variant"]').forEach(select => {
+        select.addEventListener('change', () => {
+            const item = cart.get(select.dataset.id);
+            if (!item) return;
+
+            const variant = item.variants.find(row => String(row.id) === String(select.value));
+            if (!variant) return;
+
+            cart.delete(item.key);
+            item.variantId = String(variant.id);
+            item.variantName = variant.name;
+            item.price = Number(variant.price);
+            item.key = `${item.id}-${item.variantId}`;
+
+            if (cart.has(item.key)) {
+                const existing = cart.get(item.key);
+                existing.qty += item.qty;
+            } else {
+                cart.set(item.key, item);
+            }
+
             renderCart();
         });
     });
@@ -301,6 +407,7 @@ function renderTotals() {
     paidHiddenEl.value = paid;
     paidFieldEl.style.display = isCash ? '' : 'none';
     changeRowEl.style.display = isCash ? '' : 'none';
+    midtransPayBtn.classList.toggle('is-hidden', isCash);
     totalItemsEl.textContent = qty;
     grandEl.textContent = money(total);
     changeEl.textContent = money(Math.max(paid - total, 0));
@@ -337,11 +444,6 @@ document.getElementById('cashierForm').addEventListener('submit', e => {
 });
 
 filterMenus();
+renderTotals();
 </script>
 @endpush
-
-
-
-
-
-

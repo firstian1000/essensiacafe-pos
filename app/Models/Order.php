@@ -11,6 +11,7 @@ class Order extends Model
     'cafe_table_id',
     'customer_name',
     'phone',
+    'service_type',
     'total',
     'status',
     'payment_method',
