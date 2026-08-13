@@ -23,11 +23,11 @@
 
     <link rel="stylesheet" href="{{ asset('css/customer/cafe.css') }}?v=29">
 
-
-
-    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=14">
-
     @stack('head')
+
+
+
+    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=17">
 
 </head>
 
