@@ -185,6 +185,8 @@ const paginationInfoEl = document.getElementById('cashierPaginationInfo');
 const menuCards = Array.from(document.querySelectorAll('.cashier-menu-card'));
 const submitActionEl = document.getElementById('submitAction');
 const midtransPayBtn = document.getElementById('btnMidtransPay');
+const cashierFormEl = document.getElementById('cashierForm');
+let cashierFormSubmitting = false;
 
 menuCards.forEach(card => {
     card.addEventListener('click', () => {
@@ -413,7 +415,11 @@ function renderTotals() {
     changeEl.textContent = money(Math.max(paid - total, 0));
 }
 
-document.getElementById('cashierForm').addEventListener('submit', e => {
+cashierFormEl.addEventListener('submit', async e => {
+    if (cashierFormSubmitting) {
+        return;
+    }
+
     if (cart.size === 0) {
         e.preventDefault();
         alert('Pilih minimal satu menu.');
@@ -441,6 +447,33 @@ document.getElementById('cashierForm').addEventListener('submit', e => {
             return;
         }
     }
+
+    e.preventDefault();
+
+    try {
+        const response = await fetch(@json(route('csrf.token')), {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            cache: 'no-store',
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const tokenInput = cashierFormEl.querySelector('input[name="_token"]');
+            if (data.token && tokenInput) {
+                tokenInput.value = data.token;
+            }
+        }
+    } catch (error) {
+        console.log('Gagal refresh token kasir:', error);
+    }
+
+    cashierFormSubmitting = true;
+    cashierFormEl.requestSubmit();
 });
 
 filterMenus();

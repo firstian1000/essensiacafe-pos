@@ -22,6 +22,8 @@ use App\Http\Controllers\ExpenseController;
 
 Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AdminLoginController::class, 'login']);
+Route::get('/csrf-token', fn () => response()->json(['token' => csrf_token()]))
+    ->name('csrf.token');
 Route::get('/login/google', [AdminLoginController::class, 'redirectToGoogle'])->middleware('guest.role')->name('login.google');
 Route::get('/login/google/callback', [AdminLoginController::class, 'handleGoogleCallback'])->middleware('guest.role')->name('login.google.callback');
 Route::get('/kasir/login', [AdminLoginController::class, 'showCashierLoginForm'])->name('cashier.login.form');

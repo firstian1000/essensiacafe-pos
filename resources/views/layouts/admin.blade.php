@@ -39,7 +39,7 @@
 
 @stack('styles')
 
-<link rel="stylesheet" href="{{ asset('css/admin/responsive-fix.css') }}?v=14">
+<link rel="stylesheet" href="{{ asset('css/admin/responsive-fix.css') }}?v=17">
 
 
 
@@ -111,7 +111,7 @@ const toggle = document.getElementById('menuToggle');
 const sidebar = document.getElementById('sidebar');
 const main = document.getElementById('mainContent');
 const backdrop = document.getElementById('sidebarBackdrop');
-const mobileQuery = window.matchMedia('(max-width: 0px)');
+const mobileQuery = window.matchMedia('(max-width: 1180px)');
 
 function setSidebar(open) {
     if (mobileQuery.matches) {
@@ -235,5 +235,3 @@ syncSidebarForViewport();
 
 
 </html>
-
-

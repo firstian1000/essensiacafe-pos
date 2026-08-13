@@ -7,6 +7,10 @@
     </div>
 
     <div class="admin-footer-meta">
-        <span>Copyright by OUNERS</span>
+        <span class="admin-footer-design">
+            <i class="bi bi-stars"></i>
+            Design by OUNERS
+        </span>
+        <em>1st Dev</em>
     </div>
 </footer>

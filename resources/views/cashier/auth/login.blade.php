@@ -94,6 +94,8 @@
     <script>
         const passwordInput = document.getElementById('password');
         const passwordToggle = document.querySelector('.password-toggle');
+        const loginForm = document.querySelector('.login-form');
+        let loginSubmitting = false;
 
         passwordToggle?.addEventListener('click', () => {
             const isPassword = passwordInput.type === 'password';
@@ -101,6 +103,37 @@
             passwordToggle.setAttribute('aria-pressed', String(isPassword));
             passwordToggle.setAttribute('aria-label', isPassword ? 'Sembunyikan password' : 'Tampilkan password');
             passwordToggle.querySelector('i').className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+
+        loginForm?.addEventListener('submit', async (event) => {
+            if (loginSubmitting) return;
+
+            event.preventDefault();
+
+            try {
+                const response = await fetch(@json(route('csrf.token')), {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    cache: 'no-store',
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const tokenInput = loginForm.querySelector('input[name="_token"]');
+                    if (data.token && tokenInput) {
+                        tokenInput.value = data.token;
+                    }
+                }
+            } catch (error) {
+                console.log('Gagal refresh token login kasir:', error);
+            }
+
+            loginSubmitting = true;
+            loginForm.requestSubmit();
         });
     </script>
 </body>
