@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=13">
+<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=14">
 @endpush
 
 @section('title','Edit Meja')

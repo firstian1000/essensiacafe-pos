@@ -1,7 +1,40 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=13">
+<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=14">
+<style>
+    .table-card .table-status-form {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        margin: 16px 0 18px !important;
+        padding: 14px !important;
+        border: 1px solid #E6EEF7 !important;
+        border-radius: 16px !important;
+        background: #F8FBFF !important;
+    }
+
+    .table-card .table-status-form label {
+        margin: 0 !important;
+        color: #334155 !important;
+        font-size: 13px !important;
+        font-weight: 900 !important;
+    }
+
+    .table-card .table-status-form .table-status-select {
+        width: 100% !important;
+        height: 48px !important;
+        padding: 0 44px 0 14px !important;
+        border: 1px solid #CFE0F3 !important;
+        border-radius: 14px !important;
+        background-color: #FFFFFF !important;
+        color: #1F2937 !important;
+        font-size: 15px !important;
+        font-weight: 900 !important;
+        box-shadow: 0 8px 18px rgba(37, 99, 235, .06) !important;
+        appearance: none !important;
+    }
+</style>
 @endpush
 
 @section('title','Meja')
