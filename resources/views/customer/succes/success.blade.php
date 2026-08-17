@@ -170,11 +170,16 @@
         <div class="success-bottom-actions">
             <a href="{{ route('customer.menu', $order->table->qr_token) }}" class="outline"><i class="bi bi-house-door"></i> Kembali ke Menu</a>
             <a href="{{ route('customer.menu', $order->table->qr_token) }}" class="primary"><i class="bi bi-cart-plus"></i> Pesan Lagi</a>
+            @if($order->payment_method == 'midtrans' && $order->snap_token && $order->payment_status !== 'paid')
+                <button type="button" id="pay-button" class="primary" style="border:0;">
+                    <i class="bi bi-credit-card"></i> Buka Pembayaran
+                </button>
+            @endif
         </div>
         @else
         <div class="success-bottom-actions">
             <a href="{{ route('cashier.index') }}" class="primary"><i class="bi bi-shop"></i> Kembali ke Kasir</a>
-            @if($order->payment_method == 'midtrans' && $order->snap_token)
+            @if($order->payment_method == 'midtrans' && $order->snap_token && $order->payment_status !== 'paid')
                 <button type="button" id="pay-button" class="primary" style="border:0;">
                     <i class="bi bi-credit-card"></i> Buka Pembayaran
                 </button>
@@ -185,7 +190,7 @@
 </section>
 
 @if($order->payment_method == 'midtrans' && $order->snap_token)
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.clientKey') }}"></script>
+<script src="{{ config('midtrans.isProduction') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('midtrans.clientKey') }}"></script>
 @endif
 <script>
 localStorage.removeItem('essensia_customer_cart');

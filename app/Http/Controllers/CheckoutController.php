@@ -165,7 +165,10 @@ class CheckoutController extends Controller
 
             session()->forget('cart');
 
-            return redirect()->route('order.success', $order->id);
+            return redirect()->route('order.success', [
+                'order' => $order->id,
+                'auto_pay' => $request->payment_method === 'midtrans' ? 1 : null,
+            ]);
 
         } catch (\Exception $e) {
 
