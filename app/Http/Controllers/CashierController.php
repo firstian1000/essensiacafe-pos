@@ -141,7 +141,7 @@ class CashierController extends Controller
             ]);
         }
 
-        return redirect()->route('cashier.receipt', [
+        return redirect()->route('payments.recap', [
             'order' => $order->id,
             'paid' => $isCash ? $data['paid_amount'] : $total,
         ]);

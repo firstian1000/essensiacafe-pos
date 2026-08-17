@@ -271,8 +271,12 @@ body:has(.cashier-page) .content{height:auto!important;overflow:visible!importan
     margin:0!important;
 }
 .cashier-action-buttons .btn-midtrans-pay{
-    background:#0F172A!important;
-    box-shadow:0 14px 30px rgba(15,23,42,.18)!important;
+    background:#2563EB!important;
+    box-shadow:0 14px 30px rgba(37,99,235,.22)!important;
+}
+.cashier-action-buttons .btn-cash-pay{
+    background:#2563EB!important;
+    box-shadow:0 14px 30px rgba(37,99,235,.22)!important;
 }
 .cashier-action-buttons .btn-cashier-submit.is-hidden{
     display:none!important;

@@ -108,6 +108,9 @@
 @section('content')
 @php
     $activeArea = auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $isCash = $order->payment_method === 'cash';
+    $paidAmount = (float) request('paid', $order->total);
+    $changeAmount = max($paidAmount - (float) $order->total, 0);
 @endphp
 
 @if(session('success'))
@@ -157,7 +160,13 @@
         <div class="detail-grid">
             <div class="detail-info-item">
                 <span>Metode Pembayaran</span>
-                <strong><span class="badge bg-info text-dark"><i class="bi bi-qr-code"></i> Midtrans</span></strong>
+                <strong>
+                    @if($isCash)
+                        <span class="badge bg-success"><i class="bi bi-cash-coin"></i> Tunai</span>
+                    @else
+                        <span class="badge bg-info text-dark"><i class="bi bi-qr-code"></i> Midtrans</span>
+                    @endif
+                </strong>
             </div>
             <div class="detail-info-item">
                 <span>Status Pembayaran</span>
@@ -177,6 +186,16 @@
                 <span>Jumlah Item</span>
                 <strong>{{ $order->items->sum('qty') }} item</strong>
             </div>
+            @if($isCash)
+            <div class="detail-info-item">
+                <span>Uang Diterima</span>
+                <strong>Rp {{ number_format($paidAmount, 0, ',', '.') }}</strong>
+            </div>
+            <div class="detail-info-item">
+                <span>Kembalian</span>
+                <strong>Rp {{ number_format($changeAmount, 0, ',', '.') }}</strong>
+            </div>
+            @endif
         </div>
 
         <div class="detail-section-head">
@@ -216,7 +235,7 @@
         </div>
 
         <div class="recap-actions">
-            <a href="{{ route('payments.receipt', $order) }}" class="btn-detail-action primary">
+            <a href="{{ route('payments.receipt', ['order' => $order, 'paid' => $paidAmount]) }}" class="btn-detail-action primary">
                 <i class="bi bi-printer-fill"></i> Cetak Nota
             </a>
             @if(auth()->user()?->role === 'cashier' && $order->status !== 'cancelled')

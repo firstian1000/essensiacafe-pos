@@ -149,11 +149,11 @@
             <div class="cashier-action-buttons">
                 <button type="submit" class="btn-cashier-submit btn-midtrans-pay" id="btnMidtransPay" data-submit-action="pay_midtrans">
                     <i class="bi bi-qr-code-scan"></i>
-                    Bayar Non Tunai
+                    Bayar
                 </button>
-                <button type="submit" class="btn-cashier-submit" data-submit-action="print_receipt">
-                <i class="bi bi-receipt-cutoff"></i>
-                Cetak Nota
+                <button type="submit" class="btn-cashier-submit btn-cash-pay" id="btnCashPay" data-submit-action="print_receipt">
+                    <i class="bi bi-cash-coin"></i>
+                    Bayar
                 </button>
             </div>
         </aside>
@@ -185,6 +185,7 @@ const paginationInfoEl = document.getElementById('cashierPaginationInfo');
 const menuCards = Array.from(document.querySelectorAll('.cashier-menu-card'));
 const submitActionEl = document.getElementById('submitAction');
 const midtransPayBtn = document.getElementById('btnMidtransPay');
+const cashPayBtn = document.getElementById('btnCashPay');
 const cashierFormEl = document.getElementById('cashierForm');
 let cashierFormSubmitting = false;
 
@@ -410,6 +411,7 @@ function renderTotals() {
     paidFieldEl.style.display = isCash ? '' : 'none';
     changeRowEl.style.display = isCash ? '' : 'none';
     midtransPayBtn.classList.toggle('is-hidden', isCash);
+    cashPayBtn.classList.toggle('is-hidden', !isCash);
     totalItemsEl.textContent = qty;
     grandEl.textContent = money(total);
     changeEl.textContent = money(Math.max(paid - total, 0));
