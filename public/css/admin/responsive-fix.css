@@ -368,7 +368,8 @@
         grid-template-columns:1fr!important;
         gap:10px!important;
     }
-    .dashboard-filter-row .btn-export-excel{
+    .dashboard-filter-row .export-dropdown,
+    .dashboard-filter-row .btn-export-download{
         width:100%!important;
     }
     .card-header-dashboard{

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=14">
+<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=15">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endpush
 
@@ -141,12 +141,18 @@
                 <i class="bi bi-arrow-counterclockwise"></i>
                 Reset
             </a>
-            <details class="export-dropdown">
-                <summary class="btn-export-download" title="Unduh rekap" aria-label="Unduh rekap">
+            <div class="dropdown export-dropdown">
+                <button
+                    type="button"
+                    class="btn-export-download"
+                    title="Unduh rekap"
+                    aria-label="Unduh rekap"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
                     <i class="bi bi-download"></i>
-                </summary>
-                <div class="export-dropdown-menu">
-                    <a href="{{ route('dashboard.export', [
+                </button>
+                <div class="dropdown-menu dropdown-menu-end export-dropdown-menu">
+                    <a class="dropdown-item" href="{{ route('dashboard.export', [
                         'date' => $selectedDate,
                         'payment_filter' => $paymentFilter,
                         'brand_filter' => $brandFilter,
@@ -155,7 +161,7 @@
                         <i class="bi bi-file-earmark-pdf"></i>
                         Cetak PDF
                     </a>
-                    <a href="{{ route('dashboard.export', [
+                    <a class="dropdown-item" href="{{ route('dashboard.export', [
                         'date' => $selectedDate,
                         'payment_filter' => $paymentFilter,
                         'brand_filter' => $brandFilter,
@@ -165,7 +171,7 @@
                         Cetak Excel
                     </a>
                 </div>
-            </details>
+            </div>
         </form>
     </div>
 
