@@ -1100,3 +1100,22 @@
         font-size:22px!important;
     }
 }
+
+.float-bar-btn-mobile-text{
+    display:none!important;
+}
+
+@media(max-width:980px){
+    body:has(.menu-page) .float-bar-btn{
+        font-size:15px!important;
+    }
+
+    body:has(.menu-page) .float-bar-btn .float-bar-btn-text,
+    body:has(.menu-page) .float-bar-btn i{
+        display:none!important;
+    }
+
+    body:has(.menu-page) .float-bar-btn .float-bar-btn-mobile-text{
+        display:inline!important;
+    }
+}
