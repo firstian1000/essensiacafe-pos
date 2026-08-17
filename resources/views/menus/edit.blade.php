@@ -22,6 +22,11 @@
 
 @section('content')
 
+@php
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $areaQuery = $activeArea === 'cashier' ? ['area' => 'cashier'] : [];
+@endphp
+
 <div class="menu-page">
 
     <div class="page-header">
@@ -31,9 +36,11 @@
             <h1>Edit Menu</h1>
 
             <div class="breadcrumb-custom">
-                <a href="{{ route('dashboard') }}">Dashboard</a>
-                <span>></span>
-                <a href="{{ route('menus.index') }}">Menu</a>
+                @if($activeArea === 'admin')
+                    <a href="{{ route('dashboard') }}">Dashboard</a>
+                    <span>></span>
+                @endif
+                <a href="{{ route('menus.index', $areaQuery) }}">Menu</a>
                 <span>></span>
                 <span>Edit</span>
             </div>
@@ -44,7 +51,7 @@
 
     <div class="menu-card">
 
-        <form action="{{ route('menus.update',$menu->id) }}"
+        <form action="{{ route('menus.update', ['menu' => $menu->id] + $areaQuery) }}"
               method="POST"
               enctype="multipart/form-data">
 
@@ -214,7 +221,7 @@
             <div class="form-footer">
 
                 <a
-                    href="{{ route('menus.index') }}"
+                    href="{{ route('menus.index', $areaQuery) }}"
                     class="btn-cancel">
 
                     Batal

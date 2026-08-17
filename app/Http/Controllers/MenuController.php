@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Storage;
 
 class MenuController extends Controller
 {
+    private function areaQuery(): array
+    {
+        return request('area') === 'cashier' || auth()->user()?->role === 'cashier'
+            ? ['area' => 'cashier']
+            : [];
+    }
+
     public function index(Request $request)
 {
     $perPage = (int) $request->get('per_page', 15);
@@ -91,7 +98,7 @@ if ($request->hasFile('image')) {
 
     $this->syncVariants($menu, $request->input('variants', []));
 
-    return redirect()->route('menus.index')
+    return redirect()->route('menus.index', $this->areaQuery())
         ->with('success', 'Menu berhasil ditambahkan');
 }
 
@@ -164,7 +171,7 @@ public function update(Request $request, Menu $menu)
     $this->syncVariants($menu, $request->input('variants', []));
 
     return redirect()
-        ->route('menus.index')
+        ->route('menus.index', $this->areaQuery())
         ->with('success', 'Menu berhasil diperbarui');
 }
 public function destroy(Menu $menu)
@@ -178,7 +185,7 @@ public function destroy(Menu $menu)
     $menu->delete();
 
     return redirect()
-        ->route('menus.index')
+        ->route('menus.index', $this->areaQuery())
         ->with('success', 'Menu berhasil dihapus');
 }
 

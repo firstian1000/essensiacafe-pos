@@ -1,9 +1,11 @@
 @php
-    $isCashierArea = request()->is('cashier', 'cashier/*', 'kasir/*') || request('area') === 'cashier';
+    $isCashierArea = request()->is('cashier', 'cashier/*', 'kasir/*')
+        || request('area') === 'cashier'
+        || auth()->user()?->role === 'cashier';
     $navbarUser = $isCashierArea && auth('cashier')->check()
         ? auth('cashier')->user()
         : (auth('admin')->user() ?? auth('cashier')->user());
-    $navbarArea = $navbarUser?->role === 'cashier' ? 'cashier' : 'admin';
+    $navbarArea = $isCashierArea || $navbarUser?->role === 'cashier' ? 'cashier' : 'admin';
 @endphp
 
 <nav class="topbar">

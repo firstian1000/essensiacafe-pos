@@ -13,9 +13,11 @@ class EnsureUserRole
     {
         $requestedArea = $request->query('area');
 
-        if (in_array($requestedArea, ['admin', 'cashier'], true) && Auth::guard($requestedArea)->check()) {
-            Auth::shouldUse($requestedArea);
-        } elseif ($request->is('cashier', 'cashier/*', 'kasir/*') && Auth::guard('cashier')->check()) {
+        if (($requestedArea === 'cashier' || $request->is('cashier', 'cashier/*', 'kasir/*')) && Auth::guard('cashier')->check()) {
+            Auth::shouldUse('cashier');
+        } elseif ($requestedArea === 'admin' && Auth::guard('admin')->check()) {
+            Auth::shouldUse('admin');
+        } elseif (Auth::guard('cashier')->check() && ! Auth::guard('admin')->check()) {
             Auth::shouldUse('cashier');
         } elseif (Auth::guard('admin')->check()) {
             Auth::shouldUse('admin');

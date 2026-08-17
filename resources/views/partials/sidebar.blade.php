@@ -1,10 +1,12 @@
 <div class="sidebar" id="sidebar">
     @php
-        $isCashierArea = request()->is('cashier', 'cashier/*', 'kasir/*') || request('area') === 'cashier';
+        $isCashierArea = request()->is('cashier', 'cashier/*', 'kasir/*')
+            || request('area') === 'cashier'
+            || auth()->user()?->role === 'cashier';
         $currentUser = $isCashierArea && auth('cashier')->check()
             ? auth('cashier')->user()
             : (auth('admin')->user() ?? auth('cashier')->user());
-        $activeArea = $currentUser?->role === 'cashier' ? 'cashier' : 'admin';
+        $activeArea = $isCashierArea || $currentUser?->role === 'cashier' ? 'cashier' : 'admin';
     @endphp
 
     <!-- Logo -->

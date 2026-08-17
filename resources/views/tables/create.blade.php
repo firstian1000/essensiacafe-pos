@@ -8,6 +8,11 @@
 
 @section('content')
 
+@php
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $areaQuery = $activeArea === 'cashier' ? ['area' => 'cashier'] : [];
+@endphp
+
 <div class="table-page">
 
     <!-- Header -->
@@ -20,13 +25,15 @@
 
             <div class="breadcrumb-custom">
 
+                @if($activeArea === 'admin')
                 <a href="{{ route('dashboard') }}">
                     Dashboard
                 </a>
 
                 <span>></span>
+                @endif
 
-                <a href="{{ route('tables.index') }}">
+                <a href="{{ route('tables.index', $areaQuery) }}">
                     Meja
                 </a>
 
@@ -45,7 +52,7 @@
     <div class="table-form-card">
 
         <form
-            action="{{ route('tables.store') }}"
+            action="{{ route('tables.store', $areaQuery) }}"
             method="POST">
 
             @csrf
@@ -123,7 +130,7 @@
             <div class="form-footer">
 
                 <a
-                    href="{{ route('tables.index') }}"
+                    href="{{ route('tables.index', $areaQuery) }}"
                     class="btn-cancel">
 
                     <i class="bi bi-arrow-left"></i>

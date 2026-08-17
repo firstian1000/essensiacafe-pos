@@ -9,6 +9,10 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        if (auth()->user()?->role === 'cashier' && $request->query('area') !== 'cashier') {
+            return redirect()->route('orders.index', array_merge($request->query(), ['area' => 'cashier']));
+        }
+
         $query = Order::with('table');
 
         if ($request->filled('search')) {

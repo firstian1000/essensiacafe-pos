@@ -11,6 +11,13 @@ class CafeTableController extends Controller
 {
     private const TABLE_STATUSES = ['available', 'occupied', 'reserved'];
 
+    private function areaQuery(): array
+    {
+        return request('area') === 'cashier' || auth()->user()?->role === 'cashier'
+            ? ['area' => 'cashier']
+            : [];
+    }
+
     public function index(Request $request)
 {
     $query = CafeTable::query();
@@ -60,7 +67,7 @@ class CafeTableController extends Controller
         'status'       => $request->status ?? 'available'
     ]);
 
-    return redirect()->route('tables.index')
+    return redirect()->route('tables.index', $this->areaQuery())
         ->with('success', 'Meja berhasil ditambahkan');
 }
 
@@ -82,7 +89,7 @@ public function update(Request $request, CafeTable $table)
     ]);
 
     return redirect()
-        ->route('tables.index')
+        ->route('tables.index', $this->areaQuery())
         ->with('success', 'Meja berhasil diupdate');
 }
 
@@ -114,7 +121,7 @@ public function destroy(CafeTable $table)
     $table->delete();
 
     return redirect()
-        ->route('tables.index')
+        ->route('tables.index', $this->areaQuery())
         ->with('success', 'Meja berhasil dihapus');
 }
 

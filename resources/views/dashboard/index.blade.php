@@ -145,11 +145,12 @@
                 <button
                     type="button"
                     class="btn-export-download"
-                    title="Unduh rekap"
-                    aria-label="Unduh rekap"
+                    title="Cetak rekap"
+                    aria-label="Cetak rekap"
                     data-bs-toggle="dropdown"
                     aria-expanded="false">
-                    <i class="bi bi-download"></i>
+                    <i class="bi bi-printer-fill"></i>
+                    <span>Cetak Rekap</span>
                 </button>
                 <div class="dropdown-menu dropdown-menu-end export-dropdown-menu">
                     <a class="dropdown-item" href="{{ route('dashboard.export', [

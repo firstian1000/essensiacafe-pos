@@ -8,6 +8,11 @@
 
 @section('content')
 
+@php
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $areaQuery = $activeArea === 'cashier' ? ['area' => 'cashier'] : [];
+@endphp
+
 @if(session('success'))
 
 <div class="alert alert-success alert-dismissible fade show">
@@ -36,6 +41,7 @@
 
             <div class="breadcrumb-custom">
 
+                @if($activeArea === 'admin')
                 <a href="{{ route('dashboard') }}">
 
                     Dashboard
@@ -43,6 +49,7 @@
                 </a>
 
                 <span>></span>
+                @endif
 
                 <span>Menu</span>
 
@@ -51,7 +58,7 @@
         </div>
 
         <a
-            href="{{ route('menus.create') }}"
+            href="{{ route('menus.create', $areaQuery) }}"
             class="btn-add">
 
             <i class="bi bi-plus-lg"></i>
@@ -75,6 +82,10 @@
                 method="GET"
                 class="toolbar-form"
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 15px; flex-wrap: wrap;">
+
+                @if($activeArea === 'cashier')
+                    <input type="hidden" name="area" value="cashier">
+                @endif
 
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 15px; font-weight: 600; color: #4B5563;">Tampilkan:</span>
@@ -211,7 +222,7 @@
                 <div>
 
                     <form
-                        action="{{ route('menus.status',$menu->id) }}"
+                        action="{{ route('menus.status', ['menu' => $menu->id] + $areaQuery) }}"
                         method="POST">
 
                         @csrf
@@ -249,7 +260,7 @@
                 <div data-label="Rekomendasi">
 
                     <form
-                        action="{{ route('menus.recommendation',$menu->id) }}"
+                        action="{{ route('menus.recommendation', ['menu' => $menu->id] + $areaQuery) }}"
                         method="POST">
 
                         @csrf
@@ -287,14 +298,14 @@
                 <div class="action-buttons" data-label="Aksi">
 
                     <a
-                        href="{{ route('menus.edit',$menu->id) }}"
+                        href="{{ route('menus.edit', ['menu' => $menu->id] + $areaQuery) }}"
                         class="btn-edit">
 
                         <i class="bi bi-pencil"></i>
                     </a>
 
                     <form
-                        action="{{ route('menus.destroy',$menu->id) }}"
+                        action="{{ route('menus.destroy', ['menu' => $menu->id] + $areaQuery) }}"
                         method="POST"
                         onsubmit="return confirm('Yakin ingin menghapus menu ini?')">
 

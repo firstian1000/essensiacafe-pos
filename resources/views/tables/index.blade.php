@@ -8,6 +8,11 @@
 
 @section('content')
 
+@php
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $areaQuery = $activeArea === 'cashier' ? ['area' => 'cashier'] : [];
+@endphp
+
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show">
     {{ session('success') }}
@@ -26,11 +31,13 @@
 
             <div class="breadcrumb-custom">
 
+                @if($activeArea === 'admin')
                 <a href="{{ route('dashboard') }}">
                     Dashboard
                 </a>
 
                 <span>></span>
+                @endif
 
                 <span>Meja</span>
 
@@ -40,7 +47,7 @@
 
         <div class="header-actions">
 
-            <a href="{{ route('tables.print.all') }}"
+            <a href="{{ route('tables.print.all', $areaQuery) }}"
                class="btn-print">
 
                 <i class="bi bi-qr-code"></i>
@@ -49,7 +56,7 @@
 
             </a>
 
-            <a href="{{ route('tables.create') }}"
+            <a href="{{ route('tables.create', $areaQuery) }}"
                class="btn-add">
 
                 <i class="bi bi-plus-lg"></i>
@@ -157,6 +164,10 @@
             method="GET"
             class="toolbar-form">
 
+            @if($activeArea === 'cashier')
+                <input type="hidden" name="area" value="cashier">
+            @endif
+
             <div class="search-box">
 
                 <i class="bi bi-search"></i>
@@ -177,12 +188,12 @@
                 class="filter-select"
                 onchange="window.location=this.value">
 
-                <option value="{{ route('tables.index') }}">
+                <option value="{{ route('tables.index', $areaQuery) }}">
                     Semua Status
                 </option>
 
                 <option
-                    value="{{ route('tables.index',['status'=>'available']) }}"
+                    value="{{ route('tables.index', ['status'=>'available'] + $areaQuery) }}"
                     {{ request('status')=='available' ? 'selected' : '' }}>
 
                     Tersedia
@@ -190,7 +201,7 @@
                 </option>
 
                 <option
-                    value="{{ route('tables.index',['status'=>'occupied']) }}"
+                    value="{{ route('tables.index', ['status'=>'occupied'] + $areaQuery) }}"
                     {{ request('status')=='occupied' ? 'selected' : '' }}>
 
                     Terisi
@@ -198,7 +209,7 @@
                 </option>
 
                 <option
-                    value="{{ route('tables.index',['status'=>'reserved']) }}"
+                    value="{{ route('tables.index', ['status'=>'reserved'] + $areaQuery) }}"
                     {{ request('status')=='reserved' ? 'selected' : '' }}>
 
                     Dipesan
@@ -314,7 +325,7 @@
             </div>
 
             <form
-                action="{{ route('tables.status', $table->id) }}"
+                action="{{ route('tables.status', ['table' => $table->id] + $areaQuery) }}"
                 method="POST"
                 class="table-status-form">
 
@@ -350,7 +361,7 @@
             <div class="table-actions">
 
                 <a
-                    href="{{ route('tables.download',$table->id) }}"
+                    href="{{ route('tables.download', ['table' => $table->id] + $areaQuery) }}"
                     class="btn-download">
 
                     <i class="bi bi-download"></i>
@@ -377,7 +388,7 @@
             <div class="table-footer">
 
                 <a
-                    href="{{ route('tables.edit',$table->id) }}"
+                    href="{{ route('tables.edit', ['table' => $table->id] + $areaQuery) }}"
                     class="btn-edit">
 
                     <i class="bi bi-pencil"></i>
@@ -385,7 +396,7 @@
                 </a>
 
                 <form
-                    action="{{ route('tables.destroy',$table->id) }}"
+                    action="{{ route('tables.destroy', ['table' => $table->id] + $areaQuery) }}"
                     method="POST"
                     onsubmit="return confirm('Yakin ingin menghapus meja ini?')">
 

@@ -8,6 +8,11 @@
 
 @section('content')
 
+@php
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $areaQuery = $activeArea === 'cashier' ? ['area' => 'cashier'] : [];
+@endphp
+
 @if(session('success'))
 
 <div class="alert alert-success alert-dismissible fade show">
@@ -36,6 +41,7 @@
 
             <div class="breadcrumb-custom">
 
+                @if($activeArea === 'admin')
                 <a href="{{ route('dashboard') }}">
 
                     Dashboard
@@ -43,6 +49,7 @@
                 </a>
 
                 <span>></span>
+                @endif
 
                 <span>Kategori</span>
 
@@ -51,7 +58,7 @@
         </div>
 
         <a
-            href="{{ route('categories.create') }}"
+            href="{{ route('categories.create', $areaQuery) }}"
             class="btn-add">
 
             <i class="bi bi-plus-lg"></i>
@@ -75,6 +82,10 @@
                 method="GET"
                 class="toolbar-form"
                 style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 15px; flex-wrap: wrap;">
+
+                @if($activeArea === 'cashier')
+                    <input type="hidden" name="area" value="cashier">
+                @endif
 
                 <div style="display: flex; gap: 10px; align-items: center; width: 100%; max-width: 480px;">
                     <div class="search-box" style="flex: 1; margin-bottom: 0; border: 2px solid #2563EB; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08); background-color: #F8FAFC !important; overflow: hidden; height: 55px; border-radius: 16px; display: flex; align-items: center; padding: 0 18px; gap: 12px;">
@@ -147,7 +158,7 @@
                 <div class="action-buttons" data-label="Aksi">
 
                     <a
-                        href="{{ route('categories.edit',$category->id) }}"
+                        href="{{ route('categories.edit', ['category' => $category->id] + $areaQuery) }}"
                         class="btn-edit">
 
                         <i class="bi bi-pencil"></i>
@@ -155,7 +166,7 @@
                     </a>
 
                     <form
-                        action="{{ route('categories.destroy',$category->id) }}"
+                        action="{{ route('categories.destroy', ['category' => $category->id] + $areaQuery) }}"
                         method="POST"
                         onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
 

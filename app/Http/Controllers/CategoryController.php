@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    private function areaQuery(): array
+    {
+        return request('area') === 'cashier' || auth()->user()?->role === 'cashier'
+            ? ['area' => 'cashier']
+            : [];
+    }
+
     // Menampilkan daftar kategori
     public function index(Request $request)
 {
@@ -46,7 +53,7 @@ class CategoryController extends Controller
             'status' => true
         ]);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('categories.index', $this->areaQuery())
             ->with('success', 'Kategori berhasil ditambahkan');
     }
 
@@ -68,7 +75,7 @@ class CategoryController extends Controller
             'description' => $request->description
         ]);
 
-        return redirect()->route('categories.index')
+        return redirect()->route('categories.index', $this->areaQuery())
             ->with('success', 'Kategori berhasil diupdate');
     }
 
@@ -77,7 +84,7 @@ class CategoryController extends Controller
     {
         $category->delete();
 
-        return redirect()->route('categories.index')
+        return redirect()->route('categories.index', $this->areaQuery())
             ->with('success', 'Kategori berhasil dihapus');
     }
 }

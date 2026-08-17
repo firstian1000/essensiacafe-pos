@@ -8,6 +8,11 @@
 
 @section('content')
 
+@php
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $areaQuery = $activeArea === 'cashier' ? ['area' => 'cashier'] : [];
+@endphp
+
 <div class="category-page">
 
     <!-- HEADER -->
@@ -20,13 +25,15 @@
 
             <div class="breadcrumb-custom">
 
+                @if($activeArea === 'admin')
                 <a href="{{ route('dashboard') }}">
                     Dashboard
                 </a>
 
                 <span>></span>
+                @endif
 
-                <a href="{{ route('categories.index') }}">
+                <a href="{{ route('categories.index', $areaQuery) }}">
                     Kategori
                 </a>
 
@@ -45,7 +52,7 @@
     <div class="category-card">
 
         <form
-            action="{{ route('categories.update',$category->id) }}"
+            action="{{ route('categories.update', ['category' => $category->id] + $areaQuery) }}"
             method="POST">
 
             @csrf
@@ -114,7 +121,7 @@
             <div class="form-footer">
 
                 <a
-                    href="{{ route('categories.index') }}"
+                    href="{{ route('categories.index', $areaQuery) }}"
                     class="btn-cancel">
 
                     <i class="bi bi-arrow-left"></i>

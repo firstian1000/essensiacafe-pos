@@ -73,7 +73,7 @@
 @section('content')
 
 @php
-    $activeArea = auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
+    $activeArea = request('area') === 'cashier' || auth()->user()?->role === 'cashier' ? 'cashier' : 'admin';
 @endphp
 
 @if(session('success'))

@@ -92,7 +92,7 @@
 
 .dashboard-filter-row{
     display:grid;
-    grid-template-columns:minmax(150px,190px) repeat(2,minmax(170px,220px)) max-content max-content 54px;
+    grid-template-columns:minmax(150px,190px) repeat(2,minmax(170px,220px)) max-content max-content max-content;
     gap:16px;
     align-items:center;
 }
@@ -162,27 +162,29 @@
 }
 
 .btn-export-download{
-    width:54px;
+    min-width:150px;
     height:46px;
     border-radius:14px;
-    border:1px solid #CFEADB;
-    background:#FFFFFF;
-    color:#16A34A;
+    border:0;
+    background:#2563EB;
+    color:#FFFFFF;
     display:inline-flex;
     align-items:center;
     justify-content:center;
+    gap:8px;
     cursor:pointer;
-    box-shadow:0 10px 24px rgba(15,23,42,.06);
+    box-shadow:0 14px 30px rgba(37,99,235,.2);
     transition:.2s;
-    padding:0;
+    padding:0 18px;
+    font-weight:900;
+    white-space:nowrap;
 }
 
 .btn-export-download:hover,
 .btn-export-download:focus,
 .btn-export-download.show{
-    background:#F6FFF9;
-    border-color:#9ED8B4;
-    color:#14532D;
+    background:#1D4ED8;
+    color:#FFFFFF;
     transform:translateY(-1px);
 }
 
@@ -1255,23 +1257,23 @@
 
 /* Filter bar final layout */
 .dashboard-filter-row{
-    grid-template-columns:minmax(150px,190px) repeat(2,minmax(170px,220px)) max-content max-content 54px!important;
+    grid-template-columns:minmax(150px,190px) repeat(2,minmax(170px,220px)) max-content max-content max-content!important;
     align-items:center!important;
     justify-content:center!important;
     gap:16px!important;
 }
 .dashboard-filter-row .export-dropdown{
-    width:54px!important;
-    min-width:54px!important;
+    width:auto!important;
+    min-width:150px!important;
     height:46px!important;
     align-self:center!important;
     margin-top:22px!important;
 }
 .dashboard-filter-row .btn-export-download{
-    width:54px!important;
-    min-width:54px!important;
+    width:auto!important;
+    min-width:150px!important;
     height:46px!important;
-    padding:0!important;
+    padding:0 18px!important;
     border-radius:14px!important;
     justify-content:center!important;
 }
