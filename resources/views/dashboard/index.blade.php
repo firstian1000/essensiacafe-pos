@@ -141,14 +141,26 @@
                 <i class="bi bi-arrow-counterclockwise"></i>
                 Reset
             </a>
-            <a href="{{ route('dashboard.export', [
-                'date' => $selectedDate,
-                'payment_filter' => $paymentFilter,
-                'brand_filter' => $brandFilter,
-            ]) }}" class="btn-export-excel" title="Download Rekap Excel" aria-label="Download Rekap Excel">
-                <i class="bi bi-download"></i>
-                <i class="bi bi-file-earmark-excel"></i>
-            </a>
+            <div class="export-actions" style="display:flex; gap:8px; align-items:center;">
+                <a href="{{ route('dashboard.export', [
+                    'date' => $selectedDate,
+                    'payment_filter' => $paymentFilter,
+                    'brand_filter' => $brandFilter,
+                    'format' => 'excel',
+                ]) }}" class="btn-export-excel" title="Download Excel" aria-label="Download Excel">
+                    <i class="bi bi-file-earmark-excel"></i>
+                    Excel
+                </a>
+                <a href="{{ route('dashboard.export', [
+                    'date' => $selectedDate,
+                    'payment_filter' => $paymentFilter,
+                    'brand_filter' => $brandFilter,
+                    'format' => 'pdf',
+                ]) }}" class="btn-export-excel" title="Download PDF" aria-label="Download PDF" style="background:#DC2626;">
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    PDF
+                </a>
+            </div>
         </form>
     </div>
 

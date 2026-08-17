@@ -69,6 +69,15 @@ class PaymentController extends Controller
         return view('payments.show', compact('order'));
     }
 
+    public function qris(Order $order)
+    {
+        abort_unless($order->payment_method === 'midtrans' && $order->snap_token, 404);
+
+        $order->load(['table', 'items.menu']);
+
+        return view('payments.qris', compact('order'));
+    }
+
     public function receipt(Order $order)
     {
         $order->load(['table', 'items.menu']);

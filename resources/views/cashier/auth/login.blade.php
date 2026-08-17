@@ -55,6 +55,13 @@
                     </div>
                 @endif
 
+                <a href="{{ route('login.google', ['guard' => 'cashier']) }}" class="btn-google">
+                    <i class="bi bi-google"></i>
+                    Masuk Kasir dengan Google
+                </a>
+
+                <div class="login-divider"><span>atau masuk dengan email</span></div>
+
                 <form action="{{ route('cashier.login') }}" method="POST" class="login-form" autocomplete="off">
                     @csrf
 

@@ -93,20 +93,25 @@ class OrderController extends Controller
             ->with('success', 'Pesanan #' . $order->invoice . ' telah selesai dan diantar ke meja.');
     }
 
-    public function cancel(Order $order)
+    public function cancel(Request $request, Order $order)
     {
         $this->ensureCashierCanUpdateStatus();
+
+        $data = $request->validate([
+            'cancel_reason' => ['required', 'in:Ganti Pesanan,Ganti Pembayaran,Lain lain'],
+        ]);
 
         $order->update([
             'status' => 'cancelled',
             'payment_status' => $order->payment_status === 'paid' ? 'paid' : 'failed',
+            'cancel_reason' => $data['cancel_reason'],
         ]);
 
         $this->checkAndResetTableStatus($order);
 
         return redirect()
             ->back()
-            ->with('success', 'Pesanan #' . $order->invoice . ' berhasil dibatalkan.');
+            ->with('success', 'Pesanan #' . $order->invoice . ' berhasil dibatalkan. Alasan: ' . $data['cancel_reason'] . '.');
     }
 
     public function paid(Order $order)

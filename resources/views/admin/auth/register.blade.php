@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login Admin - Essensia Koffie</title>
+    <title>Daftar Admin - Essensia Koffie</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -21,9 +21,9 @@
             </div>
 
             <div class="visual-copy">
-                <span class="eyebrow">Cafe Management</span>
-                <h1>Kelola pesanan dengan lebih tenang.</h1>
-                <p>Aman,Cepat,Informatif</p>
+                <span class="eyebrow">Admin Access</span>
+                <h1>Mulai kelola operasional cafe.</h1>
+                <p>Buat akun admin untuk membuka dashboard Essensia.</p>
             </div>
 
             <div class="visual-stats">
@@ -41,10 +41,10 @@
 
             <div class="login-card">
                 <div class="login-heading">
-                    <span class="login-icon"><i class="bi bi-shield-lock"></i></span>
+                    <span class="login-icon"><i class="bi bi-person-plus"></i></span>
                     <div>
-                        <h2>Masuk Admin</h2>
-                        <p>Gunakan akun admin untuk membuka dashboard.</p>
+                        <h2>Daftar Admin</h2>
+                        <p>Buat akun baru atau gunakan akun Google.</p>
                     </div>
                 </div>
 
@@ -55,21 +55,29 @@
                     </div>
                 @endif
 
-                <a href="{{ route('login.google') }}" class="btn-google">
+                <a href="{{ route('register.google') }}" class="btn-google">
                     <i class="bi bi-google"></i>
-                    Masuk dengan Google
+                    Daftar dengan Google
                 </a>
 
-                <div class="login-divider"><span>atau masuk dengan email</span></div>
+                <div class="login-divider"><span>atau daftar dengan email</span></div>
 
-                <form action="{{ route('login') }}" method="POST" class="login-form" autocomplete="off">
+                <form action="{{ route('register') }}" method="POST" class="login-form" autocomplete="off">
                     @csrf
+
+                    <label class="field-group">
+                        <span>Nama</span>
+                        <div class="input-shell">
+                            <i class="bi bi-person"></i>
+                            <input type="text" name="name" value="{{ old('name') }}" placeholder="Nama admin" autocomplete="name" required autofocus>
+                        </div>
+                    </label>
 
                     <label class="field-group">
                         <span>Email</span>
                         <div class="input-shell">
                             <i class="bi bi-envelope"></i>
-                            <input type="email" name="email" value="" placeholder="essensia@gmail.com" autocomplete="off" required autofocus>
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="essensia@gmail.com" autocomplete="email" required>
                         </div>
                     </label>
 
@@ -77,40 +85,27 @@
                         <span>Password</span>
                         <div class="input-shell">
                             <i class="bi bi-key"></i>
-                            <input id="password" type="password" name="password" placeholder="password" autocomplete="new-password" required>
-                            <button type="button" class="password-toggle" aria-label="Tampilkan password" aria-pressed="false">
-                                <i class="bi bi-eye"></i>
-                            </button>
+                            <input id="password" type="password" name="password" placeholder="minimal 8 karakter" autocomplete="new-password" required>
                         </div>
                     </label>
 
-                    <label class="remember-row">
-                        <input type="checkbox" name="remember" value="1">
-                        <span>Ingat perangkat ini</span>
+                    <label class="field-group">
+                        <span>Konfirmasi Password</span>
+                        <div class="input-shell">
+                            <i class="bi bi-key-fill"></i>
+                            <input type="password" name="password_confirmation" placeholder="ulangi password" autocomplete="new-password" required>
+                        </div>
                     </label>
 
                     <button type="submit" class="btn-login">
-                        Masuk
+                        Daftar
                         <i class="bi bi-arrow-right"></i>
                     </button>
                 </form>
 
-                <div class="login-divider"><span><a href="{{ route('register') }}">Belum punya akun? Daftar</a></span></div>
+                <div class="login-divider"><span><a href="{{ route('login') }}">Sudah punya akun? Masuk</a></span></div>
             </div>
         </section>
     </main>
-
-    <script>
-        const passwordInput = document.getElementById('password');
-        const passwordToggle = document.querySelector('.password-toggle');
-
-        passwordToggle?.addEventListener('click', () => {
-            const isPassword = passwordInput.type === 'password';
-            passwordInput.type = isPassword ? 'text' : 'password';
-            passwordToggle.setAttribute('aria-pressed', String(isPassword));
-            passwordToggle.setAttribute('aria-label', isPassword ? 'Sembunyikan password' : 'Tampilkan password');
-            passwordToggle.querySelector('i').className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
-        });
-    </script>
 </body>
 </html>

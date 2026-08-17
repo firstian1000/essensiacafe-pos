@@ -22,10 +22,13 @@ use App\Http\Controllers\ExpenseController;
 
 Route::get('/login', [AdminLoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AdminLoginController::class, 'login']);
+Route::get('/register', [AdminLoginController::class, 'showRegisterForm'])->middleware('guest.role:admin')->name('register');
+Route::post('/register', [AdminLoginController::class, 'register'])->middleware('guest.role:admin');
 Route::get('/csrf-token', fn () => response()->json(['token' => csrf_token()]))
     ->name('csrf.token');
-Route::get('/login/google', [AdminLoginController::class, 'redirectToGoogle'])->middleware('guest.role')->name('login.google');
-Route::get('/login/google/callback', [AdminLoginController::class, 'handleGoogleCallback'])->middleware('guest.role')->name('login.google.callback');
+Route::get('/login/google', [AdminLoginController::class, 'redirectToGoogle'])->name('login.google');
+Route::get('/register/google', [AdminLoginController::class, 'redirectToGoogleRegister'])->middleware('guest.role:admin')->name('register.google');
+Route::get('/login/google/callback', [AdminLoginController::class, 'handleGoogleCallback'])->name('login.google.callback');
 Route::get('/kasir/login', [AdminLoginController::class, 'showCashierLoginForm'])->name('cashier.login.form');
 Route::post('/kasir/login', [AdminLoginController::class, 'cashierLogin'])->name('cashier.login');
 Route::post('/logout', [AdminLoginController::class, 'logout'])->name('logout');
@@ -104,6 +107,9 @@ Route::middleware(['auth:admin,cashier', 'role:admin,cashier'])->group(function 
 
     Route::get('/payments', [PaymentController::class, 'index'])
         ->name('payments.index');
+
+    Route::get('/payments/{order}/qris', [PaymentController::class, 'qris'])
+        ->name('payments.qris');
 
     Route::get('/payments/{order}/receipt', [PaymentController::class, 'receipt'])
         ->name('payments.receipt');

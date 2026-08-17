@@ -9,15 +9,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RedirectIfRoleAuthenticated
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        if (Auth::guard('admin')->check()) {
+        $guards = $guards ?: ['admin', 'cashier'];
+
+        if (in_array('admin', $guards, true) && Auth::guard('admin')->check()) {
             Auth::shouldUse('admin');
 
             return redirect()->route('dashboard');
         }
 
-        if (Auth::guard('cashier')->check()) {
+        if (in_array('cashier', $guards, true) && Auth::guard('cashier')->check()) {
             Auth::shouldUse('cashier');
 
             return redirect()->route('cashier.index');

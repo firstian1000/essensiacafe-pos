@@ -2,6 +2,70 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/order.css') }}?v=10">
+<style>
+    .cancel-reason-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.48);
+    }
+
+    .cancel-reason-modal.is-open {
+        display: flex;
+    }
+
+    .cancel-reason-dialog {
+        width: min(420px, 100%);
+        background: #fff;
+        border-radius: 8px;
+        padding: 22px;
+        box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+    }
+
+    .cancel-reason-dialog h3 {
+        margin: 0 0 6px;
+        color: #0F172A;
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .cancel-reason-dialog p {
+        margin: 0 0 16px;
+        color: #64748B;
+        font-size: 14px;
+    }
+
+    .cancel-reason-options {
+        display: grid;
+        gap: 10px;
+    }
+
+    .cancel-reason-options button,
+    .cancel-reason-close {
+        border: 0;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .cancel-reason-options button {
+        background: #FFE4E6;
+        color: #BE123C;
+        text-align: left;
+    }
+
+    .cancel-reason-close {
+        width: 100%;
+        margin-top: 12px;
+        background: #E2E8F0;
+        color: #0F172A;
+    }
+</style>
 @endpush
 
 @section('title', 'Pesanan')
@@ -122,7 +186,7 @@
                             <i class="bi bi-cash-coin"></i> Lunas
                         </a>
                         @endif
-                        <a href="{{ route('orders.cancel', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" onclick="return confirm('Yakin ingin membatalkan pesanan #{{ $order->invoice }}?')">
+                        <a href="{{ route('orders.cancel', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" data-cancel-order data-invoice="{{ $order->invoice }}">
                             <i class="bi bi-x-circle"></i> Batal
                         </a>
                         <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
@@ -140,7 +204,7 @@
                         <a href="{{ route('orders.unprocess', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-unprocess" title="Kembalikan ke Pending" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
                             <i class="bi bi-arrow-counterclockwise"></i> Batal Proses
                         </a>
-                        <a href="{{ route('orders.cancel', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" onclick="return confirm('Yakin ingin membatalkan pesanan #{{ $order->invoice }}?')">
+                        <a href="{{ route('orders.cancel', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-cancel" title="Batalkan Pesanan" data-cancel-order data-invoice="{{ $order->invoice }}">
                             <i class="bi bi-x-circle"></i> Batal
                         </a>
                         <a href="{{ route('orders.show', ['order' => $order, 'area' => $activeArea]) }}" class="btn-action-text btn-action-detail" title="Detail Pesanan">
@@ -180,4 +244,61 @@
         @endif
     </div>
 </div>
+
+<div class="cancel-reason-modal" id="cancelReasonModal" aria-hidden="true">
+    <div class="cancel-reason-dialog" role="dialog" aria-modal="true" aria-labelledby="cancelReasonTitle">
+        <h3 id="cancelReasonTitle">Alasan Pembatalan</h3>
+        <p id="cancelReasonText">Pilih alasan untuk membatalkan pesanan.</p>
+        <div class="cancel-reason-options">
+            <button type="button" data-cancel-reason="Ganti Pesanan">Ganti Pesanan</button>
+            <button type="button" data-cancel-reason="Ganti Pembayaran">Ganti Pembayaran</button>
+            <button type="button" data-cancel-reason="Lain lain">Lain lain</button>
+        </div>
+        <button type="button" class="cancel-reason-close" id="cancelReasonClose">Tutup</button>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const modal = document.getElementById('cancelReasonModal');
+    const closeButton = document.getElementById('cancelReasonClose');
+    const text = document.getElementById('cancelReasonText');
+    let cancelUrl = '';
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        cancelUrl = '';
+    }
+
+    document.querySelectorAll('[data-cancel-order]').forEach(button => {
+        button.addEventListener('click', event => {
+            event.preventDefault();
+            cancelUrl = button.href;
+            text.textContent = `Pilih alasan untuk membatalkan pesanan #${button.dataset.invoice}.`;
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+        });
+    });
+
+    document.querySelectorAll('[data-cancel-reason]').forEach(button => {
+        button.addEventListener('click', () => {
+            if (!cancelUrl) return;
+            const url = new URL(cancelUrl, window.location.origin);
+            url.searchParams.set('cancel_reason', button.dataset.cancelReason);
+            window.location.href = url.toString();
+        });
+    });
+
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', event => {
+        if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeModal();
+    });
+})();
+</script>
+@endpush

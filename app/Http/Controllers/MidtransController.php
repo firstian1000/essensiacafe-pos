@@ -9,65 +9,60 @@ use Illuminate\Support\Facades\Log;
 
 class MidtransController extends Controller
 {
-    // public function callback(Request $request)
-    // {
-    //     $notification = new Notification();
+    public function callback(Request $request)
+    {
+        Log::info('===== CALLBACK MIDTRANS MASUK =====', $request->all());
 
-    //     $transaction = $notification->transaction_status;
-    //     $orderId = $notification->order_id;
-    //     $fraud = $notification->fraud_status;
+        try {
+            $notification = new Notification();
+        } catch (\Throwable $exception) {
+            Log::error('Callback Midtrans tidak valid', [
+                'message' => $exception->getMessage(),
+            ]);
 
-    //     $order = Order::where('invoice', $orderId)->first();
+            return response()->json([
+                'message' => 'Callback tidak valid',
+            ], 400);
+        }
 
-    //     if (!$order) {
-    //         return response()->json([
-    //             'message' => 'Order tidak ditemukan'
-    //         ], 404);
-    //     }
+        $transaction = $notification->transaction_status;
+        $orderId = $notification->order_id;
+        $fraud = $notification->fraud_status ?? null;
 
-    //     if ($transaction == 'capture') {
+        $order = Order::where('invoice', $orderId)->first();
 
-    //         if ($fraud == 'accept') {
+        if (! $order) {
+            return response()->json([
+                'message' => 'Order tidak ditemukan',
+            ], 404);
+        }
 
-    //             $order->update([
-    //                 'payment_status' => 'paid',
-    //                 'status' => 'processing',
-    //             ]);
+        if ($transaction === 'capture' && $fraud === 'accept') {
+            $order->update([
+                'payment_status' => 'paid',
+                'status' => $order->status === 'completed' ? 'completed' : 'processing',
+            ]);
+        } elseif ($transaction === 'settlement') {
+            $order->update([
+                'payment_status' => 'paid',
+                'status' => $order->status === 'completed' ? 'completed' : 'processing',
+            ]);
+        } elseif ($transaction === 'pending') {
+            $order->update([
+                'payment_status' => 'pending',
+            ]);
+        } elseif (in_array($transaction, ['deny', 'cancel'], true)) {
+            $order->update([
+                'payment_status' => 'failed',
+            ]);
+        } elseif ($transaction === 'expire') {
+            $order->update([
+                'payment_status' => 'expired',
+            ]);
+        }
 
-    //         }
-
-    //     } elseif ($transaction == 'settlement') {
-
-    //         $order->update([
-    //             'payment_status' => 'paid',
-    //             'status' => 'processing',
-    //         ]);
-
-    //     } elseif ($transaction == 'pending') {
-
-    //         $order->update([
-    //             'payment_status' => 'pending',
-    //         ]);
-
-    //     } elseif (in_array($transaction, ['deny', 'expire', 'cancel'])) {
-
-    //         $order->update([
-    //             'payment_status' => 'failed',
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'message' => 'OK'
-    //     ]);
-    // }
-
- public function callback(Request $request)
-{
-    Log::info('===== CALLBACK MASUK =====');
-    Log::info($request->all());
-
-    return response()->json([
-        'success' => true
-    ]);
-}
+        return response()->json([
+            'message' => 'OK',
+        ]);
+    }
 }

@@ -2,6 +2,70 @@
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/order.css') }}?v=2">
+<style>
+    .cancel-reason-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, 0.48);
+    }
+
+    .cancel-reason-modal.is-open {
+        display: flex;
+    }
+
+    .cancel-reason-dialog {
+        width: min(420px, 100%);
+        background: #fff;
+        border-radius: 8px;
+        padding: 22px;
+        box-shadow: 0 20px 48px rgba(15, 23, 42, 0.22);
+    }
+
+    .cancel-reason-dialog h3 {
+        margin: 0 0 6px;
+        color: #0F172A;
+        font-size: 20px;
+        font-weight: 900;
+    }
+
+    .cancel-reason-dialog p {
+        margin: 0 0 16px;
+        color: #64748B;
+        font-size: 14px;
+    }
+
+    .cancel-reason-options {
+        display: grid;
+        gap: 10px;
+    }
+
+    .cancel-reason-options button,
+    .cancel-reason-close {
+        border: 0;
+        border-radius: 8px;
+        padding: 12px 14px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    .cancel-reason-options button {
+        background: #FFE4E6;
+        color: #BE123C;
+        text-align: left;
+    }
+
+    .cancel-reason-close {
+        width: 100%;
+        margin-top: 12px;
+        background: #E2E8F0;
+        color: #0F172A;
+    }
+</style>
 @endpush
 
 @section('title', 'Detail Pesanan')
@@ -104,6 +168,12 @@
                     <strong><span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Dibatalkan</span></strong>
                 @endif
             </div>
+            @if($order->status === 'cancelled' && $order->cancel_reason)
+            <div class="detail-info-item">
+                <span>Alasan Pembatalan</span>
+                <strong>{{ $order->cancel_reason }}</strong>
+            </div>
+            @endif
         </div>
 
         @if(auth()->user()?->role === 'cashier' && $order->payment_method == 'cash' && $order->payment_status == 'pending' && $order->status != 'cancelled')
@@ -153,7 +223,7 @@
                 <a href="{{ route('orders.process', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action primary">
                     <i class="bi bi-play-fill me-1"></i> Proses Pesanan
                 </a>
-                <a href="{{ route('orders.cancel', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                <a href="{{ route('orders.cancel', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" data-cancel-order data-invoice="{{ $order->invoice }}">
                     <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
                 </a>
             @elseif($order->status == 'processing')
@@ -163,7 +233,7 @@
                 <a href="{{ route('orders.unprocess', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action warning" style="background: #FFF7ED; color: #C2410C;" onclick="return confirm('Kembalikan status pesanan ke Pending?')">
                     <i class="bi bi-arrow-counterclockwise me-1"></i> Batal Proses
                 </a>
-                <a href="{{ route('orders.cancel', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                <a href="{{ route('orders.cancel', ['order' => $order->id, 'area' => $activeArea]) }}" class="btn-detail-action danger" style="background: #FFE4E6; color: #E11D48;" data-cancel-order data-invoice="{{ $order->invoice }}">
                     <i class="bi bi-x-circle me-1"></i> Batalkan Pesanan
                 </a>
             @elseif($order->status == 'completed')
@@ -179,4 +249,61 @@
         @endif
     </div>
 </div>
+
+<div class="cancel-reason-modal" id="cancelReasonModal" aria-hidden="true">
+    <div class="cancel-reason-dialog" role="dialog" aria-modal="true" aria-labelledby="cancelReasonTitle">
+        <h3 id="cancelReasonTitle">Alasan Pembatalan</h3>
+        <p id="cancelReasonText">Pilih alasan untuk membatalkan pesanan.</p>
+        <div class="cancel-reason-options">
+            <button type="button" data-cancel-reason="Ganti Pesanan">Ganti Pesanan</button>
+            <button type="button" data-cancel-reason="Ganti Pembayaran">Ganti Pembayaran</button>
+            <button type="button" data-cancel-reason="Lain lain">Lain lain</button>
+        </div>
+        <button type="button" class="cancel-reason-close" id="cancelReasonClose">Tutup</button>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    const modal = document.getElementById('cancelReasonModal');
+    const closeButton = document.getElementById('cancelReasonClose');
+    const text = document.getElementById('cancelReasonText');
+    let cancelUrl = '';
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        cancelUrl = '';
+    }
+
+    document.querySelectorAll('[data-cancel-order]').forEach(button => {
+        button.addEventListener('click', event => {
+            event.preventDefault();
+            cancelUrl = button.href;
+            text.textContent = `Pilih alasan untuk membatalkan pesanan #${button.dataset.invoice}.`;
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+        });
+    });
+
+    document.querySelectorAll('[data-cancel-reason]').forEach(button => {
+        button.addEventListener('click', () => {
+            if (!cancelUrl) return;
+            const url = new URL(cancelUrl, window.location.origin);
+            url.searchParams.set('cancel_reason', button.dataset.cancelReason);
+            window.location.href = url.toString();
+        });
+    });
+
+    closeButton.addEventListener('click', closeModal);
+    modal.addEventListener('click', event => {
+        if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeModal();
+    });
+})();
+</script>
+@endpush

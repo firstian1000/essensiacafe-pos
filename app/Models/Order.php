@@ -16,6 +16,7 @@ class Order extends Model
     'status',
     'payment_method',
     'payment_status',
+    'cancel_reason',
     'snap_token',
 ];
 

@@ -148,8 +148,8 @@
 
             <div class="cashier-action-buttons">
                 <button type="submit" class="btn-cashier-submit btn-midtrans-pay" id="btnMidtransPay" data-submit-action="pay_midtrans">
-                    <i class="bi bi-credit-card"></i>
-                    Bayar Nanti
+                    <i class="bi bi-qr-code-scan"></i>
+                    Bayar Non Tunai
                 </button>
                 <button type="submit" class="btn-cashier-submit" data-submit-action="print_receipt">
                 <i class="bi bi-receipt-cutoff"></i>

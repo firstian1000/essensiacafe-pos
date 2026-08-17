@@ -21,6 +21,15 @@ class AdminLoginController extends Controller
         return view('admin.auth.login');
     }
 
+    public function showRegisterForm()
+    {
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('admin.auth.register');
+    }
+
     public function showCashierLoginForm()
     {
         if (Auth::guard('cashier')->check()) {
@@ -30,7 +39,17 @@ class AdminLoginController extends Controller
         return view('cashier.auth.login');
     }
 
-    public function redirectToGoogle()
+    public function redirectToGoogle(Request $request)
+    {
+        return $this->startGoogleAuth($request, 'login');
+    }
+
+    public function redirectToGoogleRegister(Request $request)
+    {
+        return $this->startGoogleAuth($request, 'register', 'admin');
+    }
+
+    private function startGoogleAuth(Request $request, string $mode, ?string $guard = null)
     {
         if (! config('services.google.client_id') || ! config('services.google.client_secret') || ! config('services.google.redirect')) {
             return back()->withErrors([
@@ -38,8 +57,13 @@ class AdminLoginController extends Controller
             ]);
         }
 
+        $guard = $guard ?: ($request->query('guard') === 'cashier' ? 'cashier' : 'admin');
         $state = Str::random(40);
-        session(['google_oauth_state' => $state]);
+        session([
+            'google_oauth_state' => $state,
+            'google_oauth_mode' => $mode,
+            'google_oauth_guard' => $guard,
+        ]);
 
         $query = http_build_query([
             'client_id' => config('services.google.client_id'),
@@ -62,7 +86,9 @@ class AdminLoginController extends Controller
             ]);
         }
 
-        $request->session()->forget('google_oauth_state');
+        $mode = session('google_oauth_mode', 'login');
+        $requestedGuard = session('google_oauth_guard', 'admin');
+        $request->session()->forget(['google_oauth_state', 'google_oauth_mode', 'google_oauth_guard']);
 
         if ($request->filled('error')) {
             return redirect()->route('login')->withErrors([
@@ -101,13 +127,35 @@ class AdminLoginController extends Controller
             ]);
         }
 
-        $user = User::firstOrCreate(
-            ['email' => $googleUser['email']],
-            [
+        $user = User::where('email', $googleUser['email'])->first();
+
+        if (! $user && $mode !== 'register') {
+            return redirect()->route($requestedGuard === 'cashier' ? 'cashier.login.form' : 'login')->withErrors([
+                'email' => 'Akun belum terdaftar. Silakan daftar dengan Google terlebih dahulu.',
+            ]);
+        }
+
+        if (! $user) {
+            $user = User::create([
                 'name' => $googleUser['name'] ?? 'Admin',
+                'email' => $googleUser['email'],
+                'email_verified_at' => now(),
                 'password' => Hash::make(Str::random(32)),
-            ],
-        );
+                'role' => $requestedGuard === 'cashier' ? 'cashier' : 'admin',
+            ]);
+        }
+
+        if ($requestedGuard === 'cashier' && $user->role !== 'cashier') {
+            return redirect()->route('cashier.login.form')->withErrors([
+                'email' => 'Akun Google ini bukan akun kasir.',
+            ]);
+        }
+
+        if ($requestedGuard === 'admin' && $user->role !== 'admin') {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun Google ini bukan akun admin.',
+            ]);
+        }
 
         $guard = $user->role === 'cashier' ? 'cashier' : 'admin';
         Auth::guard($guard)->login($user, true);
@@ -115,6 +163,28 @@ class AdminLoginController extends Controller
         $request->session()->regenerate();
 
         return redirect()->route($user->role === 'cashier' ? 'cashier.index' : 'dashboard');
+    }
+
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'role' => 'admin',
+        ]);
+
+        Auth::guard('admin')->login($user);
+        Auth::shouldUse('admin');
+        $request->session()->regenerate();
+
+        return redirect()->route('dashboard');
     }
 
     public function login(Request $request)
