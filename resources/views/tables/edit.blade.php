@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=11">
+<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=12">
 @endpush
 
 @section('title','Edit Meja')
@@ -114,10 +114,10 @@
                         </option>
 
                         <option
-                            value="inactive"
-                            {{ old('status',$table->status)=='inactive' ? 'selected' : '' }}>
+                            value="reserved"
+                            {{ old('status',$table->status)=='reserved' ? 'selected' : '' }}>
 
-                            Tidak Tersedia
+                            Dipesan
 
                         </option>
 

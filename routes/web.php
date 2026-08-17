@@ -79,6 +79,9 @@ Route::middleware(['auth:admin,cashier', 'role:admin,cashier'])->group(function 
     Route::post('/cashier', [CashierController::class, 'store'])->name('cashier.store');
     Route::get('/cashier/receipt/{order}', [CashierController::class, 'receipt'])->name('cashier.receipt');
 
+    Route::put('/tables/{table}/status', [CafeTableController::class, 'updateStatus'])
+        ->name('tables.status');
+
     Route::resource('tables', CafeTableController::class);
 
     Route::get('/tables/{table}/download', [QrCodeController::class, 'download'])

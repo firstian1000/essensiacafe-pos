@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=11">
+<link rel="stylesheet" href="{{ asset('css/admin/table.css') }}?v=12">
 @endpush
 
 @section('title','Meja')
@@ -128,19 +128,19 @@
 
         <div class="stat-card">
 
-            <div class="stat-icon red">
+            <div class="stat-icon purple">
 
-                <i class="bi bi-x-circle"></i>
+                    <i class="bi bi-calendar-check"></i>
 
             </div>
 
             <div>
 
-                <small>Tidak Tersedia</small>
+                <small>Dipesan</small>
 
-                <h2>{{ $tables->where('status','inactive')->count() }}</h2>
+                <h2>{{ $tables->where('status','reserved')->count() }}</h2>
 
-                <p>Meja tidak aktif</p>
+                <p>Sudah dipesan</p>
 
             </div>
 
@@ -198,10 +198,10 @@
                 </option>
 
                 <option
-                    value="{{ route('tables.index',['status'=>'inactive']) }}"
-                    {{ request('status')=='inactive' ? 'selected' : '' }}>
+                    value="{{ route('tables.index',['status'=>'reserved']) }}"
+                    {{ request('status')=='reserved' ? 'selected' : '' }}>
 
-                    Tidak Tersedia
+                    Dipesan
 
                 </option>
 
@@ -243,11 +243,19 @@
 
                     </span>
 
+                @elseif($table->status=='reserved')
+
+                    <span class="badge-status reserved">
+
+                        Dipesan
+
+                    </span>
+
                 @else
 
-                    <span class="badge-status inactive">
+                    <span class="badge-status available">
 
-                        Tidak Tersedia
+                        Tersedia
 
                     </span>
 
@@ -285,17 +293,57 @@
 
                     <small>Meja sedang dipakai</small>
 
+                @elseif($table->status=='reserved')
+
+                    <span class="status-dot reserved"></span>
+
+                    <strong>Dipesan</strong>
+
+                    <small>Meja sudah dipesan</small>
+
                 @else
 
-                    <span class="status-dot inactive"></span>
+                    <span class="status-dot available"></span>
 
-                    <strong>Tidak Tersedia</strong>
+                    <strong>Available</strong>
 
-                    <small>Meja nonaktif</small>
+                    <small>Siap digunakan</small>
 
                 @endif
 
             </div>
+
+            <form
+                action="{{ route('tables.status', $table->id) }}"
+                method="POST"
+                class="table-status-form">
+
+                @csrf
+                @method('PUT')
+
+                <label for="table-status-{{ $table->id }}">Pengaturan meja</label>
+
+                <select
+                    id="table-status-{{ $table->id }}"
+                    name="status"
+                    class="table-status-select"
+                    onchange="this.form.submit()">
+
+                    <option value="available" {{ $table->status === 'available' ? 'selected' : '' }}>
+                        Tersedia
+                    </option>
+
+                    <option value="occupied" {{ $table->status === 'occupied' ? 'selected' : '' }}>
+                        Terisi
+                    </option>
+
+                    <option value="reserved" {{ $table->status === 'reserved' ? 'selected' : '' }}>
+                        Dipesan
+                    </option>
+
+                </select>
+
+            </form>
 
             <!-- Button -->
 

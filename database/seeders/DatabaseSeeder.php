@@ -7,31 +7,28 @@ use App\Models\Category;
 use App\Models\Menu;
 use App\Models\CafeTable;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin User
-        $user = User::firstOrCreate(
-            ['email' => 'admin@cafe.com'],
-            [
-                'name' => 'Admin Cafe',
-                'password' => bcrypt('password'),
-                'role' => 'admin',
-            ]
-        );
-        $user->update(['role' => 'admin']);
+        User::query()->delete();
 
-        User::firstOrCreate(
-            ['email' => 'kasir@essensia.test'],
-            [
-                'name' => 'Kasir Cafe',
-                'password' => bcrypt('password'),
-                'role' => 'cashier',
-            ]
-        );
+        User::create([
+            'name' => 'Admin Essensia',
+            'email' => 'admin@essensia.com',
+            'password' => Hash::make('eseadmin'),
+            'role' => 'admin',
+        ]);
+
+        User::create([
+            'name' => 'Kasir Essensia',
+            'email' => 'kasir@essensia.com',
+            'password' => Hash::make('KoffieEsensia88'),
+            'role' => 'cashier',
+        ]);
 
         // Categories
         $catKopi = Category::firstOrCreate(['name' => 'Coffee'], ['status' => true]);

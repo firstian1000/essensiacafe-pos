@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=13">
+<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=14">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endpush
 
@@ -141,26 +141,31 @@
                 <i class="bi bi-arrow-counterclockwise"></i>
                 Reset
             </a>
-            <div class="export-actions" style="display:flex; gap:8px; align-items:center;">
-                <a href="{{ route('dashboard.export', [
-                    'date' => $selectedDate,
-                    'payment_filter' => $paymentFilter,
-                    'brand_filter' => $brandFilter,
-                    'format' => 'excel',
-                ]) }}" class="btn-export-excel" title="Download Excel" aria-label="Download Excel">
-                    <i class="bi bi-file-earmark-excel"></i>
-                    Excel
-                </a>
-                <a href="{{ route('dashboard.export', [
-                    'date' => $selectedDate,
-                    'payment_filter' => $paymentFilter,
-                    'brand_filter' => $brandFilter,
-                    'format' => 'pdf',
-                ]) }}" class="btn-export-excel" title="Download PDF" aria-label="Download PDF" style="background:#DC2626;">
-                    <i class="bi bi-file-earmark-pdf"></i>
-                    PDF
-                </a>
-            </div>
+            <details class="export-dropdown">
+                <summary class="btn-export-download" title="Unduh rekap" aria-label="Unduh rekap">
+                    <i class="bi bi-download"></i>
+                </summary>
+                <div class="export-dropdown-menu">
+                    <a href="{{ route('dashboard.export', [
+                        'date' => $selectedDate,
+                        'payment_filter' => $paymentFilter,
+                        'brand_filter' => $brandFilter,
+                        'format' => 'pdf',
+                    ]) }}">
+                        <i class="bi bi-file-earmark-pdf"></i>
+                        Cetak PDF
+                    </a>
+                    <a href="{{ route('dashboard.export', [
+                        'date' => $selectedDate,
+                        'payment_filter' => $paymentFilter,
+                        'brand_filter' => $brandFilter,
+                        'format' => 'excel',
+                    ]) }}">
+                        <i class="bi bi-file-earmark-excel"></i>
+                        Cetak Excel
+                    </a>
+                </div>
+            </details>
         </form>
     </div>
 

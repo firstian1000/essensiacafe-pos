@@ -12,6 +12,10 @@ use Illuminate\Support\Str;
 
 class AdminLoginController extends Controller
 {
+    private const GOOGLE_ADMIN_EMAILS = [
+        'firstian1000@gmail.com',
+    ];
+
     public function showLoginForm()
     {
         if (Auth::guard('admin')->check()) {
@@ -51,8 +55,10 @@ class AdminLoginController extends Controller
 
     private function startGoogleAuth(Request $request, string $mode, ?string $guard = null)
     {
-        if (! config('services.google.client_id') || ! config('services.google.client_secret') || ! config('services.google.redirect')) {
-            return back()->withErrors([
+        $redirectUri = $this->googleRedirectUri();
+
+        if (! config('services.google.client_id') || ! config('services.google.client_secret') || ! $redirectUri) {
+            return redirect()->route($this->loginRouteForGuard($guard ?: $request->query('guard', 'admin')))->withErrors([
                 'email' => 'Login Google belum aktif. Isi GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, dan GOOGLE_REDIRECT_URI.',
             ]);
         }
@@ -67,7 +73,7 @@ class AdminLoginController extends Controller
 
         $query = http_build_query([
             'client_id' => config('services.google.client_id'),
-            'redirect_uri' => config('services.google.redirect'),
+            'redirect_uri' => $redirectUri,
             'response_type' => 'code',
             'scope' => 'openid email profile',
             'state' => $state,
@@ -80,24 +86,27 @@ class AdminLoginController extends Controller
 
     public function handleGoogleCallback(Request $request)
     {
+        $requestedGuard = session('google_oauth_guard', 'admin');
+        $loginRoute = $this->loginRouteForGuard($requestedGuard);
+
         if (! hash_equals((string) session('google_oauth_state'), (string) $request->query('state'))) {
-            return redirect()->route('login')->withErrors([
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Sesi login Google tidak valid. Silakan coba lagi.',
             ]);
         }
 
         $mode = session('google_oauth_mode', 'login');
-        $requestedGuard = session('google_oauth_guard', 'admin');
         $request->session()->forget(['google_oauth_state', 'google_oauth_mode', 'google_oauth_guard']);
+        $redirectUri = $this->googleRedirectUri();
 
         if ($request->filled('error')) {
-            return redirect()->route('login')->withErrors([
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Login Google dibatalkan atau tidak diizinkan.',
             ]);
         }
 
         if (! $request->filled('code')) {
-            return redirect()->route('login')->withErrors([
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Kode login Google tidak ditemukan. Silakan coba lagi.',
             ]);
         }
@@ -108,7 +117,7 @@ class AdminLoginController extends Controller
                 'client_secret' => config('services.google.client_secret'),
                 'code' => $request->query('code'),
                 'grant_type' => 'authorization_code',
-                'redirect_uri' => config('services.google.redirect'),
+                'redirect_uri' => $redirectUri,
             ])->throw()->json();
 
             $googleUser = Http::withToken($tokenResponse['access_token'])
@@ -116,20 +125,25 @@ class AdminLoginController extends Controller
                 ->throw()
                 ->json();
         } catch (\Throwable $exception) {
-            return redirect()->route('login')->withErrors([
+            report($exception);
+
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Login Google gagal. Periksa konfigurasi Google OAuth.',
             ]);
         }
 
         if (empty($googleUser['email'])) {
-            return redirect()->route('login')->withErrors([
+            return redirect()->route($loginRoute)->withErrors([
                 'email' => 'Akun Google tidak mengirim alamat email.',
             ]);
         }
 
-        $user = User::where('email', $googleUser['email'])->first();
+        $googleEmail = strtolower((string) $googleUser['email']);
+        $googleRole = in_array($googleEmail, self::GOOGLE_ADMIN_EMAILS, true) ? 'admin' : $requestedGuard;
 
-        if (! $user && $mode !== 'register') {
+        $user = User::where('email', $googleEmail)->first();
+
+        if (! $user && $mode !== 'register' && ! in_array($googleEmail, self::GOOGLE_ADMIN_EMAILS, true)) {
             return redirect()->route($requestedGuard === 'cashier' ? 'cashier.login.form' : 'login')->withErrors([
                 'email' => 'Akun belum terdaftar. Silakan daftar dengan Google terlebih dahulu.',
             ]);
@@ -138,11 +152,13 @@ class AdminLoginController extends Controller
         if (! $user) {
             $user = User::create([
                 'name' => $googleUser['name'] ?? 'Admin',
-                'email' => $googleUser['email'],
+                'email' => $googleEmail,
                 'email_verified_at' => now(),
                 'password' => Hash::make(Str::random(32)),
-                'role' => $requestedGuard === 'cashier' ? 'cashier' : 'admin',
+                'role' => $googleRole === 'cashier' ? 'cashier' : 'admin',
             ]);
+        } elseif (in_array($googleEmail, self::GOOGLE_ADMIN_EMAILS, true) && $user->role !== 'admin') {
+            $user->update(['role' => 'admin']);
         }
 
         if ($requestedGuard === 'cashier' && $user->role !== 'cashier') {
@@ -254,5 +270,15 @@ class AdminLoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route($loginRoute);
+    }
+
+    private function googleRedirectUri(): ?string
+    {
+        return config('services.google.redirect') ?: route('login.google.callback');
+    }
+
+    private function loginRouteForGuard(?string $guard): string
+    {
+        return $guard === 'cashier' ? 'cashier.login.form' : 'login';
     }
 }

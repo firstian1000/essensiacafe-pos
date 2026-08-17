@@ -69,7 +69,7 @@
                         <span>Email</span>
                         <div class="input-shell">
                             <i class="bi bi-envelope"></i>
-                            <input type="email" name="email" value="" placeholder="kasir@essensia.test" autocomplete="off" required autofocus>
+                            <input type="email" name="email" value="" placeholder="Masukan email" autocomplete="off" required autofocus>
                         </div>
                     </label>
 

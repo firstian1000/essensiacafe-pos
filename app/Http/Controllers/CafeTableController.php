@@ -9,6 +9,8 @@ use App\Services\QrCodeService;
 
 class CafeTableController extends Controller
 {
+    private const TABLE_STATUSES = ['available', 'occupied', 'reserved'];
+
     public function index(Request $request)
 {
     $query = CafeTable::query();
@@ -40,7 +42,8 @@ class CafeTableController extends Controller
   public function store(Request $request)
 {
     $request->validate([
-        'table_number' => 'required|unique:cafe_tables,table_number'
+        'table_number' => 'required|unique:cafe_tables,table_number',
+        'status' => 'nullable|in:' . implode(',', self::TABLE_STATUSES),
     ]);
 
     // Generate token
@@ -54,7 +57,7 @@ class CafeTableController extends Controller
         'table_number' => $request->table_number,
         'qr_token'     => $token,
         'qr_image'     => $qrImage,
-        'status'       => 'available'
+        'status'       => $request->status ?? 'available'
     ]);
 
     return redirect()->route('tables.index')
@@ -69,7 +72,8 @@ public function edit(CafeTable $table)
 public function update(Request $request, CafeTable $table)
 {
     $request->validate([
-        'table_number' => 'required|unique:cafe_tables,table_number,' . $table->id
+        'table_number' => 'required|unique:cafe_tables,table_number,' . $table->id,
+        'status' => 'required|in:' . implode(',', self::TABLE_STATUSES),
     ]);
 
     $table->update([
@@ -80,6 +84,19 @@ public function update(Request $request, CafeTable $table)
     return redirect()
         ->route('tables.index')
         ->with('success', 'Meja berhasil diupdate');
+}
+
+public function updateStatus(Request $request, CafeTable $table)
+{
+    $request->validate([
+        'status' => 'required|in:' . implode(',', self::TABLE_STATUSES),
+    ]);
+
+    $table->update([
+        'status' => $request->status,
+    ]);
+
+    return back()->with('success', 'Status meja berhasil diperbarui');
 }
 
 public function destroy(CafeTable $table)

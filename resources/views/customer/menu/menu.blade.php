@@ -230,9 +230,7 @@
         <div class="float-bar-total">Rp {{ number_format($floatTotal,0,',','.') }}</div>
     </div>
     <a href="{{ route('cart.index') }}" class="float-bar-btn">
-        <span class="float-bar-btn-text">Lihat Keranjang</span>
-        <span class="float-bar-btn-mobile-text">Lanjutkan</span>
-        <i class="bi bi-arrow-right"></i>
+        Lihat Keranjang <i class="bi bi-arrow-right"></i>
     </a>
 </div>
 @endif
@@ -389,9 +387,7 @@ function updateFloatCart(data) {
             <div class="float-bar-total">${rupiah(data.cart_total)}</div>
         </div>
         <a href="${cartUrl}" class="float-bar-btn">
-            <span class="float-bar-btn-text">Lihat Keranjang</span>
-            <span class="float-bar-btn-mobile-text">Lanjutkan</span>
-            <i class="bi bi-arrow-right"></i>
+            Lihat Keranjang <i class="bi bi-arrow-right"></i>
         </a>
     `;
 }

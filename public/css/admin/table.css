@@ -206,6 +206,12 @@
 
 }
 
+.stat-icon.purple{
+
+    background:#7C3AED;
+
+}
+
 .stat-icon.red{
 
     background:#EF4444;
@@ -500,6 +506,14 @@
 
 }
 
+.badge-status.reserved{
+
+    background:#EDE9FE;
+
+    color:#7C3AED;
+
+}
+
 .badge-status.inactive{
 
     background:#FEE2E2;
@@ -574,6 +588,98 @@
     font-size:14px;
 
     margin-top:4px;
+
+}
+
+.status-dot{
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:999px;
+
+    display:inline-flex;
+
+}
+
+.status-dot.available{
+
+    background:#22C55E;
+
+}
+
+.status-dot.occupied{
+
+    background:#F59E0B;
+
+}
+
+.status-dot.reserved{
+
+    background:#7C3AED;
+
+}
+
+.status-dot.inactive{
+
+    background:#EF4444;
+
+}
+
+.table-status-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    margin:16px 0 20px;
+
+}
+
+.table-status-form label{
+
+    color:#64748B;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+.table-status-select{
+
+    width:100%;
+
+    height:46px;
+
+    padding:0 14px;
+
+    border:1px solid #D7DEE8;
+
+    border-radius:14px;
+
+    background:#FFFFFF;
+
+    color:#1F2937;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+.table-status-select:focus{
+
+    outline:none;
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 .15rem rgba(37,99,235,.15);
 
 }
 /* =====================================================
