@@ -165,7 +165,7 @@
             </div>
 
             <div class="qris-actions">
-                <a class="qris-secondary" href="{{ route('payments.show', $order) }}">Detail</a>
+                <a class="qris-secondary" href="{{ route('payments.recap', $order) }}">Rekap</a>
                 <a class="qris-primary" id="receiptLink" href="{{ route('payments.receipt', $order) }}" style="{{ $order->payment_status === 'paid' ? '' : 'display:none;' }}">Cetak Nota</a>
                 <button type="button" class="qris-primary" id="openSnap">Buka Pembayaran</button>
                 <button type="button" class="qris-primary" id="reloadSnap">Muat Ulang QRIS</button>
@@ -185,6 +185,7 @@
 const snapToken = @json($order->snap_token);
 const statusUrl = @json(route('order.success.status', $order));
 const receiptUrl = @json(route('payments.receipt', $order));
+const recapUrl = @json(route('payments.recap', $order));
 const qrisStatus = document.getElementById('qrisStatus');
 const receiptLink = document.getElementById('receiptLink');
 const reloadSnap = document.getElementById('reloadSnap');
@@ -195,7 +196,7 @@ function setPaid() {
     qrisStatus.innerHTML = '<i class="bi bi-check-circle-fill"></i><span>Pembayaran berhasil, nota siap dicetak</span>';
     receiptLink.style.display = '';
     setTimeout(() => {
-        window.location.href = receiptUrl;
+        window.location.href = recapUrl;
     }, 1200);
 }
 

@@ -586,7 +586,7 @@ body {
 
         {{-- Footer buttons --}}
         <div class="nota-footer">
-            <a href="{{ route('payments.index') }}" class="btn-nota btn-nota-back">
+            <a href="{{ route('cashier.index') }}" class="btn-nota btn-nota-back">
                 <i class="bi bi-arrow-left"></i>
                 Kembali
             </a>

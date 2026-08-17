@@ -105,17 +105,17 @@ Route::middleware(['auth:admin,cashier', 'role:admin,cashier'])->group(function 
     Route::get('/orders/{order}/paid', [OrderController::class, 'paid'])
         ->name('orders.paid');
 
-    Route::get('/payments', [PaymentController::class, 'index'])
-        ->name('payments.index');
-
     Route::get('/payments/{order}/qris', [PaymentController::class, 'qris'])
         ->name('payments.qris');
 
+    Route::get('/payments/{order}/midtrans', [PaymentController::class, 'midtrans'])
+        ->name('payments.midtrans');
+
+    Route::get('/payments/{order}/recap', [PaymentController::class, 'recap'])
+        ->name('payments.recap');
+
     Route::get('/payments/{order}/receipt', [PaymentController::class, 'receipt'])
         ->name('payments.receipt');
-
-    Route::get('/payments/{order}', [PaymentController::class, 'show'])
-        ->name('payments.show');
 
 });
 
@@ -175,6 +175,9 @@ Route::post('/checkout', [CheckoutController::class, 'store'])
 
 Route::get('/order/success/{order}', [OrderSuccessController::class, 'index'])
     ->name('order.success');
+
+Route::get('/order/payment/{order}', [OrderSuccessController::class, 'payment'])
+    ->name('order.payment');
 
 Route::get('/order/success/{order}/status', [OrderSuccessController::class, 'status'])
     ->name('order.success.status');

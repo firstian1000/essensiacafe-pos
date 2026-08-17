@@ -135,7 +135,10 @@ class CashierController extends Controller
                 'snap_token' => $snapToken,
             ]);
 
-            return redirect()->route('payments.qris', $order);
+            return redirect()->route('payments.midtrans', [
+                'order' => $order,
+                'auto_pay' => 1,
+            ]);
         }
 
         return redirect()->route('cashier.receipt', [

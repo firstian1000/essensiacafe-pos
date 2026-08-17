@@ -13,6 +13,15 @@ class OrderSuccessController extends Controller
         return view('customer.succes.success', compact('order'));
     }
 
+    public function payment(Order $order)
+    {
+        abort_unless($order->payment_method === 'midtrans' && $order->snap_token, 404);
+
+        $order->load(['table', 'items.menu.category']);
+
+        return view('customer.payment.status', compact('order'));
+    }
+
     public function status(Order $order)
     {
         return response()->json([
