@@ -6,7 +6,7 @@ return [
 
     'clientKey' => env('MIDTRANS_CLIENT_KEY'),
 
-    'isProduction' => env('MIDTRANS_IS_PRODUCTION', false),
+    'isProduction' => filter_var(env('MIDTRANS_IS_PRODUCTION', false), FILTER_VALIDATE_BOOLEAN),
 
     'isSanitized' => true,
 

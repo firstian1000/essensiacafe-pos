@@ -99,6 +99,21 @@
         background: #F8FAFC;
     }
 
+    .qris-snap-fallback {
+        display: grid;
+        gap: 14px;
+        place-items: center;
+        min-height: 360px;
+        padding: 24px;
+        text-align: center;
+        color: #334155;
+    }
+
+    .qris-snap-fallback strong {
+        color: #0F172A;
+        font-size: 18px;
+    }
+
     @media (max-width: 900px) {
         .qris-page {
             grid-template-columns: 1fr;
@@ -152,6 +167,7 @@
             <div class="qris-actions">
                 <a class="qris-secondary" href="{{ route('payments.show', $order) }}">Detail</a>
                 <a class="qris-primary" id="receiptLink" href="{{ route('payments.receipt', $order) }}" style="{{ $order->payment_status === 'paid' ? '' : 'display:none;' }}">Cetak Nota</a>
+                <button type="button" class="qris-primary" id="openSnap">Buka Pembayaran</button>
                 <button type="button" class="qris-primary" id="reloadSnap">Muat Ulang QRIS</button>
             </div>
         </section>
@@ -172,6 +188,7 @@ const receiptUrl = @json(route('payments.receipt', $order));
 const qrisStatus = document.getElementById('qrisStatus');
 const receiptLink = document.getElementById('receiptLink');
 const reloadSnap = document.getElementById('reloadSnap');
+const openSnap = document.getElementById('openSnap');
 
 function setPaid() {
     qrisStatus.classList.add('is-paid');
@@ -191,17 +208,48 @@ function renderSnap() {
         return;
     }
 
-    snap.embed(snapToken, {
-        embedId: 'snap-container',
+    try {
+        snap.embed(snapToken, {
+            embedId: 'snap-container',
+            onSuccess: setPaid,
+            onPending: function () {
+                qrisStatus.innerHTML = '<i class="bi bi-clock-fill"></i><span>Pembayaran masih diproses</span>';
+            },
+            onError: function () {
+                qrisStatus.innerHTML = '<i class="bi bi-x-circle-fill"></i><span>Pembayaran gagal, coba muat ulang QRIS</span>';
+            },
+            onClose: function () {
+                qrisStatus.innerHTML = '<i class="bi bi-qr-code-scan"></i><span>Menunggu pelanggan scan dan bayar</span>';
+            }
+        });
+    } catch (error) {
+        console.log('Snap embed gagal:', error);
+        container.innerHTML = `
+            <div class="qris-snap-fallback">
+                <i class="bi bi-qr-code-scan" style="font-size:44px;color:#2563EB;"></i>
+                <strong>Pembayaran belum bisa ditampilkan di halaman ini.</strong>
+                <span>Klik tombol Buka Pembayaran untuk membuka popup Midtrans.</span>
+            </div>
+        `;
+    }
+}
+
+function openSnapPopup() {
+    if (typeof snap === 'undefined') {
+        alert('Snap Midtrans gagal dimuat. Cek koneksi atau konfigurasi client key.');
+        return;
+    }
+
+    snap.pay(snapToken, {
         onSuccess: setPaid,
         onPending: function () {
             qrisStatus.innerHTML = '<i class="bi bi-clock-fill"></i><span>Pembayaran masih diproses</span>';
         },
         onError: function () {
-            qrisStatus.innerHTML = '<i class="bi bi-x-circle-fill"></i><span>Pembayaran gagal, coba muat ulang QRIS</span>';
+            qrisStatus.innerHTML = '<i class="bi bi-x-circle-fill"></i><span>Pembayaran gagal, coba ulangi pembayaran</span>';
         },
         onClose: function () {
-            qrisStatus.innerHTML = '<i class="bi bi-qr-code-scan"></i><span>Menunggu pelanggan scan dan bayar</span>';
+            qrisStatus.innerHTML = '<i class="bi bi-qr-code-scan"></i><span>Popup ditutup, pembayaran belum selesai</span>';
         }
     });
 }
@@ -232,6 +280,7 @@ async function pollPaymentStatus() {
 }
 
 reloadSnap.addEventListener('click', renderSnap);
+openSnap.addEventListener('click', openSnapPopup);
 window.addEventListener('load', renderSnap);
 setInterval(pollPaymentStatus, 3000);
 </script>
