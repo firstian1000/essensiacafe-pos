@@ -259,11 +259,10 @@ class AdminLoginController extends Controller
 
     public function logout(Request $request)
     {
-        $guard = $request->query('redirect') === 'cashier' ? 'cashier' : 'admin';
-        $user = Auth::guard($guard)->user() ?? Auth::user();
-        $loginRoute = $request->query('redirect') === 'cashier' || $user?->role === 'cashier'
-            ? 'cashier.login.form'
-            : 'login';
+        $guard = $request->query('redirect') === 'cashier' || $request->is('cashier', 'cashier/*', 'kasir/*')
+            ? 'cashier'
+            : 'admin';
+        $loginRoute = $guard === 'cashier' ? 'cashier.login.form' : 'login';
 
         Auth::guard($guard)->logout();
 
