@@ -156,7 +156,7 @@
 </head>
 <body>
 @php
-    $dateLabel = \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y');
+    $dateLabel = $periodLabel ?? \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y');
     $paymentLabel = $paymentFilter === 'cash' ? 'Tunai' : ($paymentFilter === 'non_cash' ? 'Non Tunai' : 'Semua Pembayaran');
     $brandLabel = $brandFilter === 'buncha' ? 'Buncha' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand');
     $rupiah = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');

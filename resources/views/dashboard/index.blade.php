@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=15">
+<link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}?v=17">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 @endpush
 
@@ -115,7 +115,43 @@
         <form action="{{ route('dashboard') }}" method="GET" class="dashboard-filter-row">
             <label>
                 <span>Kalender</span>
-                <input type="text" name="date" class="btn-date" id="flatpickr-date" value="{{ \Carbon\Carbon::parse($selectedDate)->format('Y-m-d') }}">
+                <input type="text" name="date" class="btn-date" id="flatpickr-date" value="{{ \Carbon\Carbon::parse($selectedDate)->format('Y-m-d') }}" {{ $periodType !== 'day' ? 'disabled' : '' }}>
+            </label>
+            <label>
+                <span>Filter Periode</span>
+                <select name="period_type" id="periodTypeSelect">
+                    <option value="day" {{ $periodType === 'day' ? 'selected' : '' }}>Harian</option>
+                    <option value="week" {{ $periodType === 'week' ? 'selected' : '' }}>Mingguan</option>
+                    <option value="month" {{ $periodType === 'month' ? 'selected' : '' }}>Bulanan</option>
+                    <option value="year" {{ $periodType === 'year' ? 'selected' : '' }}>Tahunan</option>
+                </select>
+            </label>
+            <label class="period-field period-week-field">
+                <span>Minggu</span>
+                <select name="period_week">
+                    <option value="1" {{ (int) $periodWeek === 1 ? 'selected' : '' }}>Minggu 1</option>
+                    <option value="2" {{ (int) $periodWeek === 2 ? 'selected' : '' }}>Minggu 2</option>
+                    <option value="3" {{ (int) $periodWeek === 3 ? 'selected' : '' }}>Minggu 3</option>
+                    <option value="4" {{ (int) $periodWeek === 4 ? 'selected' : '' }}>Minggu 4</option>
+                </select>
+            </label>
+            <label class="period-field period-month-field">
+                <span>Bulan</span>
+                <select name="period_month">
+                    @for($month = 1; $month <= 12; $month++)
+                        <option value="{{ $month }}" {{ (int) $periodMonth === $month ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create(now()->year, $month, 1)->translatedFormat('F') }}
+                        </option>
+                    @endfor
+                </select>
+            </label>
+            <label class="period-field period-year-field">
+                <span>Tahun</span>
+                <select name="period_year">
+                    @for($year = now()->year + 1; $year >= now()->year - 5; $year--)
+                        <option value="{{ $year }}" {{ (int) $periodYear === $year ? 'selected' : '' }}>{{ $year }}</option>
+                    @endfor
+                </select>
             </label>
             <label>
                 <span>Pembayaran</span>
@@ -137,7 +173,7 @@
                 <i class="bi bi-funnel-fill"></i>
                 Terapkan
             </button>
-            <a href="{{ route('dashboard', ['date' => $selectedDate]) }}" class="btn-filter-reset">
+            <a href="{{ route('dashboard') }}" class="btn-filter-reset">
                 <i class="bi bi-arrow-counterclockwise"></i>
                 Reset
             </a>
@@ -155,6 +191,10 @@
                 <div class="dropdown-menu dropdown-menu-end export-dropdown-menu">
                     <a class="dropdown-item" href="{{ route('dashboard.export', [
                         'date' => $selectedDate,
+                        'period_type' => $periodType,
+                        'period_week' => $periodWeek,
+                        'period_month' => $periodMonth,
+                        'period_year' => $periodYear,
                         'payment_filter' => $paymentFilter,
                         'brand_filter' => $brandFilter,
                         'format' => 'pdf',
@@ -164,6 +204,10 @@
                     </a>
                     <a class="dropdown-item" href="{{ route('dashboard.export', [
                         'date' => $selectedDate,
+                        'period_type' => $periodType,
+                        'period_week' => $periodWeek,
+                        'period_month' => $periodMonth,
+                        'period_year' => $periodYear,
                         'payment_filter' => $paymentFilter,
                         'brand_filter' => $brandFilter,
                         'format' => 'excel',
@@ -243,7 +287,7 @@
                             {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand') }}
                         </small>
                     </div>
-                    <span class="btn-filter">7 Hari Terakhir</span>
+                    <span class="btn-filter">{{ $periodType === 'day' ? '7 Hari Terakhir' : $periodLabel }}</span>
                 </div>
                 <div class="chart-wrapper">
                     <canvas id="salesChart"></canvas>
@@ -255,7 +299,7 @@
             <div class="dashboard-card h-100">
                 <div class="card-header-dashboard">
                     <h4>Penjualan per Kategori</h4>
-                    <span class="btn-filter">{{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}</span>
+                    <span class="btn-filter">{{ $periodLabel }}</span>
                 </div>
                 @if($categorySales->sum('total_revenue') > 0)
                 <div class="category-sales-layout">
@@ -282,7 +326,7 @@
                 @else
                 <div class="text-center py-5 text-muted">
                     <i class="bi bi-pie-chart fs-1 d-block mb-2"></i>
-                    Belum ada penjualan paid di tanggal ini
+                    Belum ada penjualan paid di periode ini
                 </div>
                 @endif
             </div>
@@ -424,7 +468,35 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-    flatpickr("#flatpickr-date", {
+    const periodTypeSelect = document.getElementById('periodTypeSelect');
+    const dateInput = document.getElementById('flatpickr-date');
+    const periodFields = {
+        week: document.querySelector('.period-week-field'),
+        month: document.querySelector('.period-month-field'),
+        year: document.querySelector('.period-year-field'),
+    };
+
+    function syncPeriodFields() {
+        const type = periodTypeSelect?.value || 'day';
+        if (dateInput) {
+            dateInput.disabled = type !== 'day';
+        }
+        if (dashboardDatePicker?.altInput) {
+            dashboardDatePicker.altInput.disabled = type !== 'day';
+            dashboardDatePicker.altInput.classList.toggle('is-disabled', type !== 'day');
+        }
+        if (periodFields.week) {
+            periodFields.week.style.display = type === 'week' ? 'grid' : 'none';
+        }
+        if (periodFields.month) {
+            periodFields.month.style.display = ['week', 'month'].includes(type) ? 'grid' : 'none';
+        }
+        if (periodFields.year) {
+            periodFields.year.style.display = type !== 'day' ? 'grid' : 'none';
+        }
+    }
+
+    const dashboardDatePicker = flatpickr("#flatpickr-date", {
         dateFormat: "Y-m-d",
         altInput: true,
         altFormat: "d M Y",
@@ -433,6 +505,9 @@
             instance.input.closest('form').submit();
         }
     });
+
+    syncPeriodFields();
+    periodTypeSelect?.addEventListener('change', syncPeriodFields);
 </script>
 @endpush
 

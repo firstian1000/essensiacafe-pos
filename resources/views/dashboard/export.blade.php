@@ -14,7 +14,7 @@
 <body>
 <table>
     <tr><td colspan="8" class="title">Rekap Data Essensia Koffie</td></tr>
-    <tr><td colspan="8">Tanggal: {{ \Carbon\Carbon::parse($selectedDate)->format('d/m/Y') }}</td></tr>
+    <tr><td colspan="8">Periode: {{ $periodLabel ?? \Carbon\Carbon::parse($selectedDate)->format('d/m/Y') }}</td></tr>
     <tr><td colspan="8">Filter: Pembayaran {{ ucfirst(str_replace('_', ' ', $paymentFilter ?? 'all')) }} | Brand {{ ucfirst($brandFilter ?? 'all') }}</td></tr>
     <tr><td colspan="8">Dicetak: {{ $generatedAt }}</td></tr>
     <tr><td colspan="8"></td></tr>
@@ -27,7 +27,7 @@
         <th>Total Pesanan</th>
         <th>Pengeluaran Internal</th>
         <th>Pendapatan Paid</th>
-        <th>Pendapatan Tanggal Ini</th>
+        <th>Pendapatan Periode Ini</th>
         <th>Pending</th>
     </tr>
     <tr>
@@ -65,7 +65,7 @@
             <td>{{ ucfirst($order->status ?: '-') }}</td>
         </tr>
     @empty
-        <tr><td colspan="8">Tidak ada pesanan pada tanggal ini.</td></tr>
+        <tr><td colspan="8">Tidak ada pesanan pada periode ini.</td></tr>
     @endforelse
     <tr><td colspan="8"></td></tr>
 
