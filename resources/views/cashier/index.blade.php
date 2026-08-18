@@ -3,7 +3,7 @@
 @section('title','Kasir')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=28">
+<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=29">
 @endpush
 
 @section('content')

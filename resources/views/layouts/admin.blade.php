@@ -39,7 +39,7 @@
 
 @stack('styles')
 
-<link rel="stylesheet" href="{{ asset('css/admin/responsive-fix.css') }}?v=17">
+<link rel="stylesheet" href="{{ asset('css/admin/responsive-fix.css') }}?v=20">
 
 
 

@@ -1,17 +1,10 @@
 <footer class="customer-footer">
-    <div class="customer-footer-brand">
-        <img src="{{ asset('images/logo.png') }}?v=5" alt="Essensia Koffie">
+    <div class="footer-credit">
+        <small>Designed &amp; Developed by</small>
         <div>
-            <strong>Essensia Koffie</strong>
-            <small>Fresh Coffee, Good Vibes.</small>
+            <strong>OUNERS</strong>
+            <span></span>
+            <em>1ST DEV</em>
         </div>
-    </div>
-
-    <div class="customer-footer-info">
-        <span><i class="bi bi-cup-hot"></i> Coffee & Space</span>
-        @if(session('table_number'))
-            <span><i class="bi bi-grid-3x3-gap"></i> Nomor Meja : {{ session('table_number') }}</span>
-        @endif
-        <span>{{ now()->format('Y') }}</span>
     </div>
 </footer>

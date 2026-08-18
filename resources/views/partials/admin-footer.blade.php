@@ -1,16 +1,10 @@
 <footer class="admin-footer">
-    <div class="admin-footer-brand">
+    <div class="footer-credit">
+        <small>Designed &amp; Developed by</small>
         <div>
-            <strong>Essensia Koffie</strong>
-            <small>Coffee & Space</small>
+            <strong>OUNERS</strong>
+            <span></span>
+            <em>1ST DEV</em>
         </div>
-    </div>
-
-    <div class="admin-footer-meta">
-        <span class="admin-footer-design">
-            <i class="bi bi-stars"></i>
-            Design by OUNERS
-        </span>
-        <em>1st Dev</em>
     </div>
 </footer>
