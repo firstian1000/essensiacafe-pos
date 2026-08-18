@@ -316,6 +316,11 @@ body:has(.cashier-page) .content{height:auto!important;overflow:visible!importan
     background:#1D4ED8!important;
     color:#FFFFFF!important;
 }
+.cashier-page .cashier-action-buttons .btn-cashier-submit.is-hidden,
+.cashier-page .cashier-action-buttons .btn-midtrans-pay.is-hidden,
+.cashier-page .cashier-action-buttons .btn-cash-pay.is-hidden{
+    display:none!important;
+}
 .cashier-service-type{
     display:grid!important;
     gap:9px!important;
