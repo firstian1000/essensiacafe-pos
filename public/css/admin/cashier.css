@@ -270,7 +270,8 @@ body:has(.cashier-page) .content{height:auto!important;overflow:visible!importan
     width:100%!important;
     margin:0!important;
 }
-.cashier-action-buttons .btn-midtrans-pay{
+.cashier-action-buttons .btn-midtrans-pay,
+.cashier-action-buttons .btn-payment-submit{
     background:#2563EB!important;
     box-shadow:0 14px 30px rgba(37,99,235,.22)!important;
 }
@@ -285,7 +286,8 @@ body:has(.cashier-page) .content{height:auto!important;overflow:visible!importan
 /* Final payment button color guard */
 .cashier-page .cashier-action-buttons .btn-cashier-submit,
 .cashier-page .cashier-action-buttons .btn-midtrans-pay,
-.cashier-page .cashier-action-buttons .btn-cash-pay{
+.cashier-page .cashier-action-buttons .btn-cash-pay,
+.cashier-page .cashier-action-buttons .btn-payment-submit{
     width:100%!important;
     height:50px!important;
     border:0!important;
@@ -306,7 +308,8 @@ body:has(.cashier-page) .content{height:auto!important;overflow:visible!importan
 }
 .cashier-page .cashier-action-buttons .btn-cashier-submit i,
 .cashier-page .cashier-action-buttons .btn-midtrans-pay i,
-.cashier-page .cashier-action-buttons .btn-cash-pay i{
+.cashier-page .cashier-action-buttons .btn-cash-pay i,
+.cashier-page .cashier-action-buttons .btn-payment-submit i{
     color:#FFFFFF!important;
     font-size:18px!important;
     line-height:1!important;

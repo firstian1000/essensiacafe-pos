@@ -3,7 +3,7 @@
 @section('title','Kasir')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=27">
+<link rel="stylesheet" href="{{ asset('css/admin/cashier.css') }}?v=28">
 @endpush
 
 @section('content')
@@ -147,11 +147,7 @@
 
 
             <div class="cashier-action-buttons">
-                <button type="submit" class="btn-cashier-submit btn-midtrans-pay" id="btnMidtransPay" data-submit-action="pay_midtrans">
-                    <i class="bi bi-qr-code-scan"></i>
-                    Bayar
-                </button>
-                <button type="submit" class="btn-cashier-submit btn-cash-pay" id="btnCashPay" data-submit-action="print_receipt">
+                <button type="submit" class="btn-cashier-submit btn-payment-submit" id="btnPaymentSubmit">
                     <i class="bi bi-cash-coin"></i>
                     Bayar
                 </button>
@@ -184,8 +180,7 @@ const paginationEl = document.getElementById('cashierPagination');
 const paginationInfoEl = document.getElementById('cashierPaginationInfo');
 const menuCards = Array.from(document.querySelectorAll('.cashier-menu-card'));
 const submitActionEl = document.getElementById('submitAction');
-const midtransPayBtn = document.getElementById('btnMidtransPay');
-const cashPayBtn = document.getElementById('btnCashPay');
+const paymentSubmitBtn = document.getElementById('btnPaymentSubmit');
 const cashierFormEl = document.getElementById('cashierForm');
 let cashierFormSubmitting = false;
 
@@ -242,12 +237,6 @@ document.querySelectorAll('#cashierCategoryFilter button').forEach(button => {
 
 paidEl.addEventListener('input', renderTotals);
 paymentMethodEl.addEventListener('change', renderTotals);
-
-document.querySelectorAll('[data-submit-action]').forEach(button => {
-    button.addEventListener('click', () => {
-        submitActionEl.value = button.dataset.submitAction;
-    });
-});
 
 function filterMenus() {
     const keyword = searchEl.value.toLowerCase();
@@ -410,8 +399,13 @@ function renderTotals() {
     paidHiddenEl.value = paid;
     paidFieldEl.style.display = isCash ? '' : 'none';
     changeRowEl.style.display = isCash ? '' : 'none';
-    midtransPayBtn.classList.toggle('is-hidden', isCash);
-    cashPayBtn.classList.toggle('is-hidden', !isCash);
+    submitActionEl.value = isCash ? 'print_receipt' : 'pay_midtrans';
+    if (paymentSubmitBtn) {
+        const icon = paymentSubmitBtn.querySelector('i');
+        if (icon) {
+            icon.className = isCash ? 'bi bi-cash-coin' : 'bi bi-qr-code-scan';
+        }
+    }
     totalItemsEl.textContent = qty;
     grandEl.textContent = money(total);
     changeEl.textContent = money(Math.max(paid - total, 0));
