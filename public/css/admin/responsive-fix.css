@@ -133,7 +133,7 @@
     min-height:54px!important;
     padding:10px 24px!important;
     align-items:center!important;
-    justify-content:center!important;
+    justify-content:flex-end!important;
     border-top:1px solid #E7EEF6!important;
     background:rgba(255,255,255,.96)!important;
     box-shadow:0 -8px 24px rgba(15,23,42,.04)!important;
@@ -431,7 +431,7 @@
 
 @media(max-width:1180px){
     .admin-footer{
-        justify-content:center!important;
+        justify-content:flex-end!important;
         min-height:52px!important;
         padding:0 16px!important;
     }

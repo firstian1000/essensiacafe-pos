@@ -19,14 +19,14 @@
 
 
 /* Customer footer */
-.customer-footer{max-width:1280px;margin:20px auto 0;padding:22px 24px 28px;display:flex;align-items:center;justify-content:center;gap:18px;color:#64748B;text-align:center}
+.customer-footer{max-width:1280px;margin:20px auto 0;padding:22px 24px 28px;display:flex;align-items:center;justify-content:flex-end;gap:18px;color:#64748B;text-align:right}
 .customer-footer .footer-credit{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
 .customer-footer .footer-credit small{color:#7B8797;font-size:10px;font-weight:700;line-height:1}
 .customer-footer .footer-credit div{display:inline-flex;align-items:center;justify-content:center;gap:12px}
 .customer-footer .footer-credit strong{color:#0A84CF;font-size:13px;font-weight:950;line-height:1}
 .customer-footer .footer-credit span{width:1px;height:14px;background:#CBD5E1;display:inline-block}
 .customer-footer .footer-credit em{min-width:58px;height:22px;padding:0 10px;border-radius:999px;background:#EAF4FB;color:#0A84CF;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-style:normal;font-weight:950;line-height:1}
-@media(max-width:720px){.customer-footer{justify-content:center;padding:18px 14px 104px}}
+@media(max-width:720px){.customer-footer{justify-content:flex-end;padding:18px 14px 104px}}
 
 
 /* Remove customer menu hero logo */

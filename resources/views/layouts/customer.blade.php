@@ -25,7 +25,7 @@
 
 
 
-    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=23">
+    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=24">
 
     @stack('head')
 
@@ -136,6 +136,8 @@
     @yield('content')
 
 </main>
+
+@include('partials.customer-footer')
 
 
 
