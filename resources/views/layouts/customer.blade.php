@@ -25,7 +25,7 @@
 
 
 
-    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=24">
+    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=26">
 
     @stack('head')
 
