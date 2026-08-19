@@ -8,25 +8,16 @@
     <div class="form-group">
         <label class="form-label">Nama Pengeluaran <span class="text-danger">*</span></label>
         <select name="name" class="form-control" required>
-            @php($selectedName = old('name', $expense?->name ?? 'Lain-lain'))
+            @php($selectedName = old('name', $expense?->name ?? 'Gaji Karyawan'))
             <option value="Gaji Karyawan" {{ $selectedName === 'Gaji Karyawan' ? 'selected' : '' }}>Gaji Karyawan</option>
-            <option value="Lain-lain" {{ $selectedName === 'Lain-lain' ? 'selected' : '' }}>Lain-lain</option>
+            <option value="Internet" {{ $selectedName === 'Internet' ? 'selected' : '' }}>Internet</option>
+            <option value="Listrik" {{ $selectedName === 'Listrik' ? 'selected' : '' }}>Listrik</option>
         </select>
         @error('name')<small class="text-danger">{{ $message }}</small>@enderror
     </div>
 </div>
 
 <div class="form-row">
-    <div class="form-group">
-        <label class="form-label">Kategori <span class="text-danger">*</span></label>
-        <select name="category" class="form-control" required>
-            @php($selectedCategory = old('category', $expense?->category ?? 'Internal'))
-            <option value="Internal" {{ $selectedCategory === 'Internal' ? 'selected' : '' }}>Internal</option>
-            <option value="External" {{ $selectedCategory === 'External' ? 'selected' : '' }}>External</option>
-        </select>
-        @error('category')<small class="text-danger">{{ $message }}</small>@enderror
-    </div>
-
     <div class="form-group">
         <label class="form-label">Nominal <span class="text-danger">*</span></label>
         <input type="number" name="amount" class="form-control" value="{{ old('amount', $expense?->amount) }}" min="0" placeholder="Masukkan nominal" required>

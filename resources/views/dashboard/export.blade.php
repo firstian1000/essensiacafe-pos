@@ -13,7 +13,7 @@
 </head>
 <body>
 <table>
-    <tr><td colspan="8" class="title">Rekap Data Essensia Koffie</td></tr>
+    <tr><td colspan="8" class="title">Rekap Data Esensia Koffie</td></tr>
     <tr><td colspan="8">Periode: {{ $periodLabel ?? \Carbon\Carbon::parse($selectedDate)->format('d/m/Y') }}</td></tr>
     <tr><td colspan="8">Filter: Pembayaran {{ ucfirst(str_replace('_', ' ', $paymentFilter ?? 'all')) }} | Brand {{ ucfirst($brandFilter ?? 'all') }}</td></tr>
     <tr><td colspan="8">Dicetak: {{ $generatedAt }}</td></tr>

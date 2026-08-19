@@ -19,8 +19,8 @@
     @endphp
 
     <main class="thermal-receipt">
-        <div class="receipt-logo">Essensia<br>Koffie</div>
-        <h1>Essensia Koffie</h1>
+        <div class="receipt-logo">Esensia<br>Koffie</div>
+        <h1>Esensia Koffie</h1>
         <p class="receipt-address">
             Gg. Kurma, Ngijo Gunungpati<br>
             Semarang<br>
@@ -30,7 +30,7 @@
         <div class="receipt-meta">
             <div><span>Receipt No.</span><strong>{{ $order->invoice }}</strong></div>
             <div><span>{{ $order->created_at->format('d/m/Y H.i.s') }}</span></div>
-            <div><span>User</span><strong>Admin Essensia</strong></div>
+            <div><span>User</span><strong>Admin Esensia</strong></div>
             <div><span>Order No.</span><strong>{{ $order->customer_name }}</strong></div>
             <div><span>Metode</span><strong>{{ $paymentLabel }}</strong></div>
             <div><span>Layanan</span><strong>{{ $serviceLabel }}</strong></div>

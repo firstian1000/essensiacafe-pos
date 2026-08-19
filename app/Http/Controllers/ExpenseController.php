@@ -23,7 +23,6 @@ class ExpenseController extends Controller
             ->when($request->search, function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('name', 'like', '%'.$request->search.'%')
-                        ->orWhere('category', 'like', '%'.$request->search.'%')
                         ->orWhere('note', 'like', '%'.$request->search.'%');
                 });
             });
@@ -99,8 +98,7 @@ class ExpenseController extends Controller
     {
         return $request->validate([
             'expense_date' => ['required', 'date'],
-            'name' => ['required', 'in:Gaji Karyawan,Lain-lain'],
-            'category' => ['required', 'in:Internal,External'],
+            'name' => ['required', 'in:Gaji Karyawan,Internet,Listrik'],
             'amount' => ['required', 'integer', 'min:0'],
             'note' => ['nullable', 'string'],
         ]);

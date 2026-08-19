@@ -18,7 +18,7 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
     <div class="container">
 
         <a class="navbar-brand d-flex align-items-center" href="/">
-             <img src="{{ asset('images/logo.png') }}?v=5" alt="Essensia Koffie" style="height: 48px;">
+             <img src="{{ asset('images/logo.png') }}?v=5" alt="Esensia Koffie" style="height: 48px;">
         </a>
 
         <div class="navbar-nav">

@@ -12,10 +12,10 @@
     <!-- Logo -->
     <div class="sidebar-logo">
 
-        <img src="{{ asset('images/logo.png') }}?v=5" alt="Essensia Koffie">
+        <img src="{{ asset('images/logo.png') }}?v=5" alt="Esensia Koffie">
 
         <div class="logo-text">
-            <h3>Essensia Koffie</h3>
+            <h3>Esensia Koffie</h3>
             <small>Coffee & Space</small>
         </div>
 

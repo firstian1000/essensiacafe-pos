@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Daftar Admin - Essensia Koffie</title>
+    <title>Daftar Admin - Esensia Koffie</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -11,11 +11,11 @@
 </head>
 <body>
     <main class="login-page">
-        <section class="login-visual" aria-label="Essensia Koffie">
+        <section class="login-visual" aria-label="Esensia Koffie">
             <div class="brand-mark">
-                <img src="{{ asset('images/logo.png') }}" alt="Essensia Koffie">
+                <img src="{{ asset('images/logo.png') }}" alt="Esensia Koffie">
                 <div>
-                    <strong>Essensia Koffie</strong>
+                    <strong>Esensia Koffie</strong>
                     <span>Coffee & Space</span>
                 </div>
             </div>
@@ -23,7 +23,7 @@
             <div class="visual-copy">
                 <span class="eyebrow">Admin Access</span>
                 <h1>Mulai kelola operasional cafe.</h1>
-                <p>Buat akun admin untuk membuka dashboard Essensia.</p>
+                <p>Buat akun admin untuk membuka dashboard Esensia.</p>
             </div>
 
             <div class="visual-stats">
@@ -35,8 +35,8 @@
 
         <section class="login-panel">
             <div class="mobile-brand">
-                <img src="{{ asset('images/logo.png') }}" alt="Essensia Koffie">
-                <span>Essensia Koffie</span>
+                <img src="{{ asset('images/logo.png') }}" alt="Esensia Koffie">
+                <span>Esensia Koffie</span>
             </div>
 
             <div class="login-card">
@@ -77,7 +77,7 @@
                         <span>Email</span>
                         <div class="input-shell">
                             <i class="bi bi-envelope"></i>
-                            <input type="email" name="email" value="{{ old('email') }}" placeholder="essensia@gmail.com" autocomplete="email" required>
+                            <input type="email" name="email" value="{{ old('email') }}" placeholder="esensia@gmail.com" autocomplete="email" required>
                         </div>
                     </label>
 

@@ -17,14 +17,14 @@ class DatabaseSeeder extends Seeder
         User::query()->delete();
 
         User::create([
-            'name' => 'Admin Essensia',
+            'name' => 'Admin Esensia',
             'email' => 'admin@essensia.com',
             'password' => Hash::make('eseadmin'),
             'role' => 'admin',
         ]);
 
         User::create([
-            'name' => 'Kasir Essensia',
+            'name' => 'Kasir Esensia',
             'email' => 'kasir@essensia.com',
             'password' => Hash::make('KoffieEsensia88'),
             'role' => 'cashier',

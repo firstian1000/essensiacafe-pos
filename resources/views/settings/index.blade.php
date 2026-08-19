@@ -203,7 +203,7 @@
                         name="wifi_username"
                         class="form-control"
                         value="{{ old('wifi_username', $settings['wifi_username']) }}"
-                        placeholder="Contoh: Essensia Koffie">
+                        placeholder="Contoh: Esensia Koffie">
                     @error('wifi_username')
                         <small class="text-danger mt-1">{{ $message }}</small>
                     @enderror

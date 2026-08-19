@@ -608,8 +608,8 @@ body {
     <div class="thermal-inner thermal-receipt-unified">
 
         {{-- Logo --}}
-        <div class="t-logo">Essensia<br>Koffie</div>
-        <div class="t-title">Essensia Koffie</div>
+        <div class="t-logo">Esensia<br>Koffie</div>
+        <div class="t-title">Esensia Koffie</div>
         <div class="t-addr">
             Gg. Kurma, Ngijo Gunungpati<br>
             Semarang<br>
@@ -630,7 +630,7 @@ body {
             </div>
             <div class="t-meta-row">
                 <span>User</span>
-                <strong>Admin Essensia</strong>
+                <strong>Admin Esensia</strong>
             </div>
             <div class="t-meta-row">
                 <span>Order No.</span>

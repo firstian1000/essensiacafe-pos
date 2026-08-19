@@ -493,7 +493,7 @@
 
                 <h6>{{ $navbarUser?->name ?? 'Admin' }}</h6>
 
-                <small>{{ $navbarUser?->role === 'cashier' ? 'Kasir Essensia' : 'Admin Essensia' }}</small>
+                <small>{{ $navbarUser?->role === 'cashier' ? 'Kasir Esensia' : 'Admin Esensia' }}</small>
 
             </div>
 

@@ -3,7 +3,7 @@
 @section('title', 'Pembayaran QRIS')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/payment.css') }}?v=12">
+<link rel="stylesheet" href="{{ asset('css/admin/payment.css') }}?v=13">
 <style>
     .qris-page {
         display: grid;

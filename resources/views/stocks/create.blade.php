@@ -66,14 +66,6 @@
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Biaya Pembelian Stok <span class="text-danger">*</span></label>
-                    <input type="number" name="purchase_amount" class="form-control" value="{{ old('purchase_amount') }}" min="0" placeholder="Masukkan biaya pembelian stok" required>
-                    @error('purchase_amount')<small class="text-danger">{{ $message }}</small>@enderror
-                </div>
-            </div>
-
             <div class="form-footer">
                 <a href="{{ route('stocks.index') }}" class="btn-cancel">
                     <i class="bi bi-arrow-left"></i>

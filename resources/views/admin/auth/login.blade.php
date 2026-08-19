@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login Admin - Essensia Koffie</title>
+    <title>Login Admin - Esensia Koffie</title>
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -11,11 +11,11 @@
 </head>
 <body>
     <main class="login-page">
-        <section class="login-visual" aria-label="Essensia Koffie">
+        <section class="login-visual" aria-label="Esensia Koffie">
             <div class="brand-mark">
-                <img src="{{ asset('images/logo.png') }}" alt="Essensia Koffie">
+                <img src="{{ asset('images/logo.png') }}" alt="Esensia Koffie">
                 <div>
-                    <strong>Essensia Koffie</strong>
+                    <strong>Esensia Koffie</strong>
                     <span>Coffee & Space</span>
                 </div>
             </div>
@@ -35,8 +35,8 @@
 
         <section class="login-panel">
             <div class="mobile-brand">
-                <img src="{{ asset('images/logo.png') }}" alt="Essensia Koffie">
-                <span>Essensia Koffie</span>
+                <img src="{{ asset('images/logo.png') }}" alt="Esensia Koffie">
+                <span>Esensia Koffie</span>
             </div>
 
             <div class="login-card">
@@ -54,13 +54,6 @@
                         {{ $errors->first() }}
                     </div>
                 @endif
-
-                <a href="{{ route('login.google') }}" class="btn-google">
-                    <i class="bi bi-google"></i>
-                    Masuk dengan Google
-                </a>
-
-                <div class="login-divider"><span>atau masuk dengan email</span></div>
 
                 <form action="{{ route('login') }}" method="POST" class="login-form" autocomplete="off">
                     @csrf
@@ -95,7 +88,6 @@
                     </button>
                 </form>
 
-                <div class="login-divider"><span><a href="{{ route('register') }}">Belum punya akun? Daftar</a></span></div>
             </div>
         </section>
     </main>

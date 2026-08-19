@@ -158,7 +158,7 @@
 @php
     $dateLabel = $periodLabel ?? \Carbon\Carbon::parse($selectedDate)->translatedFormat('d F Y');
     $paymentLabel = $paymentFilter === 'cash' ? 'Tunai' : ($paymentFilter === 'non_cash' ? 'Non Tunai' : 'Semua Pembayaran');
-    $brandLabel = $brandFilter === 'buncha' ? 'Buncha' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand');
+    $brandLabel = $brandFilter === 'buncha' ? 'Buncha' : ($brandFilter === 'essensia' ? 'Esensia' : 'Semua Brand');
     $rupiah = fn ($value) => 'Rp ' . number_format((int) $value, 0, ',', '.');
 @endphp
 
@@ -168,7 +168,7 @@
             <span class="logo-mark">EK</span>
         </div>
         <div class="brand-right">
-            Essensia Koffie<br>
+            Esensia Koffie<br>
             Dicetak {{ $generatedAt }}
         </div>
     </div>
@@ -217,7 +217,7 @@
 
     <div class="share-box">
         <div class="share-card">
-            <span>Share Essensia 60%</span>
+            <span>Share Esensia 60%</span>
             <strong>{{ $rupiah($essensiaShare) }}</strong>
         </div>
         <div class="share-card">

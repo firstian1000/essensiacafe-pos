@@ -3,7 +3,7 @@
 @section('title', 'Pembayaran Non Tunai')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/admin/payment.css') }}?v=12">
+<link rel="stylesheet" href="{{ asset('css/admin/payment.css') }}?v=13">
 <style>
     .midtrans-wait-page {
         display: grid;

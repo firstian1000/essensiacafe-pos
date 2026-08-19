@@ -3,7 +3,7 @@
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/admin/menu.css') }}?v=23">
 <style>
-.expense-table-header,.expense-item{grid-template-columns:70px 160px minmax(240px,2fr) 170px 170px 180px 150px!important}
+.expense-table-header,.expense-item{grid-template-columns:70px 160px minmax(260px,2fr) 170px minmax(220px,1.4fr) 150px!important}
 .expense-badge{display:inline-flex;align-items:center;justify-content:center;min-width:92px;height:36px;border-radius:999px;padding:0 14px;font-weight:950;background:#EAF4FB;color:#2E7DB8}
 .expense-total-box{display:flex;align-items:center;gap:14px;padding:18px 22px;margin-bottom:18px;border:1px solid #DDEAF7;border-radius:18px;background:#F8FBFF}
 .expense-total-box i{width:52px;height:52px;border-radius:16px;background:#FFF8E1;color:#D97706;display:inline-flex;align-items:center;justify-content:center;font-size:24px}
@@ -74,7 +74,6 @@
                 <div>No</div>
                 <div>Tanggal</div>
                 <div>Nama</div>
-                <div>Kategori</div>
                 <div>Nominal</div>
                 <div>Catatan</div>
                 <div>Aksi</div>
@@ -87,7 +86,6 @@
                 <div class="menu-info" data-label="Nama">
                     <h5>{{ $expense->name }}</h5>
                 </div>
-                <div data-label="Kategori"><span class="expense-badge">{{ $expense->category ?: 'Internal' }}</span></div>
                 <div data-label="Nominal"><strong>Rp {{ number_format($expense->amount,0,',','.') }}</strong></div>
                 <div data-label="Catatan">{{ $expense->note ?: '-' }}</div>
                 <div class="action-buttons" data-label="Aksi">

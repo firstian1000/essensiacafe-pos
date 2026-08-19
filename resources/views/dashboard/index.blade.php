@@ -15,7 +15,7 @@
     <div class="dashboard-header">
         <div>
             <h1>Selamat datang kembali, Admin! 👋</h1>
-            <p>Berikut ringkasan aktivitas operasional Essensia Koffie hari ini.</p>
+            <p>Berikut ringkasan aktivitas operasional Esensia Koffie hari ini.</p>
         </div>
     </div>
 
@@ -165,7 +165,7 @@
                 <span>Brand</span>
                 <select name="brand_filter" onchange="this.form.submit()">
                     <option value="all" {{ $brandFilter === 'all' ? 'selected' : '' }}>Semua</option>
-                    <option value="essensia" {{ $brandFilter === 'essensia' ? 'selected' : '' }}>Essensia</option>
+                    <option value="essensia" {{ $brandFilter === 'essensia' ? 'selected' : '' }}>Esensia</option>
                     <option value="buncha" {{ $brandFilter === 'buncha' ? 'selected' : '' }}>Buncha</option>
                 </select>
             </label>
@@ -265,7 +265,7 @@
                         <small style="color:#64748B;font-weight:800;">
                             {{ $paymentFilter === 'cash' ? 'Tunai' : ($paymentFilter === 'non_cash' ? 'Non Tunai' : 'Semua Pembayaran') }}
                             -
-                            {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand') }}
+                            {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Esensia' : 'Semua Brand') }}
                         </small>
                     </div>
                     <span class="btn-filter">Total: Rp {{ number_format($filteredRevenueTotal, 0, ',', '.') }}</span>
@@ -284,7 +284,7 @@
                         <small style="color:#64748B;font-weight:800;">
                             {{ $paymentFilter === 'cash' ? 'Tunai' : ($paymentFilter === 'non_cash' ? 'Non Tunai' : 'Semua Pembayaran') }}
                             -
-                            {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Essensia' : 'Semua Brand') }}
+                            {{ $brandFilter === 'buncha' ? 'Buncha (Dimsum)' : ($brandFilter === 'essensia' ? 'Esensia' : 'Semua Brand') }}
                         </small>
                     </div>
                     <span class="btn-filter">{{ $periodType === 'day' ? '7 Hari Terakhir' : $periodLabel }}</span>

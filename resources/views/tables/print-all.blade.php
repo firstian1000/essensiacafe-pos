@@ -59,7 +59,7 @@
 
     <div class="company-name">
 
-        Essensia Koffie
+        Esensia Koffie
 
     </div>
 

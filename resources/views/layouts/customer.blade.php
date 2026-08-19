@@ -8,12 +8,12 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Essensia Koffie - Order</title>
+    <title>Esensia Koffie - Order</title>
 
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
-    <meta name="description" content="Pesan menu favoritmu di Essensia Koffie. Fresh Coffee, Good Vibes.">
+    <meta name="description" content="Pesan menu favoritmu di Esensia Koffie. Fresh Coffee, Good Vibes.">
 
 
 
@@ -21,11 +21,11 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <link rel="stylesheet" href="{{ asset('css/customer/cafe.css') }}?v=29">
+    <link rel="stylesheet" href="{{ asset('css/customer/cafe.css') }}?v=30">
 
 
 
-    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=26">
+    <link rel="stylesheet" href="{{ asset('css/customer/responsive-fix.css') }}?v=27">
 
     @stack('head')
 
@@ -47,9 +47,9 @@
 
            class="navbar-brand-custom">
 
-            <img src="{{ asset('images/logo.png') }}?v=5" alt="Essensia Koffie" class="brand-logo-img" style="max-height: 60px; height: 60px; width: auto; object-fit: contain;">
+            <img src="{{ asset('images/logo.png') }}?v=5" alt="Esensia Koffie" class="brand-logo-img" style="max-height: 60px; height: 60px; width: auto; object-fit: contain;">
             <span class="brand-copy">
-                <strong>Essensia Koffie</strong>
+                <strong>Esensia Koffie</strong>
                 <small>Coffee & Space</small>
             </span>
 

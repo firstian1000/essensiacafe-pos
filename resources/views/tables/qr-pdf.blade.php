@@ -81,7 +81,7 @@
 <body>
     <div class="pdf-page">
         <div class="qr-item">
-            <div class="company-name">Essensia Koffie</div>
+            <div class="company-name">Esensia Koffie</div>
 
             <div class="table-name">{{ strtoupper($table->table_number) }}</div>
 

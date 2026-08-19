@@ -50,14 +50,14 @@ class DashboardController extends Controller
         $exportData = $this->buildExportData($date, $paymentFilter, $brandFilter, $startDate, $endDate, $periodLabel);
 
         if ($format === 'pdf') {
-            $filename = 'laporan-essensia-koffie-' . $periodType . '-' . $date . '.pdf';
+            $filename = 'laporan-esensia-koffie-' . $periodType . '-' . $date . '.pdf';
 
             return Pdf::loadView('dashboard.export-pdf', $exportData)
                 ->setPaper('a4', 'portrait')
                 ->download($filename);
         }
 
-        $filename = 'rekap-essensia-koffie-' . $periodType . '-' . $date . '.xls';
+        $filename = 'rekap-esensia-koffie-' . $periodType . '-' . $date . '.xls';
 
         return response()->streamDownload(function () use ($exportData) {
             echo view('dashboard.export', $exportData)->render();

@@ -33,13 +33,13 @@
 
 
 
-<link rel="stylesheet" href="{{ asset('css/admin/admin.css') }}?v=11">
+<link rel="stylesheet" href="{{ asset('css/admin/admin.css') }}?v=12">
 
 
 
 @stack('styles')
 
-<link rel="stylesheet" href="{{ asset('css/admin/responsive-fix.css') }}?v=21">
+<link rel="stylesheet" href="{{ asset('css/admin/responsive-fix.css') }}?v=22">
 
 
 
